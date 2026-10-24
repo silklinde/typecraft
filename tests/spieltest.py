@@ -33,10 +33,10 @@ with sync_playwright() as p:
             pg.wait_for_timeout(7000); pg.screenshot(path=f'{AUS}/level0_haende3_demo.png')
             taste('Enter'); pg.wait_for_timeout(300)   # Demo überspringen
             assert pg.evaluate('hz.step') == 'tippen'
-            for k in ['a', 's', 'd', 'f', ' ']: taste(k); pg.wait_for_timeout(150)
+            for k in ['f', 'j', 'd', 's', 'a']: taste(k); pg.wait_for_timeout(150)
             taste('x'); pg.wait_for_timeout(150)       # falsche Taste zählt nicht
             pg.screenshot(path=f'{AUS}/level0_haende4_tippen.png')
-            for k in ['j', 'k', 'l', 'ö']: taste(k); pg.wait_for_timeout(150)
+            for k in ['k', 'l', 'ö', ' ']: taste(k); pg.wait_for_timeout(150)
             pg.wait_for_timeout(2300)
             assert pg.evaluate('phase') == 'grund'
             pg.screenshot(path=f'{AUS}/level0_grund.png')

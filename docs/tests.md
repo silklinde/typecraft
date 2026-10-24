@@ -11,4 +11,4 @@ Hinweise:
 - Zustand kann über `page.evaluate` gesetzt werden: `st.stars={0:3,...}; save(); renderMenu(); start(13)`.
 - Der Bot liest `lowestBlock().key` und drückt die Taste. Level 16 (48 Treffer) braucht länger, die Schleife braucht mehr Durchläufe.
 - Netz im Container ist eingeschränkt, `npm install` externer Pakete (z. B. jsdom) kann scheitern. Playwright reicht.
-- Level 0 beginnt mit „Hände auflegen“: Der Bot wartet die Demo ab oder sendet `Enter` (überspringt die Demo), tippt dann A S D F ␣ J K L Ö und danach F J ␣ F J ␣. Playwright ggf. mit `pip3 install playwright && python3 -m playwright install chromium` einrichten.
+- Level 0 beginnt mit „Hände auflegen“: Der Bot wartet die Demo ab oder sendet `Enter` (überspringt die Demo), tippt dann F J D S A K L Ö ␣ und danach F J ␣ F J ␣. Playwright ggf. mit `pip3 install playwright && python3 -m playwright install chromium` einrichten.
