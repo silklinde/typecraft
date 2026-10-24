@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tipp-Mine (Prototyp v9)</title>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#1d1d1d;color:#fff;}
+  #app{max-width:none;margin:0 auto;padding:12px 16px;}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .badge{background:#2b2b2b;border:3px solid #000;padding:6px 10px;border-radius:4px;font-weight:bold;}
+  .emerald{color:#41ea7a;}
+  .btn{background:#5a5a5a;color:#fff;border:3px solid #000;border-radius:4px;padding:10px 14px;font-size:16px;font-weight:bold;cursor:pointer;margin:4px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn.green{background:#4caf50;}
+  .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
+  h2{margin:4px 0 8px;font-size:18px;}
+  #biome{position:relative;height:clamp(520px,80vh,760px);--kh:clamp(52px,8.2vh,80px);--sp:calc(var(--kh)*.7);--kbh:calc(var(--kh)*3 + var(--sp) + 24px);margin:12px 0;border:4px solid #000;border-radius:4px;overflow:hidden;}
+  .biome-wald{background:linear-gradient(#7ec8ff 0%,#a8e6a1 60%,#3c7d2e 100%);}
+  .biome-hoehle{background:linear-gradient(#3a3a3a,#2b2b2b 60%,#555);}
+  .pet{position:absolute;bottom:10px;font-size:44px;transition:transform .2s;}
+  .keys{display:flex;gap:4px;margin-top:8px;}
+  .keycap{flex:1;text-align:center;padding:8px 0;min-width:0;background:#444;border:3px solid #000;border-radius:4px;font-weight:bold;font-size:18px;}
+  #hint{min-height:26px;margin:10px 0;color:#ffd166;font-size:17px;}
+  .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+  /* Modal liegt immer über allem, auch über den Händen */
+  #overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;}
+  #overlay .box{background:#2b2b2b;border:4px solid #000;border-radius:4px;padding:20px;max-width:420px;text-align:center;
+                transform-origin:center center;animation:grow .35s ease-out;}
+  @keyframes grow{0%{transform:scale(.05);opacity:0}100%{transform:scale(1);opacity:1}}
+  .hidden{display:none !important;}
+  .stars{color:#ffd166;font-size:28px;letter-spacing:4px;}
+
+  /* ---------- Spielfeld mit Tastatur und Händen (Grundhaltung und alle Level) ---------- */
+  /* F und J sind Holzblöcke, die mit bloßer Hand abgebaut werden */
+  .bigkey{position:absolute;top:76px;transform:translateX(-50%);width:clamp(96px,17vh,150px);height:clamp(96px,17vh,150px);
+          display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+          font-size:clamp(56px,10vh,92px);line-height:1;font-weight:bold;color:#fff;text-shadow:3px 3px 0 #000;
+          background-image:var(--wood);background-size:100% 100%;image-rendering:pixelated;border:4px solid #000;
+          box-shadow:inset -8px -8px 0 rgba(0,0,0,.3),inset 8px 8px 0 rgba(255,255,255,.18);
+          transition:transform .15s,outline-color .15s;}
+  .bigkey.next{transform:translateX(-50%) scale(1.1);outline:4px solid #ffd166;}
+  .bigkey.hit{transform:translateX(-50%) scale(.9);}
+  #bigS{width:clamp(150px,24vh,230px);height:clamp(56px,10vh,90px);font-size:clamp(20px,3.4vh,34px);}
+
+  /* Fallbereich: endet an der Oberkante der Tastatur (obere Reihe) */
+  .lanes{position:absolute;left:16px;right:16px;top:0;height:calc(100% - var(--kbh) - 60px);}
+  .block{position:absolute;transform:translateX(-50%);width:64px;height:64px;border:3px solid #000;box-sizing:border-box;
+         display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:28px;color:#fff;text-shadow:2px 2px 0 #000;
+         box-shadow:inset -4px -4px 0 rgba(0,0,0,.35),inset 4px 4px 0 rgba(255,255,255,.2);background-size:100% 100%;image-rendering:pixelated;}
+  .block.stone{background-image:var(--stone);}
+  .block.coal{background-image:var(--coal);}
+  .block.iron{background-image:var(--iron);}
+  .block.diamond{background-image:var(--diamond);}
+  .block.glow{outline:4px solid #ffd166;}
+
+  /* Tastatur: 1 Taste = 4 Spaltenviertel, damit die Reihen wie bei QWERTZ versetzt liegen (Q: 0, A: +1/4, Y: +3/4 Taste) */
+  .kb{position:absolute;left:16px;right:16px;bottom:60px;display:grid;grid-template-columns:repeat(45,1fr);
+      grid-template-rows:var(--kh) var(--kh) var(--kh) var(--sp);row-gap:8px;}
+  .ikey{box-sizing:border-box;margin:0 4px;background:#444;border:3px solid #000;border-radius:4px;z-index:1;
+        box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);transition:transform .12s,background .12s,box-shadow .12s,opacity .2s;}
+  .ikey.home{background:#6b5a2a;}
+  .ikey.off{opacity:.3;}
+  .ikey.new{border-color:#c9a227;}
+  .ikey.next{box-shadow:inset 0 -6px 0 rgba(0,0,0,.35),0 0 0 4px #ffd166;}
+  .ikey.pressed{transform:translateY(6px);background:#c9a227;}
+  .ikey.space{grid-row:4;grid-column:10 / 35;}
+  /* Beschriftung in einer eigenen Ebene über den Händen, damit die Buchstaben auch unter den Fingern lesbar sind */
+  .lbl{z-index:6;pointer-events:none;display:flex;justify-content:center;align-items:flex-start;padding-top:6px;box-sizing:border-box;
+       font-size:clamp(20px,3.4vh,30px);font-weight:bold;text-shadow:2px 2px 0 #000;transition:opacity .2s,color .12s;}
+  .lbl.off{opacity:.3;}
+  .lbl.next{color:#ffd166;}
+
+  /* Minecraft-Arme: Finger reichen von der Grundreihe über die untere Reihe bis zum Arm (der Arm beginnt unter der unteren Reihe) */
+  .fing{z-index:2;grid-row:2 / 4;align-self:start;height:calc(100% - var(--dy,0px));margin:0 4px;
+        background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;
+        border:3px solid #000;border-bottom:0;border-radius:3px 3px 0 0;box-sizing:border-box;
+        transition:transform .15s,filter .15s;transform:translate(var(--dx,0px),var(--dy,0px));}
+  .fing.hover{transform:translate(var(--dx,0px),calc(var(--dy,0px) - 8px));filter:brightness(1.15);}
+  .fing.press{transform:translate(var(--dx,0px),calc(var(--dy,0px) + 8px));}
+  .arm{z-index:3;grid-row:4;align-self:start;height:600px;margin:-8px 4px 0;box-sizing:border-box;border:3px solid #000;background-color:#00a0b8;
+       background-image:var(--askin),var(--sleeve);background-size:100% 110px,100% 110px;
+       background-position:0 0,0 110px;background-repeat:no-repeat,repeat-y;}
+  .arm.l{grid-column:2 / 18;}
+  .arm.r{grid-column:26 / 42;}
+  /* Daumen: kommen von der Innenseite der Arme und liegen auf der Leertaste */
+  .thumb{z-index:4;grid-row:4;align-self:stretch;box-sizing:border-box;border:3px solid #000;pointer-events:none;
+         background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;transition:transform .15s,filter .15s;}
+  .thumb.l{grid-column:18 / 22;margin-left:-6px;margin-right:4px;border-radius:0 10px 10px 0;}
+  .thumb.r{grid-column:22 / 26;margin-left:4px;margin-right:-6px;border-radius:10px 0 0 10px;}
+  .thumb.hover{transform:translateY(-8px);filter:brightness(1.15);}
+  .thumb.press{transform:translateY(8px);}
+
+  /* Einführung neuer Tasten: Erzblöcke über der Mitte ihrer Taste */
+  .newrow{position:absolute;left:16px;right:16px;top:74px;}
+  .nk{position:absolute;translate:-50% 0;width:clamp(72px,12vh,108px);aspect-ratio:1 / 1;box-sizing:border-box;
+      display:flex;align-items:center;justify-content:center;
+      font-size:clamp(36px,7vh,64px);line-height:1;font-weight:bold;color:#fff;text-shadow:3px 3px 0 #000;
+      background-size:100% 100%;image-rendering:pixelated;border:4px solid #000;
+      box-shadow:inset -8px -8px 0 rgba(0,0,0,.3),inset 8px 8px 0 rgba(255,255,255,.18);transition:scale .15s;}
+  .nk.coal{background-image:var(--coal);}
+  .nk.iron{background-image:var(--iron);}
+  .nk.diamond{background-image:var(--diamond);}
+  .nk.next{scale:1.1;outline:4px solid #ffd166;}
+  .nk.hit{scale:.9;}
+
+  /* Erfolg im Modal: neue Spitzhacke */
+  .reward{margin-top:14px;background:#1f1f1f;border:3px solid #000;border-radius:4px;padding:12px;animation:pop .45s ease-out .3s both;}
+  .reward .rw-title{color:#ffd166;font-weight:bold;margin-bottom:6px;}
+  .reward svg{display:block;margin:0 auto;}
+  .reward .rw-name{font-size:20px;font-weight:bold;margin-top:6px;}
+  .reward .rw-text{font-size:14px;opacity:.85;margin-top:4px;}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:scale(1);opacity:1}}
+  .badge svg{vertical-align:middle;margin-right:4px;}
+  .emsvg{vertical-align:middle;}
+
+  /* Oben rechts: Smaragd-Zähler und Schnellzugriffsleiste mit 4 Slots für die Spitzhacken */
+  .hud{display:flex;align-items:center;gap:14px;}
+  .counter{display:flex;align-items:center;gap:8px;font-size:26px;font-weight:bold;color:#fff;text-shadow:2px 2px 0 #3f3f3f;
+           background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:4px 14px 4px 8px;}
+  .counter #emIcon{display:inline-flex;}
+  .hotbar{display:flex;gap:4px;background:#c6c6c6;border:3px solid #000;padding:4px;border-radius:2px;
+          box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 #555;}
+  .slot{position:relative;width:46px;height:46px;box-sizing:border-box;background:#8b8b8b;border:3px solid;
+        border-color:#373737 #fff #fff #373737;display:flex;align-items:center;justify-content:center;}
+  .slot svg{image-rendering:pixelated;}
+  .slot.sel::after{content:'';position:absolute;inset:-6px;border:4px solid #fff;box-shadow:0 0 0 2px #000,inset 0 0 0 2px #000;pointer-events:none;}
+  .slot.got svg{animation:pop .5s ease-out;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="badge">Tipp-Mine</div>
+    <div class="hud">
+      <div class="counter"><span id="emIcon"></span><span id="emeralds">0</span></div>
+      <div class="hotbar" id="hotbar"></div>
+    </div>
+  </header>
+
+  <div id="menu">
+    <div class="panel">
+      <h2>Level</h2>
+      <div id="levels"></div>
+    </div>
+    <div class="panel">
+      <h2>Shop</h2>
+      <div id="shop"></div>
+    </div>
+  </div>
+
+  <div id="game" class="hidden">
+    <div class="row">
+      <button class="btn" id="backBtn">← Menü</button>
+      <button class="btn" id="hintBtn">Hinweis (3)</button>
+    </div>
+    <div id="hint"></div>
+    <div id="biome" class="biome-wald">
+      <div id="field" style="position:absolute;inset:0;"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="overlay"><div class="box" id="overlayBox"></div></div>
+
+<script>
+const KEY = 'tipp-mine-v6';
+
+// ---------- Pixel-Texturen (Minecraft-Look) ----------
+(function(){
+  const px = svg => 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  const tex = (w, h, base, patches) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" shape-rendering="crispEdges">` +
+    `<rect width="${w}" height="${h}" fill="${base}"/>` +
+    patches.map(p => `<rect x="${p[0]}" y="${p[1]}" width="${p[2]}" height="${p[3]}" fill="${p[4]}"/>`).join('') +
+    `</svg>`;
+  const D = '#9e7860', L = '#bf9378';
+  const r = document.documentElement.style;
+  r.setProperty('--askin', px(tex(32, 16, '#b08468', [
+    [3,2,3,4,D],[14,5,4,5,D],[24,2,3,3,D],[8,10,4,3,D],[26,10,4,4,D],[18,13,3,3,D],[20,0,4,2,L],[0,12,3,3,L]
+  ])));
+  r.setProperty('--fskin', px(tex(8, 12, '#b08468', [
+    [1,3,2,3,D],[5,7,2,4,D],[4,0,3,2,L]
+  ])));
+  r.setProperty('--sleeve', px(tex(32, 16, '#00a0b8', [
+    [0,0,5,3,'#0094ad'],[10,2,6,4,'#00aec7'],[22,0,6,3,'#0094ad'],[4,8,6,4,'#0094ad'],[18,9,7,4,'#00aec7'],[28,12,4,3,'#0094ad']
+  ])));
+  // Eigene Pixel-Texturen für Holz, Stein und Kohle
+  r.setProperty('--wood', px(tex(8, 8, '#a8793a', [
+    [0,0,3,1,'#c9985a'],[5,0,2,1,'#c9985a'],[1,3,2,1,'#c9985a'],
+    [0,2,8,1,'#8a5f2c'],[0,5,8,1,'#8a5f2c'],[4,3,1,2,'#8a5f2c'],[2,6,1,2,'#8a5f2c']
+  ])));
+  r.setProperty('--stone', px(tex(8, 8, '#8a8a8a', [
+    [1,1,2,2,'#7a7a7a'],[5,2,2,2,'#9c9c9c'],[3,5,3,2,'#7a7a7a'],[0,6,2,2,'#9c9c9c'],[6,6,2,2,'#7a7a7a']
+  ])));
+  r.setProperty('--iron', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#d8af93'],[5,2,2,3,'#d8af93'],[2,5,3,2,'#c49a7c'],[6,6,2,2,'#e6c4aa'],[1,1,1,1,'#f0d4bf']
+  ])));
+  r.setProperty('--diamond', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#33ebcb'],[5,2,2,3,'#33ebcb'],[2,5,3,2,'#1fb89e'],[6,6,2,2,'#7ff5e0'],[1,1,1,1,'#c8fbf3']
+  ])));
+  r.setProperty('--coal', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#1e1e1e'],[5,2,2,3,'#1e1e1e'],[2,5,3,2,'#1e1e1e'],[6,6,2,2,'#2c2c2c'],[1,1,1,1,'#3a3a3a']
+  ])));
+})();
+
+// Tastatur wie bei QWERTZ: pro Reihe die Tasten und die Startspalte (in Viertel-Tasten): Q = 1, A = 2, Y = 4
+const KEYROWS = [
+  ['q','w','e','r','t','z','u','i','o','p','ü'],
+  ['a','s','d','f','g','h','j','k','l','ö','ä'],
+  ['y','x','c','v','b','n','m',',','.','-']
+];
+const ROWSTART = [1, 2, 4];
+const NCOL = 45;
+const KEYPOS = {};
+KEYROWS.forEach((row, r) => row.forEach((k, i) => { KEYPOS[k] = {r, c: ROWSTART[r] + i * 4}; }));
+// Mitte der Taste als Anteil der Tastaturbreite (für fallende Blöcke und neue Tasten)
+const cxOf = k => (KEYPOS[k].c + 1) / NCOL;
+const HOME10 = ['a','s','d','f','g','h','j','k','l','ö'];
+
+// Jeder Finger und die Tasten, die er bedient (die Grundtaste steht vorn)
+const FINGERS = {a:'ayq', s:'sxw', d:'dce', f:'fgrtvb', j:'jhzumn', k:'ki,', l:'lo.', 'ö':'öpü-ä'};
+const FNAME = {a:'linker kleiner Finger', s:'linker Ringfinger', d:'linker Mittelfinger', f:'linker Zeigefinger',
+               j:'rechter Zeigefinger', k:'rechter Mittelfinger', l:'rechter Ringfinger', 'ö':'rechter kleiner Finger'};
+const FCOL = {a:'#4a2f18', s:'#6b4423', d:'#8a5a2b', f:'#b07a3c', j:'#b07a3c', k:'#8a5a2b', l:'#6b4423', 'ö':'#4a2f18'};
+function fingerOf(k){ for (const h in FINGERS) if (FINGERS[h].includes(k)) return h; return null; }
+const FINGER = {}, COLOR = {};
+Object.keys(KEYPOS).forEach(k => {
+  const h = fingerOf(k), r = KEYPOS[k].r;
+  const side = 'gh'.includes(k) || 'tzbn'.includes(k);
+  const how = [r === 0 ? 'eine Reihe nach oben' : r === 2 ? 'eine Reihe nach unten' : '', side ? 'zur Seite strecken' : ''].filter(Boolean).join(', ');
+  FINGER[k] = FNAME[h] + (how ? ` (${how})` : '');
+  COLOR[k] = FCOL[h];
+});
+
+// Grundhaltung: Zeigefinger auf F und J, Daumen auf der Leertaste (zweimal F, J, Leertaste)
+const GRUND_SEQ = ['f', 'j', ' ', 'f', 'j', ' '];
+function grundHint(k){
+  return k === 'f' ? 'Jetzt F: der linke Zeigefinger.'
+       : k === 'j' ? 'Jetzt J: der rechte Zeigefinger.'
+       : 'Jetzt die Leertaste: der Daumen.';
+}
+const UPPER = (extra) => HOME10.concat(extra);
+const LEVELS = [
+  {name:'Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, target:6, reward:'holz'},
+  {name:'Level 1: A S D', keys:['a','s','d','f','j'], neu:['a','s','d'],
+   hint:'Neu: A, S und D (linke Hand). Die Kohleblöcke zeigen dir die neuen Tasten. Tippe die Taste, um den Block abzubauen.', target:16},
+  {name:'Level 2: + K L Ö', keys:['a','s','d','f','j','k','l','ö'], neu:['k','l','ö'],
+   hint:'Neu: K, L und Ö (rechte Hand). Die Kohleblöcke zeigen dir die neuen Tasten.', target:16},
+  {name:'Level 3: + G H', keys:HOME10, neu:['g','h'],
+   hint:'Neu: G und H (Kohle). Dafür streckt sich der Zeigefinger zur Seite und geht danach zurück auf F bzw. J.', target:16},
+  {name:'Level 4: Ganze Reihe', keys:HOME10, neu:[],
+   hint:'Übung: Alle Tasten der Grundreihe, Stein und Kohle. Lass die Hände ruhig liegen und bewege nur die Finger.', target:32, reward:'stein'},
+
+  // Obere Reihe: Eisenerz (mit der Steinspitzhacke abbaubar). Die Finger greifen eine Reihe nach oben und gehen zurück auf die Grundtaste.
+  {name:'Level 5: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
+   hint:'Neu: E und I (Eisenerz, beide Mittelfinger). Greife eine Reihe nach oben und gehe danach zurück auf D bzw. K.', target:16},
+  {name:'Level 6: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'iron',
+   hint:'Neu: R (linker Zeigefinger) und U (rechter Zeigefinger). Nach dem Tippen geht der Finger zurück auf F bzw. J.', target:16},
+  {name:'Level 7: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'iron',
+   hint:'Neu: T und Z. Die Zeigefinger strecken sich nach oben und zur Seite. Danach zurück auf F bzw. J.', target:16},
+  {name:'Level 8: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
+   hint:'Neu: W (linker Ringfinger) und O (rechter Ringfinger).', target:16},
+  {name:'Level 9: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'iron',
+   hint:'Neu: Q (linker kleiner Finger), P und Ü (rechter kleiner Finger).', target:16},
+  {name:'Level 10: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
+   hint:'Übung: Grundreihe und obere Reihe. Eisenerz sind die Tasten der oberen Reihe.', target:32, reward:'eisen'},
+
+  // Untere Reihe: Diamanterz (mit der Eisenspitzhacke abbaubar)
+  {name:'Level 11: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
+   hint:'Neu: C (linker Mittelfinger) und Komma (rechter Mittelfinger). Greife eine Reihe nach unten und gehe zurück auf D bzw. K.', target:16},
+  {name:'Level 12: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'diamond',
+   hint:'Neu: V (linker Zeigefinger) und M (rechter Zeigefinger). Danach zurück auf F bzw. J.', target:16},
+  {name:'Level 13: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'diamond',
+   hint:'Neu: B und N. Die Zeigefinger strecken sich nach unten und zur Seite. Danach zurück auf F bzw. J.', target:16},
+  {name:'Level 14: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
+   hint:'Neu: X (linker Ringfinger) und Punkt (rechter Ringfinger).', target:16},
+  {name:'Level 15: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'diamond',
+   hint:'Neu: Y (linker kleiner Finger) und Bindestrich (rechter kleiner Finger).', target:16},
+  {name:'Level 16: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
+   hint:'Übung: Die ganze Tastatur. Diamanterz sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
+];
+const SHOP = [
+  {id:'wolf',  label:'🐺 Wolf',        cost:5,  type:'pet'},
+  {id:'katze', label:'🐱 Katze',       cost:10, type:'pet'},
+  {id:'hoehle',label:'⛰ Biom Höhle',   cost:8,  type:'biome', need:3},
+];
+const SPEED = 40;
+const BLOCK = 64;
+
+let st = load();
+let cur = -1, active = false, run = null, raf = 0, last = 0, spawnT = 0;
+let introExpected = 'f', shownKey = null;
+let phase = 'play';          // 'grund' (Grundhaltung), 'learn' (Einführung neuer Tasten), 'wait', 'play'
+let learn = null;            // Ablauf der Einführung: {seq, idx}
+let pendingTimer = null;     // Pause vor dem Modal bzw. vor dem Start der Blöcke
+
+function load(){
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return s; } catch(e){}
+  return {emeralds:0, stars:{}, owned:{wald:true}, biome:'wald'};
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
+function unlocked(i){ return i === 0 || (st.stars[i-1] || 0) >= 1; }
+
+// ---------- Spitzhacken (eigene Pixelgrafik) ----------
+const PICKS = {
+  holz:  {name:'Holzspitzhacke',  b:'#a8793a', l:'#c9985a', d:'#6e4a22',
+          text:'Du hast die Holzblöcke mit bloßer Hand abgebaut und daraus eine Holzspitzhacke gebaut.'},
+  stein: {name:'Steinspitzhacke', b:'#9a9a9a', l:'#c4c4c4', d:'#666666',
+          text:'Aus Stein und Holz gebaut. Damit kannst du als Nächstes härtere Erze abbauen.'},
+  eisen: {name:'Eisenspitzhacke', b:'#d8d8d8', l:'#f4f4f4', d:'#9a9a9a',
+          text:'Aus Eisenerz geschmolzen und gebaut. Damit kannst du Gold, Diamant und Redstone abbauen.'},
+  diamant:{name:'Diamantspitzhacke', b:'#33ebcb', l:'#a8f7ee', d:'#1b9b88',
+          text:'Die Diamantspitzhacke! Du kennst jetzt alle Buchstaben der Tastatur. Damit baust du sogar Obsidian ab.'}
+};
+
+function pickaxeSVG(type, size){
+  const P = PICKS[type];
+  const head = {2:[6,7,8,9,10], 3:[4,5,6,7,8,9,10,11,12], 4:[3,4,5,10,11,12,13], 5:[3,12,13],
+                6:[12,13], 7:[12,13], 8:[12,13], 9:[12,13], 10:[12]};
+  const g = {};
+  Object.keys(head).forEach(y => head[y].forEach(x => { g[x + ',' + y] = 'h'; }));
+  for (let i = 0; i < 10; i++) {            // Stiel: von links unten bis zum Kopf
+    g[(10 - i) + ',' + (5 + i)] = 'm';
+    g[(11 - i) + ',' + (5 + i)] = 's';
+  }
+  const has = (x, y) => g[x + ',' + y] === 'h';
+  let rects = '';
+  const rect = (x, y, c) => { rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`; };
+  for (let y = 0; y < 16; y++) {
+    for (let x = 0; x < 16; x++) {
+      const c = g[x + ',' + y];
+      if (c === 'h') {
+        const top = !has(x, y - 1), bot = !has(x, y + 1) || !has(x + 1, y);
+        rect(x, y, top && !bot ? P.l : (bot && !top ? P.d : P.b));
+      } else if (c === 'm') rect(x, y, '#8a5a2b');
+      else if (c === 's') rect(x, y, '#5a3a1a');
+      else if ([[1,0],[-1,0],[0,1],[0,-1]].some(([dx, dy]) => g[(x + dx) + ',' + (y + dy)])) rect(x, y, '#2a1c10');
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="${size}" height="${size}" ` +
+         `shape-rendering="crispEdges" style="image-rendering:pixelated">${rects}</svg>`;
+}
+
+// Smaragd als eigene 16x16-Pixelgrafik, angelehnt an das Vorbild (ovaler Edelstein mit Facetten)
+function emeraldSVG(size){
+  const rows = {1:[5,10], 2:[4,11], 3:[3,12], 4:[3,12], 5:[2,13], 6:[2,13], 7:[2,13], 8:[2,13],
+                9:[3,12], 10:[3,12], 11:[3,12], 12:[4,11], 13:[5,10], 14:[6,9]};
+  const inMask = (x, y) => rows[y] && x >= rows[y][0] && x <= rows[y][1];
+  let rects = '';
+  const rect = (x, y, c) => { rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`; };
+  for (let y = 0; y < 16; y++) {
+    for (let x = 0; x < 16; x++) {
+      if (!inMask(x, y)) continue;
+      const edge = !inMask(x - 1, y) || !inMask(x + 1, y) || !inMask(x, y - 1) || !inMask(x, y + 1);
+      let c;
+      if (edge) c = (x + y <= 11) ? '#00701f' : '#003d10';                // Umriss: links oben heller, rechts unten dunkler
+      else if (x >= 7 && x <= 8 && y >= 5 && y <= 9) c = '#b4f7d4';       // helle Mittelfacette
+      else if (x + y <= 9) c = '#5aeb98';                                 // helle Facette links oben
+      else if (x + y >= 21 || x >= 11) c = '#0a8a38';                     // dunkle Seite rechts unten
+      else if (x >= 9 || y >= 11) c = '#0fb04c';                         // mittleres Grün
+      else c = '#17dd62';                                                 // Grundfarbe
+      rect(x, y, c);
+    }
+  }
+  return `<svg class="emsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="${size}" height="${size}" ` +
+         `shape-rendering="crispEdges" style="image-rendering:pixelated">${rects}</svg>`;
+}
+
+// Eine Spitzhacke gehört dem Kind, sobald das Level mit ihrem Erfolg mindestens einen Stern hat
+function hasPick(t){
+  const i = LEVELS.findIndex(L => L.reward === t);
+  return i >= 0 && (st.stars[i] || 0) >= 1;
+}
+// Die beste gesammelte Spitzhacke ist ausgewählt
+function currentPick(){
+  let best = null;
+  HOTBAR.forEach(t => { if (hasPick(t)) best = t; });
+  return best;
+}
+
+function rewardHtml(type){
+  const P = PICKS[type];
+  return `<div class="reward">
+            <div class="rw-title">Erfolg freigeschaltet!</div>
+            ${pickaxeSVG(type, 96)}
+            <div class="rw-name">${P.name}</div>
+            <div class="rw-text">${P.text}</div>
+          </div>`;
+}
+
+// Schnellzugriffsleiste: 4 Slots für die Spitzhacken (Holz, Stein, Eisen, Diamant). Gesammelte bleiben liegen,
+// die beste ist wie in Minecraft mit einem weißen Rahmen ausgewählt.
+const HOTBAR = ['holz', 'stein', 'eisen', 'diamant'];
+let hotbarSeen = null;
+
+function renderHotbar(){
+  const sel = currentPick();
+  const first = hotbarSeen === null;
+  if (first) hotbarSeen = {};
+  document.getElementById('hotbar').innerHTML = HOTBAR.map(t => {
+    const has = hasPick(t);
+    const isNew = has && !first && !hotbarSeen[t];   // frisch gesammelt: kleine Pop-Animation
+    if (has) hotbarSeen[t] = true;
+    return `<div class="slot${t === sel ? ' sel' : ''}${isNew ? ' got' : ''}"${has ? ` title="${PICKS[t].name}"` : ''}>` +
+           `${has ? pickaxeSVG(t, 32) : ''}</div>`;
+  }).join('');
+}
+
+function topBar(){
+  document.getElementById('emeralds').textContent = st.emeralds;
+  renderHotbar();
+}
+
+function show(id){
+  document.getElementById('menu').classList.toggle('hidden', id !== 'menu');
+  document.getElementById('game').classList.toggle('hidden', id !== 'game');
+}
+
+function renderMenu(){
+  cur = -1; active = false; cancelAnimationFrame(raf); clearTimeout(pendingTimer);
+  topBar(); show('menu');
+
+  const lv = document.getElementById('levels'); lv.innerHTML = '';
+  LEVELS.forEach((L, i) => {
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.disabled = !unlocked(i);
+    const s = st.stars[i] || 0;
+    b.textContent = `${L.name} ${'★'.repeat(s)}${unlocked(i) ? '' : ' 🔒'}`;
+    b.onclick = () => start(i);
+    lv.appendChild(b);
+  });
+
+  const sh = document.getElementById('shop'); sh.innerHTML = '';
+  SHOP.forEach(item => {
+    const owned = !!st.owned[item.id];
+    const locked = item.need !== undefined && (st.stars[item.need] || 0) < 1;
+    const b = document.createElement('button');
+    b.className = 'btn';
+    if (owned) {
+      if (item.type === 'biome') {
+        b.textContent = `${item.label} ${st.biome === item.id ? '(aktiv)' : '– wählen'}`;
+        b.onclick = () => { st.biome = item.id; save(); renderMenu(); };
+      } else {
+        b.textContent = `${item.label} ✓ (dabei)`;
+        b.disabled = true;
+      }
+    } else {
+      b.innerHTML = locked ? `${item.label} 🔒 (Level ${item.need})` : `${item.label} – ${item.cost} ${emeraldSVG(18)}`;
+      b.disabled = locked || st.emeralds < item.cost;
+      b.onclick = () => {
+        st.emeralds -= item.cost;
+        st.owned[item.id] = true;
+        if (item.type === 'biome') st.biome = item.id;
+        save(); renderMenu();
+      };
+    }
+    sh.appendChild(b);
+  });
+}
+
+function setBiome(){
+  document.getElementById('biome').className = 'biome-' + (st.biome || 'wald');
+}
+
+function setHint(t){ document.getElementById('hint').textContent = t; }
+
+// Haustiere stehen zwischen den beiden Armen (unter G/H)
+function addPets(field){
+  const pets = [];
+  if (st.owned.wolf) pets.push({e:'🐺', left:'calc(16px + (100% - 32px) * .4667 - 58px)'});
+  if (st.owned.katze) pets.push({e:'🐱', left:'calc(16px + (100% - 32px) * .4667 + 10px)'});
+  pets.forEach(p => {
+    const s = document.createElement('span');
+    s.className = 'pet';
+    s.textContent = p.e;
+    s.style.left = p.left;
+    field.appendChild(s);
+  });
+}
+
+function bounce(){
+  document.querySelectorAll('.pet').forEach(p => {
+    p.style.transform = 'translateY(-14px)';
+    setTimeout(() => p.style.transform = '', 200);
+  });
+}
+
+function beep(freq){
+  try {
+    const c = new (window.AudioContext || window.webkitAudioContext)();
+    const o = c.createOscillator(), g = c.createGain();
+    o.frequency.value = freq; o.connect(g); g.connect(c.destination);
+    g.gain.value = 0.05; o.start(); o.stop(c.currentTime + 0.12);
+  } catch(e){}
+}
+
+// ---------- Tastatur mit Händen (für Grundhaltung und alle Level) ----------
+// Die Hände liegen ruhig auf der Tastatur. Nur der Finger der erwarteten Taste greift zur Taste,
+// hebt sich leicht an und drückt, wenn die richtige Taste gedrückt wird.
+function buildBoard(field, L, mode){
+  const ore = L.ore || 'coal';
+  const fing = (k, col) => `<div class="fing" data-k="${k}" style="grid-column:${col} / span 4"></div>`;
+
+  const top = L.intro
+    ? `<div style="position:absolute;top:10px;left:0;right:0;text-align:center;font-size:18px;">
+         Grundhaltung<br><span style="font-size:14px;opacity:.8">Baue die Holzblöcke mit bloßer Hand ab: Zeigefinger auf F und J, Daumen auf die Leertaste. Die Hände bleiben ruhig, nur ein Finger bewegt sich.</span>
+       </div>
+       <div id="bigF" class="bigkey" style="left:30%;">F</div>
+       <div id="bigS" class="bigkey" style="left:50%;">Leertaste</div>
+       <div id="bigJ" class="bigkey" style="left:70%;">J</div>`
+    : mode === 'learn'
+    ? `<div style="position:absolute;top:10px;left:0;right:0;text-align:center;font-size:18px;">
+         Neue Tasten: ${L.neu.map(k => k.toUpperCase()).join(' ')}<br><span style="font-size:14px;opacity:.8">Schau, wo sie auf der Tastatur liegen. Die Hände bleiben ruhig, nur ein Finger bewegt sich.</span>
+       </div>
+       <div class="newrow">
+         ${L.neu.map(k => `<div id="big-${k}" class="nk ${ore}" style="left:${(cxOf(k) * 100).toFixed(3)}%">${k.toUpperCase()}</div>`).join('')}
+       </div>`
+    : `<div class="lanes" id="lanes"></div>`;
+
+  const keysHtml = KEYROWS.map((row, r) => row.map(k => {
+    const pos = `grid-row:${r + 1};grid-column:${KEYPOS[k].c} / span 4`;
+    const off = !L.keys.includes(k);
+    const cls = 'ikey' + ((k === 'f' || k === 'j') ? ' home' : '') + (off ? ' off' : '') + ((!L.intro && L.neu.includes(k)) ? ' new' : '');
+    return `<div class="${cls}" data-k="${k}" style="${pos}"></div>` +
+           `<div class="lbl${off ? ' off' : ''}" data-lk="${k}" style="${pos}">${k.toUpperCase()}</div>`;
+  }).join('')).join('');
+
+  const wrap = document.createElement('div');
+  wrap.id = 'intro';
+  wrap.style.cssText = 'position:absolute;inset:0;';
+  wrap.innerHTML = `
+    ${top}
+    <div class="kb" id="kb">
+      ${keysHtml}
+      <div class="ikey space" data-k=" "></div>
+      ${fing('a', 2)}${fing('s', 6)}${fing('d', 10)}${fing('f', 14)}
+      ${fing('j', 26)}${fing('k', 30)}${fing('l', 34)}${fing('ö', 38)}
+      <div class="arm l"></div><div class="arm r"></div>
+      <div class="thumb l"></div><div class="thumb r"></div>
+    </div>`;
+  field.appendChild(wrap);
+}
+
+// Liefert den Finger, der die Taste bedient, und richtet ihn auf die Taste aus (zur Seite und eine Reihe hoch bzw. runter)
+function fingerFor(wrap, k){
+  if (k === ' ') return wrap.querySelector('.thumb.r');   // die Leertaste bedient der rechte Daumen
+  const h = fingerOf(k);
+  if (!h) return null;
+  const f = wrap.querySelector(`.fing[data-k="${h}"]`);
+  const hk = wrap.querySelector(`.ikey[data-k="${h}"]`);
+  const t = wrap.querySelector(`.ikey[data-k="${k}"]`);
+  if (f && hk && t) {
+    f.style.setProperty('--dx', (t.offsetLeft + t.offsetWidth / 2 - hk.offsetLeft - hk.offsetWidth / 2) + 'px');
+    f.style.setProperty('--dy', (t.offsetTop - hk.offsetTop) + 'px');
+  }
+  return f;
+}
+
+function resetFinger(f){ f.style.removeProperty('--dx'); f.style.removeProperty('--dy'); }
+
+// Der große Block zur Taste (Grundhaltung: Holzblöcke F, J und Leertaste; Einführung: Erzblöcke)
+function bigFor(k){
+  return document.getElementById(k === 'f' ? 'bigF' : k === 'j' ? 'bigJ' : k === ' ' ? 'bigS' : 'big-' + k);
+}
+
+function setExpected(k){
+  const wrap = document.getElementById('intro');
+  if (!wrap) return;
+  wrap.querySelectorAll('.ikey.next, .lbl.next').forEach(e => e.classList.remove('next'));
+  wrap.querySelectorAll('.fing.hover, .thumb.hover').forEach(e => e.classList.remove('hover'));
+  wrap.querySelectorAll('.bigkey.next, .nk.next').forEach(e => e.classList.remove('next'));
+  // Gestreckte Finger zurück in die Grundstellung (außer einer läuft gerade die Druck-Animation)
+  wrap.querySelectorAll('.fing').forEach(e => { if (!e.classList.contains('press')) resetFinger(e); });
+  if (!k) return;
+  const keyEl = wrap.querySelector(`.ikey[data-k="${k}"]`);
+  if (keyEl) keyEl.classList.add('next');
+  const lb = wrap.querySelector(`.lbl[data-lk="${k}"]`);
+  if (lb) lb.classList.add('next');
+  const f = fingerFor(wrap, k);
+  if (f) f.classList.add('hover');
+  const big = bigFor(k);
+  if (big) big.classList.add('next');
+}
+
+function pressKey(k){
+  const wrap = document.getElementById('intro');
+  if (!wrap) return;
+  const f = fingerFor(wrap, k);
+  const keyEl = wrap.querySelector(`.ikey[data-k="${k}"]`);
+  const big = bigFor(k);
+  if (big) {
+    big.classList.add('hit');
+    setTimeout(() => big.classList.remove('hit'), 160);
+  }
+  if (f) {
+    f.classList.remove('hover');
+    f.classList.add('press');
+    setTimeout(() => {
+      f.classList.remove('press');
+      if (!f.classList.contains('hover') && f.classList.contains('fing')) resetFinger(f);
+    }, 160);
+  }
+  if (keyEl) {
+    keyEl.classList.add('pressed');
+    setTimeout(() => keyEl.classList.remove('pressed'), 160);
+  }
+}
+
+function lowestBlock(){
+  return run.blocks.slice().sort((a, b) => b.y - a.y)[0];
+}
+
+// Einführung neuer Tasten: jede neue Taste mehrmals der Reihe nach, insgesamt 6 Tastendrücke
+function learnSteps(L){
+  const rounds = Math.ceil(6 / L.neu.length);
+  return Array.from({length: rounds}, () => L.neu).flat();
+}
+
+function learnHint(k){ return `Drücke ${k.toUpperCase()}: ${FINGER[k]}.`; }
+
+// Nach der Einführung beginnt das eigentliche Level mit den fallenden Blöcken
+function beginPlay(L){
+  const field = document.getElementById('field');
+  field.innerHTML = '';
+  addPets(field);
+  run = {correct:0, wrong:0, target:L.target, blocks:[]};
+  spawnT = 0;
+  shownKey = null;
+  phase = 'play';
+  buildBoard(field, L);
+  setHint(L.hint);
+}
+
+function start(i){
+  clearTimeout(pendingTimer);
+  if (document.activeElement) document.activeElement.blur();   // kein Button mit Fokus, den die Leertaste auslösen könnte
+  cur = i;
+  show('game');
+  setBiome();
+  const field = document.getElementById('field');
+  field.innerHTML = '';
+  addPets(field);
+  const L = LEVELS[i];
+  run = {correct:0, wrong:0, target:L.target, blocks:[]};
+  spawnT = 0;
+  shownKey = null;
+
+  if (L.intro) {
+    phase = 'grund';
+    buildBoard(field, L);
+    setHint('Baue die Holzblöcke ab. ' + grundHint('f'));
+    introExpected = 'f';
+    setExpected('f');
+  } else if (L.neu.length) {
+    // Level mit neuen Tasten beginnt mit einer Einführung wie die Grundhaltung
+    phase = 'learn';
+    learn = {seq: learnSteps(L), idx: 0};
+    buildBoard(field, L, 'learn');
+    setHint(learnHint(learn.seq[0]));
+    setExpected(learn.seq[0]);
+  } else {
+    phase = 'play';
+    buildBoard(field, L);
+    setHint(L.hint);
+  }
+
+  active = true;
+  last = performance.now();
+  raf = requestAnimationFrame(tick);
+}
+
+function spawn(){
+  const L = LEVELS[cur];
+  const lanes = document.getElementById('lanes');
+  if (!lanes) return;
+  const W = lanes.clientWidth;
+  // Keine Taste, deren Block schon da ist oder so nah daneben fällt, dass sich die Blöcke berühren würden
+  const pool = L.keys.filter(k => !run.blocks.some(b => Math.abs(cxOf(b.key) - cxOf(k)) * W < BLOCK + 14));
+  if (!pool.length) return;
+  const weighted = pool.flatMap(k => L.neu.includes(k) ? [k, k] : [k]);
+  const key = weighted[Math.floor(Math.random() * weighted.length)];
+  const el = document.createElement('div');
+  // Neue Tasten des Levels sind Erz, die Wiederholung ist Stein. In Übungslevels ist das Erz die Reihe der Stufe
+  // (Level 4: zufällig etwa jeder dritte Block).
+  const isOre = L.neu.length ? L.neu.includes(key)
+              : (L.oreRow !== undefined ? KEYPOS[key].r === L.oreRow : Math.random() < 0.3);
+  el.className = 'block ' + (isOre ? (L.ore || 'coal') : 'stone');
+  el.textContent = key.toUpperCase();
+  el.style.left = (cxOf(key) * 100).toFixed(3) + '%';
+  el.style.top = '0px';
+  lanes.appendChild(el);
+  run.blocks.push({key, el, y:0});
+}
+
+function tick(t){
+  if (!active) return;
+  const dt = Math.min(0.05, (t - last) / 1000);
+  last = t;
+
+  if (phase === 'play') {
+    const lanes = document.getElementById('lanes');
+    const laneH = lanes ? lanes.clientHeight : 300;
+    spawnT += dt;
+    const maxActive = LEVELS[cur].keys.length > 4 ? 3 : 2;
+    if (spawnT > 1.2 && run.blocks.length < maxActive) { spawnT = 0; spawn(); }
+    run.blocks.forEach(b => {
+      b.y += SPEED * dt;
+      if (b.y > laneH - BLOCK) b.y = 0; // kein Fehler: der Block startet einfach wieder oben
+      b.el.style.top = b.y + 'px';
+    });
+    // Der Finger der Taste, deren Block am weitesten unten ist, hebt sich leicht an
+    const low = lowestBlock();
+    const want = low ? low.key : null;
+    if (want !== shownKey) { shownKey = want; setExpected(want); }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+function onKey(e){
+  if (document.getElementById('overlay').style.display === 'flex') {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const btn = document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn');
+      if (btn) btn.click();
+    }
+    return;
+  }
+  if (!active || cur < 0) return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (k === ' ') e.preventDefault();   // die Leertaste soll weder scrollen noch einen Button auslösen
+  const L = LEVELS[cur];
+
+  if (L.intro) {
+    if (!GRUND_SEQ.includes(k)) return;
+    e.preventDefault();
+    const want = GRUND_SEQ[run.correct];
+    if (k !== want) { setHint(grundHint(want)); return; }
+    run.correct++;
+    pressKey(k);
+    beep(660);
+    if (run.correct >= run.target) { finish(); return; }
+    const nxt = GRUND_SEQ[run.correct];
+    setExpected(nxt);
+    setHint('Gut! ' + grundHint(nxt));
+    return;
+  }
+
+  if (phase === 'learn') {
+    if (!L.neu.includes(k)) return;      // andere Tasten werden in der Einführung ignoriert
+    e.preventDefault();
+    const want = learn.seq[learn.idx];
+    if (k !== want) { setHint(learnHint(want)); return; }
+    pressKey(k);
+    beep(660); bounce();
+    learn.idx++;
+    if (learn.idx >= learn.seq.length) {
+      phase = 'wait';
+      setExpected(null);
+      setHint('Super! Gleich kommen die Blöcke.');
+      pendingTimer = setTimeout(() => beginPlay(L), 1000);
+      return;
+    }
+    setExpected(learn.seq[learn.idx]);
+    setHint(learnHint(learn.seq[learn.idx]));
+    return;
+  }
+  if (phase !== 'play') return;
+
+  if (!L.keys.includes(k)) return;
+  e.preventDefault();
+  const i = run.blocks.findIndex(b => b.key === k);
+  if (i >= 0) {
+    const b = run.blocks[i];
+    b.el.remove();
+    run.blocks.splice(i, 1);
+    run.correct++;
+    st.emeralds++;
+    save(); topBar();
+    pressKey(k);
+    beep(660); bounce();
+    setHint('Super! +1 Smaragd');
+    if (run.correct >= run.target) finish();
+  } else {
+    run.wrong++;
+    beep(200);
+    const low = lowestBlock();
+    setHint(low
+      ? `Versuch es mit ${low.key.toUpperCase()} (${FINGER[low.key]})`
+      : 'Warte kurz, bis ein Block kommt.');
+  }
+}
+
+function useHint(){
+  if (cur < 0 || !active) return;
+  if (phase !== 'play') { setHint('Hier brauchst du keinen Hinweis.'); return; }
+  if (st.emeralds < 3) { setHint('Du brauchst 3 Smaragde für einen Hinweis.'); return; }
+  const low = lowestBlock();
+  if (!low) { setHint('Warte kurz, bis ein Block kommt.'); return; }
+  st.emeralds -= 3; save(); topBar();
+  low.el.classList.add('glow');
+  setTimeout(() => low.el.classList.remove('glow'), 3000);
+  setHint(`Hinweis: ${low.key.toUpperCase()} (${FINGER[low.key]})`);
+}
+
+function finish(){
+  active = false;
+  cancelAnimationFrame(raf);
+  const L = LEVELS[cur];
+  const tot = run.correct + run.wrong;
+  const acc = tot ? Math.round(run.correct / tot * 100) : 100;
+  const stars = L.intro ? 3 : (acc >= 95 ? 3 : acc >= 85 ? 2 : acc >= 70 ? 1 : 0);
+  st.stars[cur] = Math.max(st.stars[cur] || 0, stars);
+  if (stars > 0) st.emeralds += 3;
+  save();
+
+  const box = document.getElementById('overlayBox');
+  const next = cur < LEVELS.length - 1 && stars > 0;
+  const msg = stars > 0
+    ? `Geschafft!<br><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>Genauigkeit: ${acc} %<br>+3 ${emeraldSVG(20)}`
+    : `Noch nicht ganz. Genauigkeit: ${acc} %<br>Ohne Druck, einfach nochmal probieren!`;
+  const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
+  box.innerHTML = `<div style="font-size:20px;font-weight:bold;margin-bottom:10px;">${L.name}</div>${msg}${rw}<div class="btns" style="margin-top:14px;"></div>`;
+  const btns = box.querySelector('.btns');
+  const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
+  retry.onclick = () => { hideOverlay(); start(cur); };
+  const menu = document.createElement('button'); menu.className = 'btn'; menu.textContent = 'Menü';
+  menu.onclick = () => { hideOverlay(); renderMenu(); };
+  btns.appendChild(retry); btns.appendChild(menu);
+  if (next) {
+    const nb = document.createElement('button'); nb.className = 'btn green'; nb.textContent = 'Weiter';
+    nb.onclick = () => { hideOverlay(); start(cur + 1); };
+    btns.appendChild(nb);
+  }
+  // 1 Sekunde Pause: Der letzte Anschlag ist sichtbar gezählt, Eingaben werden jetzt nicht mehr gewertet.
+  // Danach wächst das Fenster aus der Mitte (Animation am Fenster selbst).
+  pendingTimer = setTimeout(() => {
+    topBar();
+    document.getElementById('overlay').style.display = 'flex';
+  }, 1000);
+}
+
+function hideOverlay(){ document.getElementById('overlay').style.display = 'none'; }
+
+document.getElementById('backBtn').onclick = renderMenu;
+document.getElementById('hintBtn').onclick = useHint;
+// Smaragd-Symbole im Kopf und am Hinweis-Button
+document.getElementById('emIcon').innerHTML = emeraldSVG(30);
+document.getElementById('hintBtn').innerHTML = `Hinweis (3 ${emeraldSVG(16)})`;
+window.addEventListener('keydown', onKey);
+
+renderMenu();
+</script>
+</body>
+</html>

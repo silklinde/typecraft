@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tipp-Mine – Vorschau Tastatur mit drei Reihen</title>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#1d1d1d;color:#fff;}
+#app{padding:12px 16px;}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+.bar span{opacity:.8;font-size:14px;margin-left:8px;}
+.btn{background:#5a5a5a;color:#fff;border:3px solid #000;border-radius:4px;padding:8px 12px;font-size:15px;font-weight:bold;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35);}
+.btn.on{background:#4caf50;}
+#frame{position:relative;height:min(88vh,800px);border:4px solid #000;border-radius:4px;overflow:hidden;background:linear-gradient(#7ec8ff 0%,#a8e6a1 60%,#3c7d2e 100%);}
+/* Tastatur: 1 Taste = 4 Spaltenviertel, damit die Reihen wie bei QWERTZ versetzt liegen (Q: 0, A: +1/4, Y: +3/4 Taste) */
+#kb{--kh:clamp(56px,9vh,84px);--sp:calc(var(--kh)*.7);position:absolute;left:16px;right:16px;top:clamp(230px,34vh,300px);
+    display:grid;grid-template-columns:repeat(45,1fr);grid-template-rows:var(--kh) var(--kh) var(--kh) var(--sp);row-gap:8px;}
+.key{box-sizing:border-box;margin:0 4px;background:#444;border:3px solid #000;border-radius:4px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);z-index:1;transition:transform .12s,background .12s,opacity .2s;}
+.key.home{background:#6b5a2a;}
+.key.off{opacity:.3;}
+.key.pressed{transform:translateY(6px);background:#ffd166;}
+.key.space{grid-row:4;grid-column:10 / 35;}
+/* Beschriftung liegt in einer eigenen Ebene über den Händen, damit Buchstaben auch unter den langen Fingern lesbar sind */
+.lbl{z-index:6;pointer-events:none;display:flex;justify-content:center;align-items:flex-start;padding-top:6px;box-sizing:border-box;
+     font-size:clamp(20px,3.4vh,30px);font-weight:bold;text-shadow:2px 2px 0 #000;transition:opacity .2s;}
+.lbl.off{opacity:.3;}
+/* Minecraft-Arme: Finger reichen von der Grundreihe über die untere Reihe bis zum Arm, der auf Höhe der Leertaste beginnt */
+.fing{z-index:2;grid-row:2 / 5;align-self:start;height:calc(100% - var(--dy,0px));margin:0 4px;background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;
+      border:3px solid #000;border-bottom:0;border-radius:3px 3px 0 0;box-sizing:border-box;transition:transform .15s,filter .15s;
+      transform:translate(var(--dx,0px),var(--dy,0px));}
+.fing.hover{transform:translate(var(--dx,0px),calc(var(--dy,0px) - 8px));filter:brightness(1.15);}
+.fing.press{transform:translate(var(--dx,0px),calc(var(--dy,0px) + 8px));}
+.arm{z-index:3;grid-row:4;align-self:start;height:600px;margin:0 4px;box-sizing:border-box;border:3px solid #000;background-color:#00a0b8;
+     background-image:var(--askin),var(--sleeve);background-size:100% 110px,100% 110px;background-position:0 0,0 110px;background-repeat:no-repeat,repeat-y;}
+.arm.l{grid-column:2 / 18;} .arm.r{grid-column:26 / 42;}
+.thumb{z-index:4;grid-row:4;align-self:stretch;margin-top:0;height:auto;box-sizing:border-box;border:3px solid #000;
+       background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;transition:transform .15s,filter .15s;}
+.thumb.l{grid-column:18 / 22;margin-left:-6px;margin-right:4px;border-radius:0 10px 10px 0;}
+.thumb.r{grid-column:22 / 26;margin-left:4px;margin-right:-6px;border-radius:10px 0 0 10px;}
+.thumb.hover{transform:translateY(-8px);filter:brightness(1.15);}
+.thumb.press{transform:translateY(8px);}
+/* fallende Blöcke (nur Vorschau): Mitte über der jeweiligen Taste */
+.block{position:absolute;width:64px;height:64px;margin-left:-32px;border:3px solid #000;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+       font-weight:bold;font-size:28px;text-shadow:2px 2px 0 #000;background-size:100% 100%;image-rendering:pixelated;
+       box-shadow:inset -4px -4px 0 rgba(0,0,0,.35),inset 4px 4px 0 rgba(255,255,255,.2);animation:fall 6s linear infinite;}
+.block.stone{background-image:var(--stone);} .block.coal{background-image:var(--coal);}
+@keyframes fall{0%{top:-70px}100%{top:var(--end)}}
+</style></head><body><div id="app">
+<div class="bar">
+  <button class="btn on" data-rows="1">Nur Grundreihe</button>
+  <button class="btn" data-rows="2">+ obere Reihe</button>
+  <button class="btn" data-rows="3">+ untere Reihe (alle Reihen)</button>
+  <span>Tippe auf deiner Tastatur: Finger und Daumen bewegen sich mit. Leertaste = Daumen.</span>
+</div>
+<div id="frame"><div id="kb"></div></div>
+</div>
+<script>
+// ---------- Pixel-Texturen (Minecraft-Look) ----------
+(function(){
+  const px = svg => 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  const tex = (w, h, base, patches) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" shape-rendering="crispEdges">` +
+    `<rect width="${w}" height="${h}" fill="${base}"/>` +
+    patches.map(p => `<rect x="${p[0]}" y="${p[1]}" width="${p[2]}" height="${p[3]}" fill="${p[4]}"/>`).join('') +
+    `</svg>`;
+  const D = '#9e7860', L = '#bf9378';
+  const r = document.documentElement.style;
+  r.setProperty('--askin', px(tex(32, 16, '#b08468', [
+    [3,2,3,4,D],[14,5,4,5,D],[24,2,3,3,D],[8,10,4,3,D],[26,10,4,4,D],[18,13,3,3,D],[20,0,4,2,L],[0,12,3,3,L]
+  ])));
+  r.setProperty('--fskin', px(tex(8, 12, '#b08468', [
+    [1,3,2,3,D],[5,7,2,4,D],[4,0,3,2,L]
+  ])));
+  r.setProperty('--sleeve', px(tex(32, 16, '#00a0b8', [
+    [0,0,5,3,'#0094ad'],[10,2,6,4,'#00aec7'],[22,0,6,3,'#0094ad'],[4,8,6,4,'#0094ad'],[18,9,7,4,'#00aec7'],[28,12,4,3,'#0094ad']
+  ])));
+  // Eigene Pixel-Texturen für Holz, Stein und Kohle
+  r.setProperty('--wood', px(tex(8, 8, '#a8793a', [
+    [0,0,3,1,'#c9985a'],[5,0,2,1,'#c9985a'],[1,3,2,1,'#c9985a'],
+    [0,2,8,1,'#8a5f2c'],[0,5,8,1,'#8a5f2c'],[4,3,1,2,'#8a5f2c'],[2,6,1,2,'#8a5f2c']
+  ])));
+  r.setProperty('--stone', px(tex(8, 8, '#8a8a8a', [
+    [1,1,2,2,'#7a7a7a'],[5,2,2,2,'#9c9c9c'],[3,5,3,2,'#7a7a7a'],[0,6,2,2,'#9c9c9c'],[6,6,2,2,'#7a7a7a']
+  ])));
+  r.setProperty('--coal', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#1e1e1e'],[5,2,2,3,'#1e1e1e'],[2,5,3,2,'#1e1e1e'],[6,6,2,2,'#2c2c2c'],[1,1,1,1,'#3a3a3a']
+  ])));
+})();
+const ROWS=[['q','w','e','r','t','z','u','i','o','p','ü'],['a','s','d','f','g','h','j','k','l','ö','ä'],['y','x','c','v','b','n','m',',','.','-']];
+const START=[1,2,4]; // Startspalte pro Reihe (Viertel-Tasten): Q, A, Y
+const FINGERS={a:'qay',s:'wsx',d:'edc',f:'rtfgvb',j:'zuhjnm',k:'ik,',l:'ol.',ö:'pöäü-'};
+const HOME=['a','s','d','f','j','k','l','ö'];
+const kb=document.getElementById('kb'), keyEl={}, lblEl={}, fingEl={};
+const add=(cls,css,txt)=>{const e=document.createElement('div');e.className=cls;if(css)e.style.cssText=css;if(txt)e.textContent=txt;kb.appendChild(e);return e;};
+ROWS.forEach((row,r)=>row.forEach((k,i)=>{
+  const c=START[r]+i*4, st=`grid-row:${r+1};grid-column:${c} / span 4`;
+  keyEl[k]=add('key'+(k==='f'||k==='j'?' home':''),st); keyEl[k].dataset.row=r;
+  lblEl[k]=add('lbl',st,k.toUpperCase()); lblEl[k].dataset.row=r;
+}));
+keyEl[' ']=add('key space');
+// Finger: Spalten der Grundtasten A S D F (2..17) und J K L Ö (26..41)
+['a','s','d','f'].forEach((k,i)=>{fingEl[k]=add('fing',`grid-column:${2+i*4} / span 4`);});
+['j','k','l','ö'].forEach((k,i)=>{fingEl[k]=add('fing',`grid-column:${26+i*4} / span 4`);});
+add('arm l'); add('arm r');
+const thumbL=add('thumb l'), thumbR=add('thumb r');
+
+// aktive Reihen (Vorschau der Level-Stände)
+let active=1;
+function setRows(n){
+  active=n;
+  document.querySelectorAll('.bar .btn').forEach(b=>b.classList.toggle('on',+b.dataset.rows===n));
+  const on=r=>r===1||(n>=2&&r===0)||(n>=3&&r===2);
+  for(const k in keyEl){ if(k===' ')continue; const r=+keyEl[k].dataset.row; keyEl[k].classList.toggle('off',!on(r)); lblEl[k].classList.toggle('off',!on(r)); }
+  frame.querySelectorAll('.block').forEach(b=>b.remove());
+  const list=n===1?['a','s','d','f','j','k','l','ö']:n===2?['e','r','k','u','d','i','o','a']:['y','n','e','m','c','k','s','z'];
+  list.forEach((k,i)=>{
+    const kr=keyEl[k].getBoundingClientRect(), fr=frame.getBoundingClientRect();
+    const b=document.createElement('div'); b.className='block '+(i%3===0?'coal':'stone'); b.textContent=k.toUpperCase();
+    b.style.left=(kr.left+kr.width/2-fr.left)+'px';
+    b.style.setProperty('--end',(document.getElementById('kb').offsetTop-70)+'px');
+    b.style.animationDelay=(-i*0.75)+'s'; frame.appendChild(b);
+  });
+}
+const frame=document.getElementById('frame');
+document.querySelectorAll('.bar .btn').forEach(b=>b.onclick=()=>setRows(+b.dataset.rows));
+
+// Fingerzuordnung und Bewegung
+function fingerOf(k){ for(const h in FINGERS) if(FINGERS[h].includes(k)) return h; return null; }
+function reach(k){
+  const h=fingerOf(k); if(!h) return null;
+  const f=fingEl[h], hk=keyEl[h], t=keyEl[k];
+  f.style.setProperty('--dx',(t.offsetLeft+t.offsetWidth/2-hk.offsetLeft-hk.offsetWidth/2)+'px');
+  f.style.setProperty('--dy',(t.offsetTop-hk.offsetTop)+'px');
+  return f;
+}
+const timers={};
+function strike(k){
+  if(k===' '){ thumbR.classList.add('press'); keyEl[' '].classList.add('pressed'); setTimeout(()=>{thumbR.classList.remove('press');keyEl[' '].classList.remove('pressed');},160); return; }
+  const f=reach(k); if(!f) return;
+  f.classList.add('press'); keyEl[k].classList.add('pressed');
+  clearTimeout(timers[k]);
+  timers[k]=setTimeout(()=>{ f.classList.remove('press'); keyEl[k].classList.remove('pressed'); f.style.removeProperty('--dx'); f.style.removeProperty('--dy'); },160);
+}
+addEventListener('keydown',e=>{ if(e.repeat)return; const k=e.key.toLowerCase(); if(k===' ')e.preventDefault(); if(keyEl[k]) strike(k); });
+// kleine Demo beim Start
+const demo=['f','j',' ','e','n','d',' ','y','k','z'];
+let di=0; const demoT=setInterval(()=>{ if(di>=demo.length){clearInterval(demoT);return;} strike(demo[di++]); },700);
+addEventListener('resize',()=>setRows(active));
+setRows(1);
+</script></body></html>
