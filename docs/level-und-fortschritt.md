@@ -36,7 +36,15 @@ Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level e
 - Ein Level ist freigeschaltet, wenn das vorige mindestens 1 Stern hat.
 
 ## Sterne und Smaragde
-- Genauigkeit = Treffer / (Treffer + Fehler). ≥ 95 % → 3 Sterne, ≥ 85 % → 2, ≥ 70 % → 1, sonst 0 (nochmal, ohne Druck). Die Grundhaltung gibt immer 3 Sterne.
+- Die Sterne hängen an der Zahl der Fehler (`starBudget(target)`, `starsFor()`), nicht an einer sichtbaren Prozentzahl. Intern gilt weiter: Genauigkeit ≥ 95 % → 3 Sterne, ≥ 85 % → 2, ≥ 70 % → 1, sonst 0 (nochmal, ohne Druck). Die Grundhaltung und alle Einführungen geben immer 3 Sterne.
+
+  | Level-Länge | ★★★ | ★★ | ★ |
+  |---|---|---|---|
+  | 16 Tasten | 0 Fehler | bis 2 | bis 6 |
+  | 32 Tasten | bis 1 | bis 5 | bis 13 |
+  | 48 Tasten | bis 2 | bis 8 | bis 20 |
+- Live-Leiste im Spiel (`#goal` in der Kopfzeile, `updateGoal()`): „Treffer / Ziel“, Fortschrittsbalken, drei Sterne und „Noch N Fehler für ★★“. Jeder Fehler über dem Budget lässt einen Stern erlöschen (er kommt nicht zurück). Nur in der Spielphase sichtbar.
+- Abschluss-Fenster zeigt „16 Blöcke, 2 Fehler“ und was für den nächsten Stern nötig ist, keine Prozent.
 - +1 Smaragd pro Treffer, +3 bei mindestens 1 Stern. Hinweis-Knopf kostet 3 Smaragde (hebt den aktuellen Block 3 Sekunden hervor).
 - Eine Spitzhacke gehört dem Kind, sobald das Level mit ihrer `reward` mindestens 1 Stern hat (`hasPick`).
 

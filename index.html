@@ -30,6 +30,15 @@
   @keyframes grow{0%{transform:scale(.05);opacity:0}100%{transform:scale(1);opacity:1}}
   .hidden{display:none !important;}
   .stars{color:#ffd166;font-size:28px;letter-spacing:4px;}
+  /* Live-Anzeige im Spiel: Fortschritt und Sterne */
+  #goal{display:flex;align-items:center;gap:14px;min-height:30px;}
+  #goal .bar{width:200px;flex:none;height:14px;background:#222;border:3px solid #000;box-sizing:border-box;position:relative;}
+  #goal .bar i{position:absolute;left:0;top:0;bottom:0;background:#7ed957;box-shadow:inset 0 3px 0 rgba(255,255,255,.35);transition:width .3s;}
+  #goal .cnt{min-width:60px;font-size:16px;}
+  #goal .gs{color:#ffd166;font-size:26px;letter-spacing:3px;text-shadow:2px 2px 0 #000;}
+  #goal .gs b{font-weight:normal;color:#555;}
+  #goal .gs.lost{animation:wackel .3s;}
+  #goal .note{color:#ddd;font-size:15px;}
 
   /* ---------- Spielfeld mit Tastatur und Händen (Grundhaltung und alle Level) ---------- */
   /* F und J sind Holzblöcke, die mit bloßer Hand abgebaut werden */
@@ -172,6 +181,7 @@
   <div id="game" class="hidden">
     <div class="row">
       <button class="btn" id="backBtn">← Menü</button>
+      <div id="goal" class="hidden"></div>
       <button class="btn" id="hintBtn">Hinweis (3)</button>
     </div>
     <div id="hint"></div>
@@ -740,6 +750,28 @@ function learnSteps(L){
   return Array.from({length: rounds}, () => L.neu).flat();
 }
 
+// Fehler-Budget je Stern: so viele Fehler darf das Kind bei `target` Blöcken machen (95 / 85 / 70 % Genauigkeit)
+function starBudget(target){ return [0.95, 0.85, 0.70].map(p => Math.floor(target * (1 / p - 1) + 1e-9)); }
+function starsFor(wrong, target){
+  const b = starBudget(target);
+  return wrong <= b[0] ? 3 : wrong <= b[1] ? 2 : wrong <= b[2] ? 1 : 0;
+}
+
+// Live-Leiste: Fortschritt und Sterne; jeder Fehler über dem Budget lässt einen Stern erlöschen
+function updateGoal(lost){
+  const el = document.getElementById('goal');
+  if (phase !== 'play' || !run || LEVELS[cur].intro) { el.classList.add('hidden'); return; }
+  const b = starBudget(run.target), stars = starsFor(run.wrong, run.target);
+  const note = stars === 3 ? (run.wrong ? `Noch ${b[0] - run.wrong} Fehler für ★★★` : 'Fehlerfrei bisher!')
+    : stars > 0 ? `Noch ${b[3 - stars] - run.wrong} Fehler für ${'★'.repeat(stars)}`
+    : 'Weiter so! Danach kannst du es nochmal probieren.';
+  el.innerHTML = `<span class="cnt">${run.correct} / ${run.target}</span>
+    <div class="bar"><i style="width:${Math.min(100, run.correct / run.target * 100)}%"></i></div>
+    <span class="gs${lost ? ' lost' : ''}">${'★'.repeat(stars)}<b>${'★'.repeat(3 - stars)}</b></span>
+    <span class="note">${note}</span>`;
+  el.classList.remove('hidden');
+}
+
 function learnHint(k){ return `Drücke ${k.toUpperCase()}: ${FINGER[k]}.`; }
 
 // Nach der Einführung beginnt das eigentliche Level mit den fallenden Blöcken
@@ -752,6 +784,7 @@ function beginPlay(L){
   phase = 'play';
   buildBoard(field, L);
   setHint(L.hint);
+  updateGoal();
   showBlock();
 }
 
@@ -792,6 +825,7 @@ function start(i){
     setHint(L.hint);
     showBlock();
   }
+  updateGoal();
 
   active = true;
   last = performance.now();
@@ -978,11 +1012,14 @@ function onKey(e){
     mineBlock(b);
     beep(660); bounce();
     setHint('Super! +1 Smaragd');
+    updateGoal();
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     setExpected(null);
     pendingTimer = setTimeout(showBlock, 450);
   } else {
+    const before = starsFor(run.wrong, run.target);
     run.wrong++;
+    updateGoal(starsFor(run.wrong, run.target) < before);
     beep(200);
     b.el.classList.remove('shake');
     void b.el.offsetWidth;
@@ -1007,18 +1044,21 @@ function finish(){
   active = false;
   cancelAnimationFrame(raf);
   const L = LEVELS[cur];
-  const tot = run.correct + run.wrong;
-  const acc = tot ? Math.round(run.correct / tot * 100) : 100;
-  const stars = L.intro ? 3 : (acc >= 95 ? 3 : acc >= 85 ? 2 : acc >= 70 ? 1 : 0);
+  const bud = starBudget(run.target);
+  const stars = L.intro ? 3 : starsFor(run.wrong, run.target);
   st.stars[cur] = Math.max(st.stars[cur] || 0, stars);
   if (stars > 0) st.emeralds += 3;
   save();
 
   const box = document.getElementById('overlayBox');
   const next = cur < LEVELS.length - 1 && stars > 0;
+  const fehler = n => n === 1 ? '1 Fehler' : `${n} Fehler`;
+  const detail = L.intro ? '' : `${run.correct} Blöcke, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
+  const ziel = (L.intro || stars === 3) ? ''
+    : `<div style="margin-top:6px;color:#ddd;">${stars === 0 ? `Für ★ höchstens ${fehler(bud[2])}` : `Für ${'★'.repeat(stars + 1)} höchstens ${fehler(bud[3 - stars - 1])}`}.</div>`;
   const msg = stars > 0
-    ? `Geschafft!<br><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>Genauigkeit: ${acc} %<br>+3 ${emeraldSVG(20)}`
-    : `Noch nicht ganz. Genauigkeit: ${acc} %<br>Ohne Druck, einfach nochmal probieren!`;
+    ? `Geschafft!<br><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>${detail}${ziel}<br>+3 ${emeraldSVG(20)}`
+    : `Noch nicht ganz. ${detail}${ziel}<br>Ohne Druck, einfach nochmal probieren!`;
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
   box.innerHTML = `<div style="font-size:20px;font-weight:bold;margin-bottom:10px;">${L.name}</div>${msg}${rw}<div class="btns" style="margin-top:14px;"></div>`;
   const btns = box.querySelector('.btns');

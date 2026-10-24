@@ -7,7 +7,7 @@ Jungen Menschen spielerisch das 10-Finger-Schreiben beibringen, im Minecraft-The
 - Ab Level 1 steht immer nur ein Block mit Buchstaben ruhig über seiner Taste auf der Bildschirmtastatur. Wer die Taste drückt, baut den Block mit einer Minecraft-Animation ab (Risse, Wackeln, Krümel), danach kommt der nächste.
 - Unten liegen zwei Minecraft-Arme mit Händen auf der Tastatur. Der Finger, der die nächste Taste bedienen muss, hebt sich leicht an, greift zur Taste (auch eine Reihe hoch/runter oder zur Seite) und drückt. Danach geht er zurück auf die Grundtaste.
 - Kein Tempodruck, kein Game Over. Ein Block, der unten ankommt, startet einfach wieder oben.
-- Falsche Taste: Der Hinweistext nennt die gesuchte Taste und den Finger. Es zählt als Fehler für die Genauigkeit.
+- Falsche Taste: Der Hinweistext nennt die gesuchte Taste und den Finger. Es zählt als Fehler; die Fehler sind als Sterne sichtbar (Live-Leiste), keine Prozentzahl.
 
 ## Fortschritt und Belohnung
 - Spitzhacken-Stufen zeigen den Lernfortschritt: **Holz → Stein → Eisen → Diamant** (danach wäre Obsidian mit der Diamantspitzhacke möglich, ist noch nicht im Spiel).
