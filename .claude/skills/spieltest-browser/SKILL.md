@@ -1,6 +1,6 @@
 ---
 name: spieltest-browser
-description: Das MineTyper-Spiel mit Playwright in Chromium testen, Level per Bot durchspielen und Screenshots auf Layoutfehler prüfen. Immer vor dem Ausliefern einer Änderung nutzen.
+description: Das Typecraft-Spiel mit Playwright in Chromium testen, Level per Bot durchspielen und Screenshots auf Layoutfehler prüfen. Immer vor dem Ausliefern einer Änderung nutzen.
 ---
 
 # Spieltest im Browser

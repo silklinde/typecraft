@@ -1,4 +1,4 @@
-"""Spieltest für MineTyper: öffnet index.html in Chromium, spielt Level per Bot und macht Screenshots.
+"""Spieltest für Typecraft: öffnet index.html in Chromium, spielt Level per Bot und macht Screenshots.
 Aufruf:  python3 tests/spieltest.py [Level ...]     (Standard: 0 5 13)
 Ausgabe: tests/ausgabe/*.png, Browserfehler auf der Konsole.
 """

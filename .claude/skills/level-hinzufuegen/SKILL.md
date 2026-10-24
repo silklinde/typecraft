@@ -1,6 +1,6 @@
 ---
 name: level-hinzufuegen
-description: Ein neues Level oder neue Tasten im MineTyper-Spiel hinzufügen oder ändern (Level-Daten, Erzart, Belohnung, Tests). Nutzen, wenn Level, Tastenreihenfolge, Trefferzahlen oder Spitzhacken-Belohnungen geändert werden.
+description: Ein neues Level oder neue Tasten im Typecraft-Spiel hinzufügen oder ändern (Level-Daten, Erzart, Belohnung, Tests). Nutzen, wenn Level, Tastenreihenfolge, Trefferzahlen oder Spitzhacken-Belohnungen geändert werden.
 ---
 
 # Level hinzufügen oder ändern

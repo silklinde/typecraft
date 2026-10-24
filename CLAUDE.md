@@ -1,6 +1,6 @@
-# MineTyper – Projektkontext für Agenten
+# Typecraft – Projektkontext für Agenten
 
-Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. Sprache des Projekts, der Oberfläche und aller Dokumente: **Deutsch** (deutsches QWERTZ-Layout). Arbeitstitel früher „FlotteFinger“, Dateinamen früher „tipp-mine“. Der Name im Spiel ist noch „Tipp-Mine“ und soll auf **MineTyper** umgestellt werden (noch nicht gemacht).
+Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. Sprache des Projekts, der Oberfläche und aller Dokumente: **Deutsch** (deutsches QWERTZ-Layout). Arbeitstitel früher „FlotteFinger“, Dateinamen früher „tipp-mine“. Der Name im Spiel ist **Typecraft** (früher MineTyper, davor „Tipp-Mine“).
 
 ## Stand
 - Lauffähiger Prototyp: `index.html` (Stand v9, eine einzige Datei mit HTML, CSS und JS, keine Abhängigkeiten, keine Build-Schritte). Einfach im Browser öffnen.

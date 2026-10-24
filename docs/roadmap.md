@@ -1,7 +1,6 @@
 # Roadmap und offene Punkte
 
 ## Sofort
-- Name im Spiel auf **MineTyper** umstellen (Titel, Kopfzeile, Dateiname).
 - Lokales Git-Repo anlegen bzw. nutzen (Auftraggeber hat ein lokales Repo angelegt; Veröffentlichung z. B. GitHub Pages vorerst nicht gewünscht).
 - Das Abschluss-Fenster von Level 16 (Diamantspitzhacke) einmal im Browser ansehen. Der Bot hat es in der Testzeit nicht erreicht, der Code ist aber derselbe wie bei Eisen.
 - Spielgefühl prüfen: Fallgeschwindigkeit (`SPEED = 40` px/s), Anzahl gleichzeitiger Blöcke (`maxActive` 2 bis 3), Länge von Level 16 (48 Treffer).
