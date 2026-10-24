@@ -1,6 +1,6 @@
 # Typecraft – Projektkontext für Agenten
 
-Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. Sprache des Projekts, der Oberfläche und aller Dokumente: **Deutsch** (deutsches QWERTZ-Layout). Arbeitstitel früher „FlotteFinger“, Dateinamen früher „tipp-mine“. Der Name im Spiel ist **Typecraft** (früher MineTyper, davor „Tipp-Mine“).
+Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. Sprache des Projekts, der Oberfläche und aller Dokumente: **Deutsch** (deutsches QWERTZ-Layout). Der Name im Spiel ist **Typecraft**.
 
 ## Stand
 - Lauffähiger Prototyp: `index.html` (Stand v9, eine einzige Datei mit HTML, CSS und JS, keine Abhängigkeiten, keine Build-Schritte). Einfach im Browser öffnen.
@@ -33,12 +33,11 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 
 ## Arbeitsweise mit dem Auftraggeber
 - Antworten und Texte auf Deutsch, kurz, ohne Fachjargon. Der Auftraggeber prüft meist mit Screenshots und gibt konkretes Feedback zum Aussehen.
-- Änderungen werden als neue Datei geliefert (früher `tipp-mine-vN.html`, fortlaufend; v9 ist die letzte). Behalte das bei oder nutze Git, aber nenne immer, was sich geändert hat.
+- Änderungen werden per Git versioniert; nenne immer, was sich geändert hat.
 - Vor dem Ausliefern immer im Browser prüfen (Playwright, siehe `docs/tests.md`), nicht nur auf Syntax. Früher wurde nur `node --check` benutzt, das reicht nicht für Layout.
 - Frage zuerst, wenn eine Änderung die Spielregeln oben berührt.
 
 ## Stolperfallen
-- Der Speicherschlüssel im localStorage heißt weiterhin `tipp-mine-v6`. Nicht ändern, sonst verlieren Testspieler den Fortschritt. Wenn nötig, Migration einbauen.
 - Level-Nummern stehen im Spielstand als Index (`st.stars[i]`). Neue Level nur **am Ende** anhängen oder alle Verweise (`reward`, Shop `need`) prüfen.
 - Die Taste Ö lässt sich in Playwright nicht per `keyboard.press` senden. Nutze `dispatchEvent(new KeyboardEvent('keydown', {key:'ö'}))`.
 - Alle Positionen der Tastatur hängen an einem 45-Spalten-Raster (Viertel-Tasten). Wer Reihen oder Tasten ändert, muss `ROWSTART`, die CSS-Spalten der Arme und Daumen und `cxOf()` gemeinsam anpassen (siehe `docs/architektur.md`).

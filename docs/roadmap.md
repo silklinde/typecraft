@@ -20,4 +20,3 @@
 
 ## Technik
 - Bei Wachstum die Datei in mehrere Dateien teilen (CSS, Daten, Logik) oder ES-Module nutzen, Bündelung erst wenn nötig.
-- Spielstand-Migration vorbereiten (`tipp-mine-v6` Schlüssel).

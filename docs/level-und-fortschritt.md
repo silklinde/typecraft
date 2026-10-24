@@ -50,4 +50,4 @@ Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level e
 Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Verläufe (`wald`, `hoehle`). Skins gibt es noch nicht.
 
 ## Spielstand
-`localStorage['tipp-mine-v6']` = `{emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
+`localStorage['typecraft-v1']` = `{emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
