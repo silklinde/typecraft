@@ -34,6 +34,7 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 ## Arbeitsweise mit dem Auftraggeber
 - Antworten und Texte auf Deutsch, kurz, ohne Fachjargon. Der Auftraggeber prüft meist mit Screenshots und gibt konkretes Feedback zum Aussehen.
 - Änderungen werden per Git versioniert; nenne immer, was sich geändert hat.
+- **Nach jeder Änderung sofort committen und pushen**, auch bevor getestet wurde. Der Auftraggeber sagt nach einem erfolgreichen Test nicht extra, dass gepusht werden soll. Gearbeitet wird direkt auf `main`. Schlägt ein Test danach fehl, wird der Fehler in einem Folge-Commit behoben.
 - Vor dem Ausliefern immer im Browser prüfen (Playwright, siehe `docs/tests.md`), nicht nur auf Syntax. Früher wurde nur `node --check` benutzt, das reicht nicht für Layout.
 - Frage zuerst, wenn eine Änderung die Spielregeln oben berührt.
 
