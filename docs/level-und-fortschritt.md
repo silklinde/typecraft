@@ -32,12 +32,12 @@ Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level e
  intro:true,                    // nur Grundhaltung
  reward:'holz'|'stein'|'eisen'|'diamant'}   // Spitzhacke im Abschluss-Fenster
 ```
-- Bekannte Tasten fallen als **Stein**, neue Tasten des Levels als **Erz**. Neue Tasten werden doppelt gewichtet.
+- Bekannte Tasten erscheinen als **Stein**, neue Tasten des Levels als **Erz** (immer nur ein Block, nie zweimal dieselbe Taste hintereinander). Neue Tasten werden doppelt gewichtet.
 - Ein Level ist freigeschaltet, wenn das vorige mindestens 1 Stern hat.
 
 ## Sterne und Smaragde
 - Genauigkeit = Treffer / (Treffer + Fehler). ≥ 95 % → 3 Sterne, ≥ 85 % → 2, ≥ 70 % → 1, sonst 0 (nochmal, ohne Druck). Die Grundhaltung gibt immer 3 Sterne.
-- +1 Smaragd pro Treffer, +3 bei mindestens 1 Stern. Hinweis-Knopf kostet 3 Smaragde (hebt den untersten Block 3 Sekunden hervor).
+- +1 Smaragd pro Treffer, +3 bei mindestens 1 Stern. Hinweis-Knopf kostet 3 Smaragde (hebt den aktuellen Block 3 Sekunden hervor).
 - Eine Spitzhacke gehört dem Kind, sobald das Level mit ihrer `reward` mindestens 1 Stern hat (`hasPick`).
 
 ## Shop (Array `SHOP`)

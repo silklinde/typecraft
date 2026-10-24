@@ -9,13 +9,13 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 - Lokal getestet nur mit Chromium/Playwright (siehe `docs/tests.md`). Ein Test auf echten Geräten und Fenstergrößen steht aus.
 
 ## Wichtigste Regeln (vom Auftraggeber so entschieden)
-1. **Kein Zeit- oder Tempodruck.** Wichtig sind das Einprägen der Positionen durch Wiederholung und das schrittweise Erweitern der Tasten. Blöcke fallen langsam, ein Block erreicht nie „Game Over“, er startet einfach wieder oben.
+1. **Kein Zeit- oder Tempodruck.** Wichtig sind das Einprägen der Positionen durch Wiederholung und das schrittweise Erweitern der Tasten. Ab Level 1 steht immer nur **ein** Block ruhig da (er fällt nicht), er bleibt stehen, bis die Taste getippt ist.
 2. **Nur Desktop** (dort schreibt man mit 10 Fingern). Kein Touch, kein Mobil-Layout.
 3. **Hände liegen ruhig auf der Tastatur, nur die Finger bewegen sich.** Das ist der Sinn des Systems und darf nicht durch Animationen verletzt werden. Die Daumen liegen auf der Leertaste, die Hände sind Minecraft-Arme (genau so breit wie vier Tasten), die Finger sind Teil des Arms.
-4. **Blöcke fallen in der Spalte der passenden Taste** auf der Bildschirmtastatur.
+4. **Der Block steht in der Spalte der passenden Taste** auf der Bildschirmtastatur. Ein Tastendruck baut ihn mit einer Minecraft-Animation ab (Risse, Wackeln, Krümel), danach kommt der nächste.
 5. **Nur Blöcke, die man mit der aktuellen Spitzhacke abbauen kann, kommen ins Spiel.** Keine grauen „noch gesperrt“-Blöcke.
 6. **Schneller sichtbarer Erfolg** zu Beginn: Level 0 beginnt mit „Hände auflegen“ (Demo ca. 20 s, überspringbar, dann 9 Tastendrücke), danach ist die Grundhaltung kurz (6 Tastendrücke) und gibt die Holzspitzhacke.
-7. **Jedes Level mit neuen Tasten beginnt mit einer Einführung** wie die Grundhaltung: die neuen Tasten erscheinen als große Erzblöcke über ihrer Taste, das Kind tippt sie mehrmals (6 Tastendrücke), danach fallen die Blöcke.
+7. **Jedes Level mit neuen Tasten beginnt mit einer Einführung** wie die Grundhaltung: die neuen Tasten erscheinen als große Erzblöcke über ihrer Taste, das Kind tippt sie mehrmals (6 Tastendrücke), danach erscheinen die Blöcke einzeln.
 8. Nicht kommerziell. Eigene Pixelgrafik für alles (Texturen, Spitzhacken, Smaragd), **keine Mojang-Dateien** verwenden. Minecraft ist eine Marke von Mojang.
 9. Das Abschluss-Fenster (Modal) liegt immer über allem, erscheint 1 Sekunde nach dem letzten Treffer und wächst aus der Mitte. Mit Enter geht es weiter. In dieser Sekunde zählen keine Anschläge mehr.
 

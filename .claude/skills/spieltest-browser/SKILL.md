@@ -21,4 +21,4 @@ Reine Syntaxprüfung reicht nicht, weil fast alle Fehler im Layout und im Zusamm
 ## Tricks
 - Zustand setzen: `pg.evaluate("st.stars={0:3}; save(); renderMenu(); start(5)")`.
 - Tasten immer per `dispatchEvent(new KeyboardEvent('keydown',{key:k}))` senden (Ö, Ü, Ä gehen mit `keyboard.press` nicht).
-- Wenn der Bot ein Level in der Zeit nicht schafft, die Schleife in `spieltest.py` verlängern. Die Fallgeschwindigkeit ist langsam (40 px/s).
+- Wenn der Bot ein Level in der Zeit nicht schafft, die Schleife in `spieltest.py` verlängern. Pro Block dauern Abbau und Pause ca. 0,8 s.

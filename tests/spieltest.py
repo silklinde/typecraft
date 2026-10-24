@@ -45,8 +45,15 @@ with sync_playwright() as p:
             if pg.evaluate('phase') == 'learn':
                 for k in pg.evaluate('learn.seq'): taste(k); pg.wait_for_timeout(100)
                 pg.wait_for_timeout(1500)
-            pg.wait_for_timeout(3500)
+            pg.wait_for_timeout(800)
             pg.screenshot(path=f'{AUS}/level{lv}_spiel.png')
+            # falsche Taste: Block wackelt, zählt als Fehler; richtige Taste: Screenshot mitten im Abbau
+            falsch = pg.evaluate('(()=>{const L=LEVELS[cur];return L.keys.find(k=>k!==run.cur.key)})()')
+            taste(falsch); pg.wait_for_timeout(100)
+            assert pg.evaluate('run.wrong') == 1
+            taste(pg.evaluate('run.cur.key')); pg.wait_for_timeout(180)
+            pg.screenshot(path=f'{AUS}/level{lv}_abbau.png')
+            pg.wait_for_timeout(700)
             for _ in range(1500):
                 low = pg.evaluate('(()=>{const b=lowestBlock();return b?b.key:null})()')
                 if low: taste(low)
