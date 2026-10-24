@@ -3,7 +3,7 @@
 Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. Sprache des Projekts, der Oberfläche und aller Dokumente: **Deutsch** (deutsches QWERTZ-Layout). Der Name im Spiel ist **Typecraft**.
 
 ## Stand
-- Lauffähiger Prototyp: `index.html` (Stand v9, eine einzige Datei mit HTML, CSS und JS, keine Abhängigkeiten, keine Build-Schritte). Einfach im Browser öffnen.
+- Lauffähiger Prototyp: `index.html` (Stand v10, eine einzige Datei mit HTML, CSS und JS, keine Abhängigkeiten, keine Build-Schritte). Einfach im Browser öffnen.
 - 17 Level (Grundhaltung + Level 1–16): Grundreihe, obere Reihe, untere Reihe, mit Spitzhacken-Belohnungen Holz, Stein, Eisen, Diamant.
 - Noch nicht umgesetzt: Skins, weitere Haustiere und Biome, Zahlenreihe, Umschalttaste, Ä (siehe `docs/roadmap.md`).
 - Lokal getestet nur mit Chromium/Playwright (siehe `docs/tests.md`). Ein Test auf echten Geräten und Fenstergrößen steht aus.
@@ -14,7 +14,7 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 3. **Hände liegen ruhig auf der Tastatur, nur die Finger bewegen sich.** Das ist der Sinn des Systems und darf nicht durch Animationen verletzt werden. Die Daumen liegen auf der Leertaste, die Hände sind Minecraft-Arme (genau so breit wie vier Tasten), die Finger sind Teil des Arms.
 4. **Blöcke fallen in der Spalte der passenden Taste** auf der Bildschirmtastatur.
 5. **Nur Blöcke, die man mit der aktuellen Spitzhacke abbauen kann, kommen ins Spiel.** Keine grauen „noch gesperrt“-Blöcke.
-6. **Schneller sichtbarer Erfolg** zu Beginn: Die Grundhaltung ist kurz (6 Tastendrücke) und gibt sofort die Holzspitzhacke.
+6. **Schneller sichtbarer Erfolg** zu Beginn: Level 0 beginnt mit „Hände auflegen“ (Demo ca. 20 s, überspringbar, dann 9 Tastendrücke), danach ist die Grundhaltung kurz (6 Tastendrücke) und gibt die Holzspitzhacke.
 7. **Jedes Level mit neuen Tasten beginnt mit einer Einführung** wie die Grundhaltung: die neuen Tasten erscheinen als große Erzblöcke über ihrer Taste, das Kind tippt sie mehrmals (6 Tastendrücke), danach fallen die Blöcke.
 8. Nicht kommerziell. Eigene Pixelgrafik für alles (Texturen, Spitzhacken, Smaragd), **keine Mojang-Dateien** verwenden. Minecraft ist eine Marke von Mojang.
 9. Das Abschluss-Fenster (Modal) liegt immer über allem, erscheint 1 Sekunde nach dem letzten Treffer und wächst aus der Mitte. Mit Enter geht es weiter. In dieser Sekunde zählen keine Anschläge mehr.

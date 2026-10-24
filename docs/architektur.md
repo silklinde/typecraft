@@ -3,6 +3,7 @@
 Eine Datei: `<style>` (CSS), HTML-Gerüst (Menü `#menu`, Spiel `#game`, Modal `#overlay`) und ein `<script>` ohne Bibliotheken. Zeichnen per DOM und CSS, Spielschleife per `requestAnimationFrame` (`tick`).
 
 ## Zustände (`phase`)
+- `haende` – Level 0, erster Teil „Hände auflegen“: `hz.step` = `show` (nur Hände) → `demo` (Finger legen sich nacheinander auf, `HAENDE_SEQ` = A S D F ␣ J K L Ö) → `tippen` (Kind drückt die Tasten, Finger bleiben unten) → `done` → `startGrund()`. Finger sind per Klasse `.away` angehoben, `layFinger(k)` legt sie ab. Schritte laufen als Kette über `pendingTimer` (`later()`). Enter überspringt die Demo, Button „Überspringen“ den ganzen Teil.
 - `grund` – Grundhaltung (Level 0): Holzblöcke F, Leertaste, J; Reihenfolge `GRUND_SEQ` = F J ␣ F J ␣.
 - `learn` – Einführung in Levels mit neuen Tasten: große Erzblöcke `#big-<taste>`, `learn.seq` (6 Tastendrücke, nur neue Tasten werden gewertet).
 - `wait` – 1 Sekunde Pause nach der Einführung (`pendingTimer`), dann `beginPlay`.

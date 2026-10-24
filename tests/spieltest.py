@@ -27,6 +27,19 @@ with sync_playwright() as p:
         pg.evaluate(f'start({lv})'); pg.wait_for_timeout(300)
         pg.screenshot(path=f'{AUS}/level{lv}_start.png')
         if lv == 0:
+            # Hände auflegen: nur Hände, Tastatur, Demo, selbst tippen, dann Grundhaltung
+            pg.wait_for_timeout(1200); pg.screenshot(path=f'{AUS}/level0_haende1_nur_haende.png')
+            pg.wait_for_timeout(3500); pg.screenshot(path=f'{AUS}/level0_haende2_tastatur.png')
+            pg.wait_for_timeout(7000); pg.screenshot(path=f'{AUS}/level0_haende3_demo.png')
+            taste('Enter'); pg.wait_for_timeout(300)   # Demo überspringen
+            assert pg.evaluate('hz.step') == 'tippen'
+            for k in ['a', 's', 'd', 'f', ' ']: taste(k); pg.wait_for_timeout(150)
+            taste('x'); pg.wait_for_timeout(150)       # falsche Taste zählt nicht
+            pg.screenshot(path=f'{AUS}/level0_haende4_tippen.png')
+            for k in ['j', 'k', 'l', 'ö']: taste(k); pg.wait_for_timeout(150)
+            pg.wait_for_timeout(2300)
+            assert pg.evaluate('phase') == 'grund'
+            pg.screenshot(path=f'{AUS}/level0_grund.png')
             for k in ['f', 'j', ' ', 'f', 'j', ' ']: taste(k); pg.wait_for_timeout(120)
         else:
             if pg.evaluate('phase') == 'learn':
