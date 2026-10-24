@@ -78,7 +78,7 @@
         transition:transform .15s,filter .15s;transform:translate(var(--dx,0px),var(--dy,0px));}
   /* Nur in "Hände auflegen": Finger sind angehoben und gedimmt, bis sie auf ihrer Taste liegen */
   .fing.away:not(.hover),.thumb.away:not(.hover){transform:translate(var(--dx,0px),calc(var(--dy,0px) - 20px));filter:brightness(.55);}
-  .fing.hover{transform:translate(var(--dx,0px),calc(var(--dy,0px) - 8px));filter:brightness(1.15);}
+  .fing.hover{transform:translate(var(--dx,0px),calc(var(--dy,0px) - 8px));filter:brightness(1.15) drop-shadow(0 0 6px #ffd166) drop-shadow(0 0 3px #ffd166);}
   .fing.press{transform:translate(var(--dx,0px),calc(var(--dy,0px) + 8px));}
   .arm{z-index:3;grid-row:4;align-self:start;height:600px;margin:-8px 4px 0;box-sizing:border-box;border:3px solid #000;background-color:#00a0b8;
        background-image:var(--askin),var(--sleeve);background-size:100% 110px,100% 110px;
@@ -90,7 +90,7 @@
          background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;transition:transform .15s,filter .15s;}
   .thumb.l{grid-column:18 / 22;margin-left:-6px;margin-right:4px;border-radius:0 10px 10px 0;}
   .thumb.r{grid-column:22 / 26;margin-left:4px;margin-right:-6px;border-radius:10px 0 0 10px;}
-  .thumb.hover{transform:translateY(-8px);filter:brightness(1.15);}
+  .thumb.hover{transform:translateY(-8px);filter:brightness(1.15) drop-shadow(0 0 6px #ffd166) drop-shadow(0 0 3px #ffd166);}
   .thumb.press{transform:translateY(8px);}
 
   /* Hände auflegen (Level 0, vor der Grundhaltung): erst nur die Hände, dann blendet die Tastatur ein */
