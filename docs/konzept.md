@@ -25,4 +25,4 @@ Jungen Menschen spielerisch das 10-Finger-Schreiben beibringen, im Minecraft-The
 - Spitzhacken-Symbolik beibehalten, Erze pro Stufe statt reiner Fingerfarben.
 
 ## Reihenfolge der Tasten (lernpsychologisch)
-Grundhaltung F J + Daumen/Leertaste → A S D → K L Ö → G H → ganze Grundreihe → obere Reihe paarweise (E I, R U, T Z, W O, Q P Ü) → untere Reihe paarweise (C ‚, V M, B N, X ., Y -). Immer erst die starken Finger, die Zeigefinger-Seitenstrecker (G H, T Z, B N) jeweils später.
+Grundhaltung F J + Daumen/Leertaste → A S D (nur linke Hand) → K L Ö (nur rechte Hand) → G H → ganze Grundreihe → obere Reihe paarweise (E I, R U, T Z, W O, Q P Ü) → untere Reihe paarweise (C ‚, V M, B N, X ., Y -). Immer erst die starken Finger, die Zeigefinger-Seitenstrecker (G H, T Z, B N) jeweils später.

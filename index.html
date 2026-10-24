@@ -269,10 +269,10 @@ function tippenText(k){
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
   {name:'Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, haende:true, target:6, reward:'holz'},
-  {name:'Level 1: A S D', keys:['a','s','d','f','j'], neu:['a','s','d'],
-   hint:'Neu: A, S und D (linke Hand). Die Kohleblöcke zeigen dir die neuen Tasten. Tippe die Taste, um den Block abzubauen.', target:16},
-  {name:'Level 2: + K L Ö', keys:['a','s','d','f','j','k','l','ö'], neu:['k','l','ö'],
-   hint:'Neu: K, L und Ö (rechte Hand). Die Kohleblöcke zeigen dir die neuen Tasten.', target:16},
+  {name:'Level 1: A S D', keys:['a','s','d','f'], neu:['a','s','d'],
+   hint:'Neu: A, S und D (nur linke Hand, die rechte ruht). Die Kohleblöcke zeigen dir die neuen Tasten. Tippe die Taste, um den Block abzubauen.', target:16},
+  {name:'Level 2: K L Ö', keys:['j','k','l','ö'], neu:['k','l','ö'],
+   hint:'Neu: K, L und Ö (nur rechte Hand, die linke ruht). Die Kohleblöcke zeigen dir die neuen Tasten.', target:16},
   {name:'Level 3: + G H', keys:HOME10, neu:['g','h'],
    hint:'Neu: G und H (Kohle). Dafür streckt sich der Zeigefinger zur Seite und geht danach zurück auf F bzw. J.', target:16},
   {name:'Level 4: Ganze Reihe', keys:HOME10, neu:[],

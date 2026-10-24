@@ -5,8 +5,8 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 | Nr | Name | Neue Tasten | Erz | Treffer | Belohnung |
 |----|------|-------------|-----|---------|-----------|
 | 0 | Grundhaltung | F J + Leertaste | Holz | 6 (F J Leertaste, zweimal) | Holzspitzhacke |
-| 1 | A S D | A S D | Kohle | 16 | |
-| 2 | + K L Ö | K L Ö | Kohle | 16 | |
+| 1 | A S D | A S D | Kohle | 16 | nur linke Hand (A S D F) |
+| 2 | K L Ö | K L Ö | Kohle | 16 | nur rechte Hand (J K L Ö) |
 | 3 | + G H | G H | Kohle | 16 | |
 | 4 | Ganze Reihe | – | Kohle (zufällig ca. jeder dritte Block) | 32 | Steinspitzhacke |
 | 5 | + E I | E I | Eisen | 16 | |
