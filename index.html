@@ -565,32 +565,13 @@ function bounce(){
   });
 }
 
-// Töne mit der Web Audio API: ein einziger AudioContext, beim ersten Ton angelegt
-let audioCtx = null;
-function getAudio(){
+function beep(freq){
   try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-  } catch(e){ return null; }
-  return audioCtx;
-}
-
-// Erfolgston: heller "Bling" aus zwei aufsteigenden Glockentönen (nur bei Erfolgsmomenten, nie bei Fehlern)
-function playErfolgTon(){
-  const c = getAudio(); if (!c) return;
-  // [Grundton, Start, Lautstärke]; jeder Ton klingt mit einem Oberton (Faktor 2,76 wie bei Glocken) lange aus
-  [[988, 0, 0.4], [1319, 0.09, 0.45]].forEach(([f, dt, vol]) => {
-    const t = c.currentTime + dt;
-    [[1, 1], [2.76, 0.35]].forEach(([mul, amp]) => {
-      const o = c.createOscillator(), g = c.createGain();
-      o.type = mul === 1 ? 'triangle' : 'sine'; o.frequency.value = f * mul;
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(vol * amp, t + 0.004);
-      g.gain.exponentialRampToValueAtTime(0.001, t + (mul === 1 ? 0.7 : 0.3));
-      o.connect(g); g.connect(c.destination);
-      o.start(t); o.stop(t + 0.75);
-    });
-  });
+    const c = new (window.AudioContext || window.webkitAudioContext)();
+    const o = c.createOscillator(), g = c.createGain();
+    o.frequency.value = freq; o.connect(g); g.connect(c.destination);
+    g.gain.value = 0.05; o.start(); o.stop(c.currentTime + 0.12);
+  } catch(e){}
 }
 
 // ---------- Tastatur mit Händen (für Grundhaltung und alle Level) ----------
@@ -998,6 +979,7 @@ function onKey(e){
     hz.busy = true;
     document.querySelectorAll('#hrow .hname').forEach(n => n.remove());
     layFinger(k);
+    beep(660);
     mineBlock(hz.blk);
     hz.idx++;
     if (hz.idx >= HAENDE_SEQ.length) {
@@ -1022,6 +1004,7 @@ function onKey(e){
     run.correct++;
     run.busy = true;
     pressKey(k);
+    beep(660);
     mineBlock(run.cur);
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     later(grundAsk, 450);
@@ -1034,7 +1017,7 @@ function onKey(e){
     const want = learn.seq[learn.idx];
     if (k !== want) { setHint(learnHint(want)); return; }
     pressKey(k);
-    bounce();
+    beep(660); bounce();
     learn.idx++;
     if (learn.idx >= learn.seq.length) {
       phase = 'wait';
@@ -1061,7 +1044,7 @@ function onKey(e){
     save(); topBar();
     pressKey(k);
     mineBlock(b);
-    bounce();
+    beep(660); bounce();
     setHint('Super! +1 Smaragd');
     updateGoal();
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
@@ -1071,6 +1054,7 @@ function onKey(e){
     const before = starsFor(run.wrong, run.target);
     run.wrong++;
     updateGoal(starsFor(run.wrong, run.target) < before);
+    beep(200);
     b.el.classList.remove('shake');
     void b.el.offsetWidth;
     b.el.classList.add('shake');
@@ -1127,7 +1111,6 @@ function finish(){
   pendingTimer = setTimeout(() => {
     topBar();
     document.getElementById('overlay').style.display = 'flex';
-    if (stars > 0) playErfolgTon();
   }, 1000);
 }
 
@@ -1139,8 +1122,6 @@ document.getElementById('hintBtn').onclick = useHint;
 document.getElementById('emIcon').innerHTML = emeraldSVG(30);
 document.getElementById('hintBtn').innerHTML = `Hinweis (3 ${emeraldSVG(16)})`;
 window.addEventListener('keydown', onKey);
-// Audio beim ersten Tastendruck oder Klick freischalten (Browser erlauben Ton erst nach einer Eingabe)
-['keydown', 'pointerdown'].forEach(ev => window.addEventListener(ev, getAudio, { once: true }));
 
 renderMenu();
 </script>
