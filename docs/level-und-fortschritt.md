@@ -11,24 +11,24 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 | 4 | + G H | G H | Kohle | 16 | |
 | 5 | Ganze Reihe | – | Kohle (zufällig ca. jeder dritte Block) | 32 | Steinspitzhacke |
 | 6 | + E I | E I | Eisen | 16 | |
-| 7 | + R U | R U | Eisen | 16 | |
-| 8 | + T Z | T Z | Eisen | 16 | |
+| 7 | + R U | R U | Kupfer | 16 | |
+| 8 | + T Z | T Z | Lapislazuli | 16 | |
 | 9 | + W O | W O | Eisen | 16 | |
-| 10 | + Q P Ü | Q P Ü | Eisen | 16 | |
-| 11 | Obere Reihe | – | Eisen = Tasten der oberen Reihe | 32 | Eisenspitzhacke |
+| 10 | + Q P Ü | Q P Ü | Kupfer | 16 | |
+| 11 | Obere Reihe | – | Erze der Tasten der oberen Reihe (je Taste wie oben) | 32 | Eisenspitzhacke |
 | 12 | + C , | C , | Diamant | 16 | |
-| 13 | + V M | V M | Diamant | 16 | |
-| 14 | + B N | B N | Diamant | 16 | |
+| 13 | + V M | V M | Gold | 16 | |
+| 14 | + B N | B N | Redstone | 16 | |
 | 15 | + X . | X . | Diamant | 16 | |
-| 16 | + Y - | Y - | Diamant | 16 | |
-| 17 | Alle Reihen | – | Diamant = Tasten der unteren Reihe | 48 | Diamantspitzhacke |
+| 16 | + Y - | Y - | Gold | 16 | |
+| 17 | Alle Reihen | – | Erze der Tasten der unteren Reihe (je Taste wie oben) | 48 | Diamantspitzhacke |
 
 Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level enthalten.
 
 ## Level-Felder
 ```js
 {name, keys:[...aktive Tasten], neu:[...neue Tasten], hint:'Text', target:Trefferzahl,
- ore:'coal'|'iron'|'diamond',   // Erzart der neuen Tasten (Standard: coal)
+ ore:'coal'|'iron'|'copper'|'lapis'|'diamond'|'gold'|'redstone',   // Erzart der neuen Tasten (Standard: coal); in Übungslevels gilt je Taste das Erz aus ihrem Einführungslevel (`ORE_OF`)
  oreRow:0|2,                    // nur in Übungslevels: Tasten dieser Reihe sind Erz (0 oben, 2 unten)
  intro:true, haende:true,        // Level 0 (Hände auflegen); intro allein = Grundhaltung
  reward:'holz'|'stein'|'eisen'|'diamant'}   // Spitzhacke im Abschluss-Fenster

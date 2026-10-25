@@ -14,8 +14,9 @@ Jungen Menschen spielerisch das 10-Finger-Schreiben beibringen, im Minecraft-The
 - Welche Erze zu welcher Stufe gehören (so von Auftraggeber vorgegeben):
   - Holzblöcke (F, J): mit bloßer Hand abbaubar → Holzspitzhacke nach der Grundhaltung.
   - Stein und Kohle (Level 2–5): → Steinspitzhacke nach Level 5. Mit ihr baut man Kohle, Kupfer, Lapislazuli und Eisen ab.
-  - Eisenerz (obere Reihe, Level 6–11) → Eisenspitzhacke nach Level 11. Mit ihr baut man Gold, Diamant und Redstone ab.
-  - Diamanterz (untere Reihe, Level 12–17) → Diamantspitzhacke nach Level 17.
+  - Obere Reihe (Level 6–11): Eisen, Kupfer und Lapislazuli, alle mit der Steinspitzhacke abbaubar → Eisenspitzhacke nach Level 11. Mit ihr baut man Gold, Diamant und Redstone ab.
+  - Untere Reihe (Level 12–17): Diamant, Gold und Redstone, mit der Eisenspitzhacke abbaubar → Diamantspitzhacke nach Level 17.
+  - Jede Taste behält immer ihr Erz (`ORE_OF`). Beide Tasten eines Paares haben dasselbe Erz.
 - Der Erfolg (neue Spitzhacke) erscheint im Abschluss-Fenster des Levels. Oben rechts liegt eine Schnellzugriffsleiste mit 4 Slots wie in Minecraft, die beste Spitzhacke ist ausgewählt. Links daneben steht nur Smaragd-Symbol und Zahl.
 - **Smaragde** sind die Punkte: +1 pro Treffer, +3 bei Levelerfolg. Damit schaltet man im Shop Haustiere und Biome frei und kauft Hinweise (3 Smaragde).
 

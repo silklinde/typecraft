@@ -50,6 +50,10 @@
   .block.coal{background-image:var(--coal);}
   .block.iron{background-image:var(--iron);}
   .block.diamond{background-image:var(--diamond);}
+  .block.copper{background-image:var(--copper);}
+  .block.lapis{background-image:var(--lapis);}
+  .block.gold{background-image:var(--gold);}
+  .block.redstone{background-image:var(--redstone);}
   .block.glow{outline:4px solid #ffd166;}
   /* Ein einzelner, ruhig stehender Block über seiner Taste (ab Level 2) */
   .block.big{top:24px;width:clamp(96px,17vh,150px);height:clamp(96px,17vh,150px);border-width:4px;font-size:clamp(56px,10vh,92px);
@@ -129,6 +133,10 @@
   .nk.coal{background-image:var(--coal);}
   .nk.iron{background-image:var(--iron);}
   .nk.diamond{background-image:var(--diamond);}
+  .nk.copper{background-image:var(--copper);}
+  .nk.lapis{background-image:var(--lapis);}
+  .nk.gold{background-image:var(--gold);}
+  .nk.redstone{background-image:var(--redstone);}
   .nk.next{scale:1.1;outline:4px solid #ffd166;}
   .nk.hit{scale:.9;}
 
@@ -235,6 +243,22 @@ const KEY = 'typecraft-v1';
     [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
     [1,1,2,2,'#33ebcb'],[5,2,2,3,'#33ebcb'],[2,5,3,2,'#1fb89e'],[6,6,2,2,'#7ff5e0'],[1,1,1,1,'#c8fbf3']
   ])));
+  r.setProperty('--copper', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#c8774a'],[5,2,2,3,'#c8774a'],[2,5,3,2,'#a85d36'],[6,6,2,2,'#e0956a'],[1,1,1,1,'#f0b48c']
+  ])));
+  r.setProperty('--lapis', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#2a52be'],[5,2,2,3,'#2a52be'],[2,5,3,2,'#1c3a94'],[6,6,2,2,'#4a72e0'],[1,1,1,1,'#7a9af0']
+  ])));
+  r.setProperty('--gold', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#f5d33b'],[5,2,2,3,'#f5d33b'],[2,5,3,2,'#d4aa1e'],[6,6,2,2,'#fff07a'],[1,1,1,1,'#fffbc0']
+  ])));
+  r.setProperty('--redstone', px(tex(8, 8, '#8a8a8a', [
+    [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
+    [1,1,2,2,'#d02020'],[5,2,2,3,'#d02020'],[2,5,3,2,'#9c1414'],[6,6,2,2,'#ff4a3a'],[1,1,1,1,'#ff8a7a']
+  ])));
   r.setProperty('--coal', px(tex(8, 8, '#8a8a8a', [
     [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
     [1,1,2,2,'#1e1e1e'],[5,2,2,3,'#1e1e1e'],[2,5,3,2,'#1e1e1e'],[6,6,2,2,'#2c2c2c'],[1,1,1,1,'#3a3a3a']
@@ -295,33 +319,33 @@ const LEVELS = [
   {name:'Level 5: Ganze Reihe', keys:HOME10, neu:[],
    hint:'Übung: Alle Tasten der Grundreihe, Stein und Kohle. Lass die Hände ruhig liegen und bewege nur die Finger.', target:32, reward:'stein'},
 
-  // Obere Reihe: Eisenerz (mit der Steinspitzhacke abbaubar). Die Finger greifen eine Reihe nach oben und gehen zurück auf die Grundtaste.
+  // Obere Reihe: Eisen, Kupfer, Lapislazuli (mit der Steinspitzhacke abbaubar). Die Finger greifen eine Reihe nach oben und gehen zurück auf die Grundtaste.
   {name:'Level 6: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
    hint:'Neu: E und I (Eisenerz, beide Mittelfinger). Greife eine Reihe nach oben und gehe danach zurück auf D bzw. K.', target:16},
-  {name:'Level 7: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'iron',
-   hint:'Neu: R (linker Zeigefinger) und U (rechter Zeigefinger). Nach dem Tippen geht der Finger zurück auf F bzw. J.', target:16},
-  {name:'Level 8: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'iron',
-   hint:'Neu: T und Z. Die Zeigefinger strecken sich nach oben und zur Seite. Danach zurück auf F bzw. J.', target:16},
+  {name:'Level 7: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'copper',
+   hint:'Neu: R (Kupfererz, linker Zeigefinger) und U (rechter Zeigefinger). Nach dem Tippen geht der Finger zurück auf F bzw. J.', target:16},
+  {name:'Level 8: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'lapis',
+   hint:'Neu: T und Z (Lapislazuli). Die Zeigefinger strecken sich nach oben und zur Seite. Danach zurück auf F bzw. J.', target:16},
   {name:'Level 9: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
    hint:'Neu: W (linker Ringfinger) und O (rechter Ringfinger).', target:16},
-  {name:'Level 10: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'iron',
-   hint:'Neu: Q (linker kleiner Finger), P und Ü (rechter kleiner Finger).', target:16},
+  {name:'Level 10: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'copper',
+   hint:'Neu: Q (Kupfererz, linker kleiner Finger), P und Ü (rechter kleiner Finger).', target:16},
   {name:'Level 11: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
-   hint:'Übung: Grundreihe und obere Reihe. Eisenerz sind die Tasten der oberen Reihe.', target:32, reward:'eisen'},
+   hint:'Übung: Grundreihe und obere Reihe. Erze sind die Tasten der oberen Reihe.', target:32, reward:'eisen'},
 
-  // Untere Reihe: Diamanterz (mit der Eisenspitzhacke abbaubar)
+  // Untere Reihe: Diamant, Gold, Redstone (mit der Eisenspitzhacke abbaubar)
   {name:'Level 12: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
    hint:'Neu: C (linker Mittelfinger) und Komma (rechter Mittelfinger). Greife eine Reihe nach unten und gehe zurück auf D bzw. K.', target:16},
-  {name:'Level 13: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'diamond',
-   hint:'Neu: V (linker Zeigefinger) und M (rechter Zeigefinger). Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 14: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'diamond',
-   hint:'Neu: B und N. Die Zeigefinger strecken sich nach unten und zur Seite. Danach zurück auf F bzw. J.', target:16},
+  {name:'Level 13: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'gold',
+   hint:'Neu: V (Golderz, linker Zeigefinger) und M (rechter Zeigefinger). Danach zurück auf F bzw. J.', target:16},
+  {name:'Level 14: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'redstone',
+   hint:'Neu: B und N (Redstone). Die Zeigefinger strecken sich nach unten und zur Seite. Danach zurück auf F bzw. J.', target:16},
   {name:'Level 15: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
    hint:'Neu: X (linker Ringfinger) und Punkt (rechter Ringfinger).', target:16},
-  {name:'Level 16: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'diamond',
-   hint:'Neu: Y (linker kleiner Finger) und Bindestrich (rechter kleiner Finger).', target:16},
+  {name:'Level 16: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'gold',
+   hint:'Neu: Y (Golderz, linker kleiner Finger) und Bindestrich (rechter kleiner Finger).', target:16},
   {name:'Level 17: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
-   hint:'Übung: Die ganze Tastatur. Diamanterz sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
+   hint:'Übung: Die ganze Tastatur. Erze sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
 ];
 const SHOP = [
   {id:'wolf',  label:'🐺 Wolf',        cost:5,  type:'pet'},
@@ -828,6 +852,10 @@ function start(i){
   raf = requestAnimationFrame(tick);
 }
 
+// Erzart pro Taste: jede Taste behält immer ihr Erz (aus dem Level, in dem sie neu ist)
+const ORE_OF = {};
+LEVELS.forEach(L => L.neu.forEach(k => { ORE_OF[k] = L.ore || 'coal'; }));
+
 // Zeigt genau einen Block über seiner Taste (neue Tasten doppelt gewichtet, nie zweimal dieselbe Taste hintereinander)
 function showBlock(){
   const L = LEVELS[cur];
@@ -841,7 +869,7 @@ function showBlock(){
   // (Level 5: zufällig etwa jeder dritte Block).
   const isOre = L.neu.length ? L.neu.includes(key)
               : (L.oreRow !== undefined ? KEYPOS[key].r === L.oreRow : Math.random() < 0.3);
-  const kind = isOre ? (L.ore || 'coal') : 'stone';
+  const kind = isOre ? (L.neu.length ? (L.ore || 'coal') : (ORE_OF[key] || L.ore || 'coal')) : 'stone';
   el.className = 'block big ' + kind;
   el.textContent = key.toUpperCase();
   el.style.left = (cxOf(key) * 100).toFixed(3) + '%';
@@ -877,7 +905,8 @@ function crackStage(n){
   return CRACKS[n] = c.toDataURL();
 }
 
-const CRUMB_COLORS = {wood:['#a8793a','#8a5f2c','#c9985a'], dirt:['#7a5230','#5e3d20','#8f6339'], stone:['#8a8a8a','#6e6e6e','#a0a0a0'], coal:['#8a8a8a','#2b2b2b','#6e6e6e'], iron:['#8a8a8a','#d8af93','#a0a0a0'], diamond:['#8a8a8a','#4aedd9','#a0a0a0']};
+const CRUMB_COLORS = {wood:['#a8793a','#8a5f2c','#c9985a'], dirt:['#7a5230','#5e3d20','#8f6339'], stone:['#8a8a8a','#6e6e6e','#a0a0a0'], coal:['#8a8a8a','#2b2b2b','#6e6e6e'], iron:['#8a8a8a','#d8af93','#a0a0a0'], diamond:['#8a8a8a','#4aedd9','#a0a0a0'],
+  copper:['#8a8a8a','#c8774a','#a0a0a0'], lapis:['#8a8a8a','#2a52be','#a0a0a0'], gold:['#8a8a8a','#f5d33b','#a0a0a0'], redstone:['#8a8a8a','#d02020','#a0a0a0']};
 
 // Abbau wie in Minecraft: Risse wachsen, der Block wackelt, Krümel springen ab, dann zerplatzt er
 function mineBlock(b){
