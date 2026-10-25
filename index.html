@@ -33,10 +33,9 @@
                 transform-origin:center center;animation:grow .35s ease-out;}
   #overlay .box .mtitle{font-size:34px;color:#555;padding:12px 0 10px;text-shadow:2px 2px 0 #e8e8e8;}
   #overlay .box .minner{background:#0e0e0e;border:4px solid;border-color:#373737 #fff #fff #373737;padding:18px 20px 20px;color:#fff;font-size:28px;line-height:1.3;}
-  #overlay .box .minner .stars{font-size:44px;margin:6px 0;}
-  #overlay .box .mbar{display:flex;gap:2px;height:12px;margin:18px auto 4px;width:90%;}
-  #overlay .box .mbar i{flex:1;background:#2a2a2a;}
-  #overlay .box .mbar i.on{background:#7ed957;box-shadow:inset 0 3px 0 #b8f08f,inset 0 -3px 0 #4a9a2a;}
+  #overlay .box .mrow{display:flex;align-items:center;justify-content:center;gap:28px;margin:12px 0;}
+  #overlay .box .hearts{display:flex;gap:6px;}
+  #overlay .box .mem{display:flex;align-items:center;gap:8px;font-size:34px;}
   #overlay .box .btn{font-family:inherit;font-size:26px;font-weight:normal;background:#8b8b8b;color:#fff;border:3px solid #000;border-radius:0;margin:4px;padding:10px 18px;
                      text-shadow:2px 2px 0 #3f3f3f;box-shadow:inset 3px 3px 0 #c9c9c9,inset -3px -3px 0 #555;}
   #overlay .box .btn:hover{background:#7a85c7;box-shadow:inset 3px 3px 0 #b7bdf0,inset -3px -3px 0 #3d4580;}
@@ -437,6 +436,16 @@ function pickaxeSVG(type, size){
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="${size}" height="${size}" ` +
          `shape-rendering="crispEdges" style="image-rendering:pixelated">${rects}</svg>`;
+}
+
+// Lebensherz im Minecraft-Stil als 9x9-Pixelgrafik (voll = rot, leer = dunkel)
+function heartSVG(size, full){
+  const rows = ['.kk...kk.','kRRk.kRRk'.replace('.', 'k'),'kRRRkRRRk','kRRRRRRRk','kRRRRRRRk','.kRRRRRk.','..kRRRk..','...kRk...','....k....'];
+  rows[0] = '.kkk.kkk.'; rows[1] = 'kRWRkRRRk';
+  const col = full ? {k:'#000', R:'#e0222a', W:'#ffb3b3'} : {k:'#000', R:'#3a2a2a', W:'#3a2a2a'};
+  let rects = '';
+  rows.forEach((r, y) => [...r].forEach((c, x) => { if (c !== '.') rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${col[c]}"/>`; }));
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9" width="${size}" height="${size}" shape-rendering="crispEdges" style="image-rendering:pixelated">${rects}</svg>`;
 }
 
 // Smaragd als eigene 16x16-Pixelgrafik, angelehnt an das Vorbild (ovaler Edelstein mit Facetten)
@@ -1146,14 +1155,12 @@ function finish(){
   const fehler = n => n === 1 ? '1 Fehler' : `${n} Fehler`;
   const detail = L.intro ? '' : `${run.correct} Blöcke, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
   const ziel = (L.intro || stars === 3) ? ''
-    : `<div style="margin-top:6px;color:#ddd;">${stars === 0 ? `Für ★ höchstens ${fehler(bud[2])}` : `Für ${'★'.repeat(stars + 1)} höchstens ${fehler(bud[3 - stars - 1])}`}.</div>`;
+    : `<div style="margin-top:6px;color:#ddd;">${stars === 0 ? `Für ★ höchstens ${fehler(bud[2])}` : `Für ${stars + 1} ${stars === 0 ? 'Herz' : 'Herzen'} höchstens ${fehler(bud[3 - stars - 1])}`}.</div>`;
   const msg = stars > 0
-    ? `Geschafft!<br><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>${detail}${ziel}<br>+3 ${emeraldSVG(20)}`
+    ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Ohne Druck, einfach nochmal probieren!`;
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
-  const segs = 24, on = Math.round(segs * Math.min(1, run.correct / Math.max(1, run.target)));
-  const bar = `<div class="mbar">${Array.from({length: segs}, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</div>`;
-  box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${msg}${rw}${bar}<div class="btns" style="margin-top:14px;"></div></div>`;
+  box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
   retry.onclick = () => { hideOverlay(); start(cur); };
