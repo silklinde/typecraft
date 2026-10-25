@@ -27,16 +27,18 @@ with sync_playwright() as p:
         pg.evaluate(f'start({lv})'); pg.wait_for_timeout(300)
         pg.screenshot(path=f'{AUS}/level{lv}_start.png')
         if lv == 0:
-            # Hände auflegen: nur Hände, Tastatur, Demo, selbst tippen, dann Grundhaltung
+            # Hände auflegen: nur Hände, Tastatur, dann Finger + Erdblock je Taste, selbst tippen, dann Grundhaltung
             pg.wait_for_timeout(1200); pg.screenshot(path=f'{AUS}/level0_haende1_nur_haende.png')
-            pg.wait_for_timeout(3500); pg.screenshot(path=f'{AUS}/level0_haende2_tastatur.png')
-            pg.wait_for_timeout(7000); pg.screenshot(path=f'{AUS}/level0_haende3_demo.png')
-            taste('Enter'); pg.wait_for_timeout(300)   # Demo überspringen
+            pg.wait_for_timeout(2500); pg.screenshot(path=f'{AUS}/level0_haende2_tastatur.png')
+            pg.wait_for_timeout(1500)
             assert pg.evaluate('hz.step') == 'tippen'
-            for k in ['f', 'j', 'd', 's', 'a']: taste(k); pg.wait_for_timeout(150)
+            pg.screenshot(path=f'{AUS}/level0_haende3_f.png')
+            for k in ['f', 'j', 'd', 's', 'a']: taste(k); pg.wait_for_timeout(700)
             taste('x'); pg.wait_for_timeout(150)       # falsche Taste zählt nicht
             pg.screenshot(path=f'{AUS}/level0_haende4_tippen.png')
-            for k in ['k', 'l', 'ö', ' ']: taste(k); pg.wait_for_timeout(150)
+            for k in ['k', 'l', 'ö']: taste(k); pg.wait_for_timeout(700)
+            pg.screenshot(path=f'{AUS}/level0_haende5_leertaste.png')
+            taste(' ')
             pg.wait_for_timeout(2300)
             assert pg.evaluate('phase') == 'grund'
             pg.screenshot(path=f'{AUS}/level0_grund.png')

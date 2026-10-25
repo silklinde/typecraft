@@ -115,6 +115,16 @@
   .kb.keysin .ikey,.kb.keysin .lbl{transition:opacity 1s;}
   .kb.fresh .arm,.kb.fresh .fing,.kb.fresh .thumb{animation:handin 1.1s ease-out both;}
   @keyframes handin{from{translate:0 160px;opacity:0}to{translate:0 0;opacity:1}}
+  /* Hände auflegen, Tippen: Fingername über einem Erdblock mit dem Buchstaben */
+  #hrow{--hf:clamp(28px,5.2vh,48px);}
+  .hname{position:absolute;top:0;translate:-50% 0;height:calc(var(--hf) * 2.15);display:flex;align-items:flex-end;justify-content:center;
+         text-align:center;line-height:1.05;font-size:var(--hf);font-weight:bold;color:#ffd166;text-shadow:3px 3px 0 #000;white-space:nowrap;}
+  #hrow .nk{top:calc(var(--hf) * 2.3);width:clamp(96px,17vh,150px);font-size:clamp(56px,10vh,92px);}
+  .nk.dirt{background-image:var(--dirt);}
+  #hrow .nk.wide{width:clamp(150px,24vh,230px);height:clamp(56px,10vh,90px);font-size:clamp(20px,3.4vh,34px);}
+  .nk.shake{animation:wackel .3s;}
+  .nk.mining{animation:wackel .12s infinite;}
+  .nk .crack{position:absolute;inset:0;background-size:100% 100%;image-rendering:pixelated;pointer-events:none;}
   #hcap{position:absolute;top:74px;left:0;right:0;padding:0 40px;text-align:center;font-size:clamp(24px,4.2vh,38px);font-weight:bold;
         color:#fff;text-shadow:3px 3px 0 #000;}
   .hbtns{position:absolute;top:4px;right:4px;z-index:8;}
@@ -221,6 +231,9 @@ const KEY = 'typecraft-v1';
     [0,0,3,1,'#c9985a'],[5,0,2,1,'#c9985a'],[1,3,2,1,'#c9985a'],
     [0,2,8,1,'#8a5f2c'],[0,5,8,1,'#8a5f2c'],[4,3,1,2,'#8a5f2c'],[2,6,1,2,'#8a5f2c']
   ])));
+  r.setProperty('--dirt', px(tex(8, 8, '#7a5230', [
+    [1,1,2,1,'#5e3d20'],[5,0,2,2,'#8f6339'],[3,3,2,2,'#5e3d20'],[0,5,2,1,'#8f6339'],[6,5,2,2,'#5e3d20'],[2,7,3,1,'#8f6339']
+  ])));
   r.setProperty('--stone', px(tex(8, 8, '#8a8a8a', [
     [1,1,2,2,'#7a7a7a'],[5,2,2,2,'#9c9c9c'],[3,5,3,2,'#7a7a7a'],[0,6,2,2,'#9c9c9c'],[6,6,2,2,'#7a7a7a']
   ])));
@@ -276,14 +289,9 @@ function grundHint(k){
 }
 // Hände auflegen: Reihenfolge, in der die Finger auf ihre Grundtaste kommen (Leertaste = beide Daumen)
 const HAENDE_SEQ = ['f', 'j', 'd', 's', 'a', 'k', 'l', 'ö', ' '];
-const cap1 = s => s.charAt(0).toUpperCase() + s.slice(1);
-function haendeText(k){
-  if (k === ' ') return 'Beide Daumen liegen auf der Leertaste.';
-  return `${cap1(FNAME[k])} liegt auf ${k.toUpperCase()}.` + ((k === 'f' || k === 'j') ? ' Fühl die kleine Erhebung auf der Taste.' : '');
-}
-function tippenText(k){
-  return k === ' ' ? 'Drücke die Leertaste: beide Daumen.' : `Drücke ${k.toUpperCase()}: ${FNAME[k]}.`;
-}
+// Kurze Fingernamen für Hände auflegen (die Seite sieht man an der Hand)
+const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeigefinger',
+               j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
   {name:'Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, haende:true, target:6, reward:'holz'},
@@ -334,7 +342,7 @@ let st = load();
 let cur = -1, active = false, run = null, raf = 0, last = 0;
 let introExpected = 'f', shownKey = null;
 let phase = 'play';          // 'haende' (Hände auflegen), 'grund' (Grundhaltung), 'learn' (Einführung neuer Tasten), 'wait', 'play'
-let hz = null;               // Hände auflegen: {step:'show'|'demo'|'tippen'|'done', idx}
+let hz = null;               // Hände auflegen: {step:'show'|'tippen'|'done', idx, blk, busy}
 let learn = null;            // Ablauf der Einführung: {seq, idx}
 let pendingTimer = null;     // Pause vor dem Modal bzw. vor dem Start der Blöcke
 
@@ -548,11 +556,9 @@ function buildBoard(field, L, mode){
 
   const haende = mode === 'haende';
   const top = haende
-    ? `<div style="position:absolute;top:10px;left:0;right:0;padding:0 330px;text-align:center;font-size:18px;">
-         Hände auflegen<br><span style="font-size:14px;opacity:.8">So liegen die zehn Finger auf der Tastatur. Die Hände bleiben ruhig, nur die Finger bewegen sich.</span>
-       </div>
-       <div id="hcap"></div>
-       <div class="hbtns"><button class="btn hidden" id="hAgain" tabindex="-1">Nochmal ansehen</button><button class="btn" id="hSkip" tabindex="-1">Überspringen</button></div>`
+    ? `<div id="hcap"></div>
+       <div class="newrow" id="hrow"></div>
+       <div class="hbtns"><button class="btn" id="hSkip" tabindex="-1">Überspringen</button></div>`
     : L.intro
     ? `<div style="position:absolute;top:10px;left:0;right:0;text-align:center;font-size:18px;">
          Grundhaltung<br><span style="font-size:14px;opacity:.8">Baue die Holzblöcke mit bloßer Hand ab: Zeigefinger auf F und J, Daumen auf die Leertaste. Die Hände bleiben ruhig, nur ein Finger bewegt sich.</span>
@@ -682,50 +688,37 @@ function layFinger(k){
   pressKey(k);
 }
 function haendeStart(){
-  hz = {step:'show', idx:0};
+  hz = {step:'show', idx:0, blk:null, busy:false};
   document.getElementById('hSkip').onclick = e => { e.currentTarget.blur(); startGrund(); };
-  document.getElementById('hAgain').onclick = e => { e.currentTarget.blur(); haendeDemo(); };
-  hsay('Das sind deine Hände. Jede Hand hat fünf Finger.');
+  hsay('Das sind deine Hände.');
   later(() => {
     const kb = document.getElementById('kb');
     kb.classList.add('keysin'); kb.classList.remove('keysoff');
-    hsay('Hier ist die Tastatur. Gleich legst du deine Finger darauf.');
-    later(haendeDemo, 3000);
-  }, 3200);
-}
-function haendeDemo(){
-  clearTimeout(pendingTimer);
-  hz = {step:'demo', idx:0};
-  document.getElementById('hAgain').classList.add('hidden');
-  liftAll(); setExpected(null);
-  hsay('Schau erst zu: So legen sich die Finger auf die Tastatur.');
-  later(demoStep, 2200);
-}
-function demoStep(){
-  if (hz.idx >= HAENDE_SEQ.length) {
-    setExpected(null);
-    hsay('Das waren alle zehn Finger. Jetzt bist du dran!');
-    later(haendeTippen, 2500);
-    return;
-  }
-  const k = HAENDE_SEQ[hz.idx];
-  expect(k);
-  hsay(haendeText(k));
-  later(() => { layFinger(k); hz.idx++; later(demoStep, 800); }, 650);
+    later(haendeTippen, 1300);
+  }, 2200);
 }
 function haendeTippen(){
   clearTimeout(pendingTimer);
-  const kb = document.getElementById('kb');
-  kb.classList.remove('keysoff');
-  hz = {step:'tippen', idx:0};
-  document.getElementById('hAgain').classList.remove('hidden');
+  document.getElementById('kb').classList.remove('keysoff');
+  hz.step = 'tippen';
+  document.getElementById('hcap').textContent = '';
   liftAll();
   askKey();
 }
+// Ein Finger hebt sich, sein Name steht darüber, ein Erdblock mit dem Buchstaben steht über der Taste
 function askKey(){
-  const k = HAENDE_SEQ[hz.idx];
+  const k = HAENDE_SEQ[hz.idx], row = document.getElementById('hrow');
+  const x = ((k === ' ' ? 21 : KEYPOS[k].c + 1) / NCOL * 100).toFixed(3) + '%';
   expect(k);
-  hsay('Du bist dran! ' + tippenText(k));
+  const name = document.createElement('div');
+  name.className = 'hname'; name.style.left = x; name.innerHTML = HNAME[k];
+  const el = document.createElement('div');
+  el.className = 'nk dirt' + (k === ' ' ? ' wide' : ''); el.style.left = x;
+  el.textContent = k === ' ' ? 'Leertaste' : k.toUpperCase();
+  row.append(name, el);
+  hz.blk = {key:k, el, kind:'dirt'};
+  hz.busy = false;
+  setHint(k === ' ' ? 'Drücke die Leertaste.' : `Drücke ${k.toUpperCase()}.`);
 }
 function startGrund(){
   clearTimeout(pendingTimer);
@@ -881,7 +874,7 @@ function crackStage(n){
   return CRACKS[n] = c.toDataURL();
 }
 
-const CRUMB_COLORS = {stone:['#8a8a8a','#6e6e6e','#a0a0a0'], coal:['#8a8a8a','#2b2b2b','#6e6e6e'], iron:['#8a8a8a','#d8af93','#a0a0a0'], diamond:['#8a8a8a','#4aedd9','#a0a0a0']};
+const CRUMB_COLORS = {dirt:['#7a5230','#5e3d20','#8f6339'], stone:['#8a8a8a','#6e6e6e','#a0a0a0'], coal:['#8a8a8a','#2b2b2b','#6e6e6e'], iron:['#8a8a8a','#d8af93','#a0a0a0'], diamond:['#8a8a8a','#4aedd9','#a0a0a0']};
 
 // Abbau wie in Minecraft: Risse wachsen, der Block wackelt, Krümel springen ab, dann zerplatzt er
 function mineBlock(b){
@@ -942,23 +935,27 @@ function onKey(e){
   const L = LEVELS[cur];
 
   if (phase === 'haende') {
-    // Enter überspringt die Demo; die Taste Enter im Tippen-Teil und alle anderen Tasten während der Demo zählen nicht
-    if (k === 'enter' && (hz.step === 'show' || hz.step === 'demo')) { haendeTippen(); return; }
-    if (hz.step !== 'tippen' || !HAENDE_SEQ.includes(k)) return;
+    // Nur beim Tippen zählen Tasten; während des Abbaus zählen keine Anschläge
+    if (hz.step !== 'tippen' || hz.busy || !HAENDE_SEQ.includes(k)) return;
     e.preventDefault();
     const want = HAENDE_SEQ[hz.idx];
-    if (k !== want) { hsay(tippenText(want)); return; }
+    if (k !== want) {
+      const el = hz.blk.el;
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+      return;
+    }
+    hz.busy = true;
+    document.querySelectorAll('#hrow .hname').forEach(n => n.remove());
     layFinger(k);
     beep(660);
+    mineBlock(hz.blk);
     hz.idx++;
     if (hz.idx >= HAENDE_SEQ.length) {
       hz.step = 'done';
-      setExpected(null);
-      hsay('Geschafft! Alle zehn Finger liegen. Jetzt geht es los!');
-      later(startGrund, 1800);
+      later(() => { setExpected(null); hsay('Geschafft!'); later(startGrund, 1600); }, 500);
       return;
     }
-    askKey();
+    later(askKey, 450);
     return;
   }
 
