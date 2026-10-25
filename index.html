@@ -565,13 +565,42 @@ function bounce(){
   });
 }
 
-function beep(freq){
+// Töne mit der Web Audio API: ein einziger AudioContext, beim ersten Ton angelegt
+let audioCtx = null;
+function getAudio(){
   try {
-    const c = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch(e){ return null; }
+  return audioCtx;
+}
+
+// Erfolgston: zwei kurze, aufsteigende Töne (nur bei Erfolgsmomenten, nie bei Fehlern)
+function playErfolgTon(){
+  const c = getAudio(); if (!c) return;
+  [[880, 0], [1320, 0.08]].forEach(([f, dt]) => {
+    const t = c.currentTime + dt;
     const o = c.createOscillator(), g = c.createGain();
-    o.frequency.value = freq; o.connect(g); g.connect(c.destination);
-    g.gain.value = 0.05; o.start(); o.stop(c.currentTime + 0.12);
-  } catch(e){}
+    o.type = 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.25, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + 0.12);
+  });
+}
+
+// Tipp-Klick: sehr leiser, weicher Klick bei jeder richtigen Taste
+function playTippTon(){
+  const c = getAudio(); if (!c) return;
+  const t = c.currentTime;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(1200, t);
+  o.frequency.linearRampToValueAtTime(900, t + 0.03);
+  g.gain.setValueAtTime(0.05, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t + 0.04);
 }
 
 // ---------- Tastatur mit Händen (für Grundhaltung und alle Level) ----------
@@ -979,7 +1008,7 @@ function onKey(e){
     hz.busy = true;
     document.querySelectorAll('#hrow .hname').forEach(n => n.remove());
     layFinger(k);
-    beep(660);
+    playTippTon();
     mineBlock(hz.blk);
     hz.idx++;
     if (hz.idx >= HAENDE_SEQ.length) {
@@ -1004,7 +1033,7 @@ function onKey(e){
     run.correct++;
     run.busy = true;
     pressKey(k);
-    beep(660);
+    playTippTon();
     mineBlock(run.cur);
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     later(grundAsk, 450);
@@ -1017,7 +1046,7 @@ function onKey(e){
     const want = learn.seq[learn.idx];
     if (k !== want) { setHint(learnHint(want)); return; }
     pressKey(k);
-    beep(660); bounce();
+    playTippTon(); bounce();
     learn.idx++;
     if (learn.idx >= learn.seq.length) {
       phase = 'wait';
@@ -1044,7 +1073,7 @@ function onKey(e){
     save(); topBar();
     pressKey(k);
     mineBlock(b);
-    beep(660); bounce();
+    playTippTon(); bounce();
     setHint('Super! +1 Smaragd');
     updateGoal();
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
@@ -1054,7 +1083,6 @@ function onKey(e){
     const before = starsFor(run.wrong, run.target);
     run.wrong++;
     updateGoal(starsFor(run.wrong, run.target) < before);
-    beep(200);
     b.el.classList.remove('shake');
     void b.el.offsetWidth;
     b.el.classList.add('shake');
@@ -1111,6 +1139,7 @@ function finish(){
   pendingTimer = setTimeout(() => {
     topBar();
     document.getElementById('overlay').style.display = 'flex';
+    if (stars > 0) playErfolgTon();
   }, 1000);
 }
 
