@@ -565,6 +565,27 @@ function bounce(){
   });
 }
 
+let audioCtx = null;
+// Erfolgston wie beim Einsammeln von XP in Minecraft: kurzes, helles "Bling" mit schnell steigender Tonhöhe
+function xpPing(){
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const c = audioCtx, t = c.currentTime;
+    const base = 1100 * (0.9 + Math.random() * 0.3);
+    [[1, 0.09], [2, 0.04]].forEach(([m, vol]) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(base * m, t);
+      o.frequency.exponentialRampToValueAtTime(base * m * 1.5, t + 0.07);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      o.connect(g); g.connect(c.destination);
+      o.start(t); o.stop(t + 0.3);
+    });
+  } catch(e){}
+}
+
 function beep(freq){
   try {
     const c = new (window.AudioContext || window.webkitAudioContext)();
@@ -979,7 +1000,7 @@ function onKey(e){
     hz.busy = true;
     document.querySelectorAll('#hrow .hname').forEach(n => n.remove());
     layFinger(k);
-    beep(660);
+    xpPing();
     mineBlock(hz.blk);
     hz.idx++;
     if (hz.idx >= HAENDE_SEQ.length) {
@@ -1004,7 +1025,7 @@ function onKey(e){
     run.correct++;
     run.busy = true;
     pressKey(k);
-    beep(660);
+    xpPing();
     mineBlock(run.cur);
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     later(grundAsk, 450);
@@ -1017,7 +1038,7 @@ function onKey(e){
     const want = learn.seq[learn.idx];
     if (k !== want) { setHint(learnHint(want)); return; }
     pressKey(k);
-    beep(660); bounce();
+    xpPing(); bounce();
     learn.idx++;
     if (learn.idx >= learn.seq.length) {
       phase = 'wait';
@@ -1044,7 +1065,7 @@ function onKey(e){
     save(); topBar();
     pressKey(k);
     mineBlock(b);
-    beep(660); bounce();
+    xpPing(); bounce();
     setHint('Super! +1 Smaragd');
     updateGoal();
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
