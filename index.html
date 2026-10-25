@@ -579,11 +579,11 @@ function getAudio(){
 function playErfolgTon(){
   const c = getAudio(); if (!c) return;
   // [Grundton, Start, Lautstärke]; jeder Ton klingt mit einem Oberton (Faktor 2,76 wie bei Glocken) lange aus
-  [[1568, 0, 0.22], [2093, 0.09, 0.26]].forEach(([f, dt, vol]) => {
+  [[988, 0, 0.4], [1319, 0.09, 0.45]].forEach(([f, dt, vol]) => {
     const t = c.currentTime + dt;
     [[1, 1], [2.76, 0.35]].forEach(([mul, amp]) => {
       const o = c.createOscillator(), g = c.createGain();
-      o.type = 'sine'; o.frequency.value = f * mul;
+      o.type = mul === 1 ? 'triangle' : 'sine'; o.frequency.value = f * mul;
       g.gain.setValueAtTime(0.0001, t);
       g.gain.linearRampToValueAtTime(vol * amp, t + 0.004);
       g.gain.exponentialRampToValueAtTime(0.001, t + (mul === 1 ? 0.7 : 0.3));
