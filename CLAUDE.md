@@ -5,7 +5,7 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 ## Stand
 - Lauffähiger Prototyp: `index.html` (Stand v10, eine einzige Datei mit HTML, CSS und JS, keine Abhängigkeiten, keine Build-Schritte). Einfach im Browser öffnen.
 - 18 Level (Level 0 Hände auflegen, Level 1 Grundhaltung, Level 2–17): Grundreihe, obere Reihe, untere Reihe, mit Spitzhacken-Belohnungen Holz, Stein, Eisen, Diamant.
-- Noch nicht umgesetzt: Skins, weitere Haustiere und Biome, Zahlenreihe, Umschalttaste, Ä (siehe `docs/roadmap.md`).
+- Noch nicht umgesetzt: Skins, weitere Haustiere und Biome, Zahlenreihe, Umschalttaste, Ä. Die Roadmap wird nicht im Repo gepflegt, sondern im Projekt.
 - Lokal getestet nur mit Chromium/Playwright (siehe `docs/tests.md`). Ein Test auf echten Geräten und Fenstergrößen steht aus.
 
 ## Wichtigste Regeln (vom Auftraggeber so entschieden)
@@ -26,7 +26,6 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 - `docs/level-und-fortschritt.md` – Level-Tabelle, Sterne, Smaragde, Spitzhacken, Shop
 - `docs/design.md` – Pixel-Texturen, Farben, Tastatur- und Hand-Layout
 - `docs/tests.md` – wie man das Spiel ohne Mensch prüft (Playwright)
-- `docs/roadmap.md` – offene Punkte und Ideen
 - `docs/vorschau-tastatur-drei-reihen.html` – Layout-Vorschau, aus der das Tastatur-Layout entstand (nur Referenz)
 - `tests/spieltest.py` – Bot, der Level durchspielt und Screenshots macht
 - `.claude/skills/` – Arbeitsanleitungen für wiederkehrende Aufgaben (neues Level, Spieltest im Browser)
