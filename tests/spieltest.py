@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 HIER = os.path.dirname(os.path.abspath(__file__))
 SEITE = 'file://' + os.path.join(HIER, '..', 'index.html')
 AUS = os.path.join(HIER, 'ausgabe'); os.makedirs(AUS, exist_ok=True)
-level = [int(x) for x in sys.argv[1:]] or [0, 5, 13]
+level = [int(x) for x in sys.argv[1:]] or [0, 1, 6, 14]
 
 with sync_playwright() as p:
     b = p.chromium.launch()
@@ -39,10 +39,15 @@ with sync_playwright() as p:
             for k in ['k', 'l', 'ö']: taste(k); pg.wait_for_timeout(700)
             pg.screenshot(path=f'{AUS}/level0_haende5_leertaste.png')
             taste(' ')
-            pg.wait_for_timeout(2300)
+        elif lv == 1:
+            # Grundhaltung: Holzblöcke einzeln, mit Abbau-Animation
             assert pg.evaluate('phase') == 'grund'
-            pg.screenshot(path=f'{AUS}/level0_grund.png')
-            for k in ['f', 'j', ' ', 'f', 'j', ' ']: taste(k); pg.wait_for_timeout(120)
+            taste('j'); pg.wait_for_timeout(100)     # falsche Taste zählt nicht
+            assert pg.evaluate('run.correct') == 0
+            for i, k in enumerate(['f', 'j', ' ', 'f', 'j', ' ']):
+                taste(k); pg.wait_for_timeout(150)
+                if i == 0: pg.screenshot(path=f'{AUS}/level1_abbau.png')
+                pg.wait_for_timeout(700)
         else:
             if pg.evaluate('phase') == 'learn':
                 for k in pg.evaluate('learn.seq'): taste(k); pg.wait_for_timeout(100)

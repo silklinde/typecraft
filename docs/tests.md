@@ -9,6 +9,6 @@ Es gibt keine automatisierten Unit-Tests. Geprüft wird im echten Browser mit Pl
 Hinweise:
 - Tasten per `window.dispatchEvent(new KeyboardEvent('keydown',{key:k}))` senden. Ö, Ü, Ä gehen mit `keyboard.press` nicht (US-Layout).
 - Zustand kann über `page.evaluate` gesetzt werden: `st.stars={0:3,...}; save(); renderMenu(); start(13)`.
-- Der Bot liest `lowestBlock().key` (= `run.cur`, der einzelne Block) und drückt die Taste; er prüft auch, dass eine falsche Taste als Fehler zählt, und macht einen Screenshot mitten im Abbau (`levelN_abbau.png`). Level 16 (48 Treffer) braucht länger, die Schleife braucht mehr Durchläufe.
+- Der Bot liest `lowestBlock().key` (= `run.cur`, der einzelne Block) und drückt die Taste; er prüft auch, dass eine falsche Taste als Fehler zählt, und macht einen Screenshot mitten im Abbau (`levelN_abbau.png`). Level 17 (48 Treffer) braucht länger, die Schleife braucht mehr Durchläufe.
 - Netz im Container ist eingeschränkt, `npm install` externer Pakete (z. B. jsdom) kann scheitern. Playwright reicht.
-- Level 0 beginnt mit „Hände auflegen“: Der Bot wartet die kurze Einblendung ab, tippt dann F J D S A K L Ö ␣ und danach F J ␣ F J ␣. Playwright ggf. mit `pip3 install playwright && python3 -m playwright install chromium` einrichten.
+- Level 0 „Hände auflegen“: Der Bot wartet die kurze Einblendung ab und tippt F J D S A K L Ö ␣. Level 1 „Grundhaltung“: F J ␣ F J ␣ (je ein Holzblock). Playwright ggf. mit `pip3 install playwright && python3 -m playwright install chromium` einrichten.

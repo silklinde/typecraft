@@ -2,8 +2,8 @@
 
 ## Sofort
 - Lokales Git-Repo anlegen bzw. nutzen (Auftraggeber hat ein lokales Repo angelegt; Veröffentlichung z. B. GitHub Pages vorerst nicht gewünscht).
-- Das Abschluss-Fenster von Level 16 (Diamantspitzhacke) einmal im Browser ansehen. Der Bot hat es in der Testzeit nicht erreicht, der Code ist aber derselbe wie bei Eisen.
-- Spielgefühl prüfen: Dauer der Abbau-Animation (ca. 350 ms plus 450 ms Pause), Länge von Level 16 (48 Treffer).
+- Das Abschluss-Fenster von Level 17 (Diamantspitzhacke) einmal im Browser ansehen. Der Bot hat es in der Testzeit nicht erreicht, der Code ist aber derselbe wie bei Eisen.
+- Spielgefühl prüfen: Dauer der Abbau-Animation (ca. 350 ms plus 450 ms Pause), Länge von Level 17 (48 Treffer).
 
 ## Ideen, vom Auftraggeber erwähnt
 - Skins für den Spieler (Minecraft-Skins), Skins für Haustiere.

@@ -12,7 +12,7 @@ Alle Level stehen im Array `LEVELS` in `index.html`. Lies zuerst `docs/level-und
 2. **Neues Level ans Ende anhängen.** Der Spielstand speichert Sterne pro Level-Index, ein Einfügen in der Mitte verschiebt den Fortschritt. Wenn es doch nötig ist: Spielstand migrieren und `SHOP[].need` sowie alle `reward`-Verweise prüfen.
 3. Level-Objekt anlegen:
    ```js
-   {name:'Level 17: + Ä', keys:UPPER([...alle bisherigen Tasten, 'ä']), neu:['ä'], ore:'diamond',
+   {name:'Level 18: + Ä', keys:UPPER([...alle bisherigen Tasten, 'ä']), neu:['ä'], ore:'diamond',
     hint:'Neu: Ä (rechter kleiner Finger).', target:16}
    ```
    - `keys` muss alle aktiven Tasten enthalten (sonst sind sie abgedunkelt und werden nicht gewertet).

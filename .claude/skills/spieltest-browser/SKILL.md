@@ -9,7 +9,7 @@ Reine Syntaxprüfung reicht nicht, weil fast alle Fehler im Layout und im Zusamm
 
 ## Ablauf
 1. Syntax: JS aus `index.html` (`<script>…</script>`) in eine temporäre Datei schreiben und `node --check <datei>` ausführen.
-2. Bot: `python3 tests/spieltest.py` (Standard Level 0, 5, 13) oder mit Level-Nummern, z. B. `python3 tests/spieltest.py 4 10 16`. Playwright ist in der Cloud-Umgebung vorinstalliert. Nicht neu installieren.
+2. Bot: `python3 tests/spieltest.py` (Standard Level 0, 1, 6, 14) oder mit Level-Nummern, z. B. `python3 tests/spieltest.py 5 11 17`. Playwright ist in der Cloud-Umgebung vorinstalliert. Nicht neu installieren.
 3. Die Screenshots in `tests/ausgabe/` mit dem Read-Werkzeug ansehen. Prüfen:
    - Finger hängen am Arm, auch beim Greifen in die obere oder untere Reihe und beim Ö-Finger zu `-`.
    - Buchstaben sind lesbar (auch unter den Fingern), Texte überlappen keine Blöcke.

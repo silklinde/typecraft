@@ -41,17 +41,6 @@
   #goal .note{color:#ddd;font-size:15px;}
 
   /* ---------- Spielfeld mit Tastatur und Händen (Grundhaltung und alle Level) ---------- */
-  /* F und J sind Holzblöcke, die mit bloßer Hand abgebaut werden */
-  .bigkey{position:absolute;top:76px;transform:translateX(-50%);width:clamp(96px,17vh,150px);height:clamp(96px,17vh,150px);
-          display:flex;align-items:center;justify-content:center;box-sizing:border-box;
-          font-size:clamp(56px,10vh,92px);line-height:1;font-weight:bold;color:#fff;text-shadow:3px 3px 0 #000;
-          background-image:var(--wood);background-size:100% 100%;image-rendering:pixelated;border:4px solid #000;
-          box-shadow:inset -8px -8px 0 rgba(0,0,0,.3),inset 8px 8px 0 rgba(255,255,255,.18);
-          transition:transform .15s,outline-color .15s;}
-  .bigkey.next{transform:translateX(-50%) scale(1.1);outline:4px solid #ffd166;}
-  .bigkey.hit{transform:translateX(-50%) scale(.9);}
-  #bigS{width:clamp(150px,24vh,230px);height:clamp(56px,10vh,90px);font-size:clamp(20px,3.4vh,34px);}
-
   /* Fallbereich: endet an der Oberkante der Tastatur (obere Reihe) */
   .lanes{position:absolute;left:16px;right:16px;top:0;height:calc(100% - var(--kbh) - 60px);}
   .block{position:absolute;transform:translateX(-50%);width:64px;height:64px;border:3px solid #000;box-sizing:border-box;
@@ -62,7 +51,7 @@
   .block.iron{background-image:var(--iron);}
   .block.diamond{background-image:var(--diamond);}
   .block.glow{outline:4px solid #ffd166;}
-  /* Ein einzelner, ruhig stehender Block über seiner Taste (Level 1–16) */
+  /* Ein einzelner, ruhig stehender Block über seiner Taste (ab Level 2) */
   .block.big{top:24px;width:clamp(96px,17vh,150px);height:clamp(96px,17vh,150px);border-width:4px;font-size:clamp(56px,10vh,92px);
              text-shadow:3px 3px 0 #000;box-shadow:inset -8px -8px 0 rgba(0,0,0,.3),inset 8px 8px 0 rgba(255,255,255,.18);}
   .block.big .crack{position:absolute;inset:0;background-size:100% 100%;image-rendering:pixelated;pointer-events:none;}
@@ -110,7 +99,7 @@
   .thumb.hover{transform:translateY(-8px);filter:brightness(1.15) drop-shadow(0 0 6px #ffd166) drop-shadow(0 0 3px #ffd166);}
   .thumb.press{transform:translateY(8px);}
 
-  /* Hände auflegen (Level 0, vor der Grundhaltung): erst nur die Hände, dann blendet die Tastatur ein */
+  /* Hände auflegen (Level 0): erst nur die Hände, dann blendet die Tastatur ein */
   .kb.keysoff .ikey,.kb.keysoff .lbl{opacity:0;}
   .kb.keysin .ikey,.kb.keysin .lbl{transition:opacity 1s;}
   .kb.fresh .arm,.kb.fresh .fing,.kb.fresh .thumb{animation:handin 1.1s ease-out both;}
@@ -121,6 +110,7 @@
          text-align:center;line-height:1.05;font-size:var(--hf);font-weight:bold;color:#ffd166;text-shadow:3px 3px 0 #000;white-space:nowrap;}
   #hrow .nk{top:calc(var(--hf) * 2.3);width:clamp(96px,17vh,150px);font-size:clamp(56px,10vh,92px);}
   .nk.dirt{background-image:var(--dirt);}
+  .nk.wood{background-image:var(--wood);}
   #hrow .nk.wide{width:clamp(150px,24vh,230px);height:clamp(56px,10vh,90px);font-size:clamp(20px,3.4vh,34px);}
   .nk.shake{animation:wackel .3s;}
   .nk.mining{animation:wackel .12s infinite;}
@@ -294,48 +284,49 @@ const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeige
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
-  {name:'Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, haende:true, target:6, reward:'holz'},
-  {name:'Level 1: A S D', keys:['a','s','d','f'], neu:['a','s','d'],
+  {name:'Level 0: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9},
+  {name:'Level 1: Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, target:6, reward:'holz'},
+  {name:'Level 2: A S D', keys:['a','s','d','f'], neu:['a','s','d'],
    hint:'Neu: A, S und D (nur linke Hand, die rechte ruht). Die Kohleblöcke zeigen dir die neuen Tasten. Tippe die Taste, um den Block abzubauen.', target:16},
-  {name:'Level 2: K L Ö', keys:['j','k','l','ö'], neu:['k','l','ö'],
+  {name:'Level 3: K L Ö', keys:['j','k','l','ö'], neu:['k','l','ö'],
    hint:'Neu: K, L und Ö (nur rechte Hand, die linke ruht). Die Kohleblöcke zeigen dir die neuen Tasten.', target:16},
-  {name:'Level 3: + G H', keys:HOME10, neu:['g','h'],
+  {name:'Level 4: + G H', keys:HOME10, neu:['g','h'],
    hint:'Neu: G und H (Kohle). Dafür streckt sich der Zeigefinger zur Seite und geht danach zurück auf F bzw. J.', target:16},
-  {name:'Level 4: Ganze Reihe', keys:HOME10, neu:[],
+  {name:'Level 5: Ganze Reihe', keys:HOME10, neu:[],
    hint:'Übung: Alle Tasten der Grundreihe, Stein und Kohle. Lass die Hände ruhig liegen und bewege nur die Finger.', target:32, reward:'stein'},
 
   // Obere Reihe: Eisenerz (mit der Steinspitzhacke abbaubar). Die Finger greifen eine Reihe nach oben und gehen zurück auf die Grundtaste.
-  {name:'Level 5: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
+  {name:'Level 6: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
    hint:'Neu: E und I (Eisenerz, beide Mittelfinger). Greife eine Reihe nach oben und gehe danach zurück auf D bzw. K.', target:16},
-  {name:'Level 6: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'iron',
+  {name:'Level 7: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'iron',
    hint:'Neu: R (linker Zeigefinger) und U (rechter Zeigefinger). Nach dem Tippen geht der Finger zurück auf F bzw. J.', target:16},
-  {name:'Level 7: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'iron',
+  {name:'Level 8: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'iron',
    hint:'Neu: T und Z. Die Zeigefinger strecken sich nach oben und zur Seite. Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 8: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
+  {name:'Level 9: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
    hint:'Neu: W (linker Ringfinger) und O (rechter Ringfinger).', target:16},
-  {name:'Level 9: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'iron',
+  {name:'Level 10: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'iron',
    hint:'Neu: Q (linker kleiner Finger), P und Ü (rechter kleiner Finger).', target:16},
-  {name:'Level 10: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
+  {name:'Level 11: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
    hint:'Übung: Grundreihe und obere Reihe. Eisenerz sind die Tasten der oberen Reihe.', target:32, reward:'eisen'},
 
   // Untere Reihe: Diamanterz (mit der Eisenspitzhacke abbaubar)
-  {name:'Level 11: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
+  {name:'Level 12: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
    hint:'Neu: C (linker Mittelfinger) und Komma (rechter Mittelfinger). Greife eine Reihe nach unten und gehe zurück auf D bzw. K.', target:16},
-  {name:'Level 12: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'diamond',
+  {name:'Level 13: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'diamond',
    hint:'Neu: V (linker Zeigefinger) und M (rechter Zeigefinger). Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 13: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'diamond',
+  {name:'Level 14: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'diamond',
    hint:'Neu: B und N. Die Zeigefinger strecken sich nach unten und zur Seite. Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 14: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
+  {name:'Level 15: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
    hint:'Neu: X (linker Ringfinger) und Punkt (rechter Ringfinger).', target:16},
-  {name:'Level 15: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'diamond',
+  {name:'Level 16: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'diamond',
    hint:'Neu: Y (linker kleiner Finger) und Bindestrich (rechter kleiner Finger).', target:16},
-  {name:'Level 16: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
+  {name:'Level 17: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
    hint:'Übung: Die ganze Tastatur. Diamanterz sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
 ];
 const SHOP = [
   {id:'wolf',  label:'🐺 Wolf',        cost:5,  type:'pet'},
   {id:'katze', label:'🐱 Katze',       cost:10, type:'pet'},
-  {id:'hoehle',label:'⛰ Biom Höhle',   cost:8,  type:'biome', need:3},
+  {id:'hoehle',label:'⛰ Biom Höhle',   cost:8,  type:'biome', need:4},
 ];
 
 let st = load();
@@ -347,8 +338,20 @@ let learn = null;            // Ablauf der Einführung: {seq, idx}
 let pendingTimer = null;     // Pause vor dem Modal bzw. vor dem Start der Blöcke
 
 function load(){
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return s; } catch(e){}
-  return {emeralds:0, stars:{}, owned:{wald:true}, biome:'wald'};
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s) {
+      // v2: Level 0 "Hände auflegen" ist neu, alle bisherigen Level rücken um eins nach hinten
+      if (!s.v) {
+        const n = {};
+        Object.keys(s.stars || {}).forEach(i => { n[+i + 1] = s.stars[i]; });
+        if (n[1]) n[0] = 3;
+        s.stars = n; s.v = 2;
+      }
+      return s;
+    }
+  } catch(e){}
+  return {v:2, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald'};
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
 function unlocked(i){ return i === 0 || (st.stars[i-1] || 0) >= 1; }
@@ -560,12 +563,7 @@ function buildBoard(field, L, mode){
        <div class="newrow" id="hrow"></div>
        <div class="hbtns"><button class="btn" id="hSkip" tabindex="-1">Überspringen</button></div>`
     : L.intro
-    ? `<div style="position:absolute;top:10px;left:0;right:0;text-align:center;font-size:18px;">
-         Grundhaltung<br><span style="font-size:14px;opacity:.8">Baue die Holzblöcke mit bloßer Hand ab: Zeigefinger auf F und J, Daumen auf die Leertaste. Die Hände bleiben ruhig, nur ein Finger bewegt sich.</span>
-       </div>
-       <div id="bigF" class="bigkey" style="left:30%;">F</div>
-       <div id="bigS" class="bigkey" style="left:50%;">Leertaste</div>
-       <div id="bigJ" class="bigkey" style="left:70%;">J</div>`
+    ? `<div class="newrow" id="hrow"></div>`
     : mode === 'learn'
     ? `<div style="position:absolute;top:10px;left:0;right:0;text-align:center;font-size:18px;">
          Neue Tasten: ${L.neu.map(k => k.toUpperCase()).join(' ')}<br><span style="font-size:14px;opacity:.8">Schau, wo sie auf der Tastatur liegen. Die Hände bleiben ruhig, nur ein Finger bewegt sich.</span>
@@ -616,9 +614,9 @@ function fingerFor(wrap, k){
 
 function resetFinger(f){ f.style.removeProperty('--dx'); f.style.removeProperty('--dy'); }
 
-// Der große Block zur Taste (Grundhaltung: Holzblöcke F, J und Leertaste; Einführung: Erzblöcke)
+// Der große Erzblock zur Taste (Einführung neuer Tasten)
 function bigFor(k){
-  return document.getElementById(k === 'f' ? 'bigF' : k === 'j' ? 'bigJ' : k === ' ' ? 'bigS' : 'big-' + k);
+  return document.getElementById('big-' + k);
 }
 
 function setExpected(k){
@@ -626,7 +624,7 @@ function setExpected(k){
   if (!wrap) return;
   wrap.querySelectorAll('.ikey.next, .lbl.next').forEach(e => e.classList.remove('next'));
   wrap.querySelectorAll('.fing.hover, .thumb.hover').forEach(e => e.classList.remove('hover'));
-  wrap.querySelectorAll('.bigkey.next, .nk.next').forEach(e => e.classList.remove('next'));
+  wrap.querySelectorAll('.nk.next').forEach(e => e.classList.remove('next'));
   // Gestreckte Finger zurück in die Grundstellung (außer einer läuft gerade die Druck-Animation)
   wrap.querySelectorAll('.fing').forEach(e => { if (!e.classList.contains('press')) resetFinger(e); });
   if (!k) return;
@@ -664,8 +662,8 @@ function pressKey(k){
   }
 }
 
-// ---------- Hände auflegen (Level 0, vor der Grundhaltung) ----------
-// Ablauf: nur Hände -> Tastatur blendet ein -> Demo (Finger legen sich nacheinander auf) -> Kind legt selbst auf -> Grundhaltung.
+// ---------- Hände auflegen (Level 0) ----------
+// Ablauf: nur Hände -> Tastatur blendet ein -> Kind legt Finger für Finger auf (Erdblock abbauen) -> Abschluss-Fenster.
 // Alle Schritte laufen als Kette über pendingTimer, damit start() und renderMenu() sie mit clearTimeout abbrechen.
 function hsay(t){
   setHint(t);
@@ -689,7 +687,11 @@ function layFinger(k){
 }
 function haendeStart(){
   hz = {step:'show', idx:0, blk:null, busy:false};
-  document.getElementById('hSkip').onclick = e => { e.currentTarget.blur(); startGrund(); };
+  document.getElementById('hSkip').onclick = e => {
+    e.currentTarget.blur();
+    st.stars[0] = 3; save();
+    start(1);
+  };
   hsay('Das sind deine Hände.');
   later(() => {
     const kb = document.getElementById('kb');
@@ -706,31 +708,34 @@ function haendeTippen(){
   askKey();
 }
 // Ein Finger hebt sich, sein Name steht darüber, ein Erdblock mit dem Buchstaben steht über der Taste
-function askKey(){
-  const k = HAENDE_SEQ[hz.idx], row = document.getElementById('hrow');
+// Ein großer Block über seiner Taste (Hände auflegen: Erde, Grundhaltung: Holz)
+function bigBlock(k, kind){
   const x = ((k === ' ' ? 21 : KEYPOS[k].c + 1) / NCOL * 100).toFixed(3) + '%';
+  const el = document.createElement('div');
+  el.className = 'nk ' + kind + (k === ' ' ? ' wide' : ''); el.style.left = x;
+  el.textContent = k === ' ' ? 'Leertaste' : k.toUpperCase();
+  document.getElementById('hrow').appendChild(el);
+  return {x, blk:{key:k, el, kind}};
+}
+function askKey(){
+  const k = HAENDE_SEQ[hz.idx];
   expect(k);
+  const {x, blk} = bigBlock(k, 'dirt');
   const name = document.createElement('div');
   name.className = 'hname'; name.style.left = x; name.innerHTML = HNAME[k];
-  const el = document.createElement('div');
-  el.className = 'nk dirt' + (k === ' ' ? ' wide' : ''); el.style.left = x;
-  el.textContent = k === ' ' ? 'Leertaste' : k.toUpperCase();
-  row.append(name, el);
-  hz.blk = {key:k, el, kind:'dirt'};
+  document.getElementById('hrow').appendChild(name);
+  hz.blk = blk;
   hz.busy = false;
   setHint(k === ' ' ? 'Drücke die Leertaste.' : `Drücke ${k.toUpperCase()}.`);
 }
-function startGrund(){
-  clearTimeout(pendingTimer);
-  const L = LEVELS[cur], field = document.getElementById('field');
-  field.innerHTML = '';
-  addPets(field);
-  hz = null;
-  phase = 'grund';
-  buildBoard(field, L);
-  setHint('Baue die Holzblöcke ab. ' + grundHint('f'));
-  introExpected = 'f';
-  setExpected('f');
+// Grundhaltung: ein Holzblock über F, J oder der Leertaste, wird mit Animation abgebaut
+function grundAsk(){
+  const k = GRUND_SEQ[run.correct];
+  run.cur = bigBlock(k, 'wood').blk;
+  run.busy = false;
+  introExpected = k;
+  setExpected(k);
+  setHint(run.correct ? 'Gut! ' + grundHint(k) : 'Baue die Holzblöcke ab. ' + grundHint(k));
 }
 
 function lowestBlock(){
@@ -802,9 +807,7 @@ function start(i){
   } else if (L.intro) {
     phase = 'grund';
     buildBoard(field, L);
-    setHint('Baue die Holzblöcke ab. ' + grundHint('f'));
-    introExpected = 'f';
-    setExpected('f');
+    grundAsk();
   } else if (L.neu.length) {
     // Level mit neuen Tasten beginnt mit einer Einführung wie die Grundhaltung
     phase = 'learn';
@@ -835,7 +838,7 @@ function showBlock(){
   const key = weighted[Math.floor(Math.random() * weighted.length)];
   const el = document.createElement('div');
   // Neue Tasten des Levels sind Erz, die Wiederholung ist Stein. In Übungslevels ist das Erz die Reihe der Stufe
-  // (Level 4: zufällig etwa jeder dritte Block).
+  // (Level 5: zufällig etwa jeder dritte Block).
   const isOre = L.neu.length ? L.neu.includes(key)
               : (L.oreRow !== undefined ? KEYPOS[key].r === L.oreRow : Math.random() < 0.3);
   const kind = isOre ? (L.ore || 'coal') : 'stone';
@@ -874,7 +877,7 @@ function crackStage(n){
   return CRACKS[n] = c.toDataURL();
 }
 
-const CRUMB_COLORS = {dirt:['#7a5230','#5e3d20','#8f6339'], stone:['#8a8a8a','#6e6e6e','#a0a0a0'], coal:['#8a8a8a','#2b2b2b','#6e6e6e'], iron:['#8a8a8a','#d8af93','#a0a0a0'], diamond:['#8a8a8a','#4aedd9','#a0a0a0']};
+const CRUMB_COLORS = {wood:['#a8793a','#8a5f2c','#c9985a'], dirt:['#7a5230','#5e3d20','#8f6339'], stone:['#8a8a8a','#6e6e6e','#a0a0a0'], coal:['#8a8a8a','#2b2b2b','#6e6e6e'], iron:['#8a8a8a','#d8af93','#a0a0a0'], diamond:['#8a8a8a','#4aedd9','#a0a0a0']};
 
 // Abbau wie in Minecraft: Risse wachsen, der Block wackelt, Krümel springen ab, dann zerplatzt er
 function mineBlock(b){
@@ -952,7 +955,7 @@ function onKey(e){
     hz.idx++;
     if (hz.idx >= HAENDE_SEQ.length) {
       hz.step = 'done';
-      later(() => { setExpected(null); hsay('Geschafft!'); later(startGrund, 1600); }, 500);
+      later(() => { setExpected(null); finish(); }, 500);
       return;
     }
     later(askKey, 450);
@@ -960,17 +963,22 @@ function onKey(e){
   }
 
   if (L.intro) {
-    if (!GRUND_SEQ.includes(k)) return;
+    if (!GRUND_SEQ.includes(k) || run.busy) return;     // während des Abbaus zählen keine Anschläge
     e.preventDefault();
     const want = GRUND_SEQ[run.correct];
-    if (k !== want) { setHint(grundHint(want)); return; }
+    if (k !== want) {
+      const el = run.cur.el;
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+      setHint(grundHint(want));
+      return;
+    }
     run.correct++;
+    run.busy = true;
     pressKey(k);
     beep(660);
-    if (run.correct >= run.target) { finish(); return; }
-    const nxt = GRUND_SEQ[run.correct];
-    setExpected(nxt);
-    setHint('Gut! ' + grundHint(nxt));
+    mineBlock(run.cur);
+    if (run.correct >= run.target) { setExpected(null); finish(); return; }
+    later(grundAsk, 450);
     return;
   }
 

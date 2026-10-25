@@ -4,23 +4,24 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 
 | Nr | Name | Neue Tasten | Erz | Treffer | Belohnung |
 |----|------|-------------|-----|---------|-----------|
-| 0 | Grundhaltung | F J + Leertaste | Holz | 6 (F J Leertaste, zweimal) | Holzspitzhacke |
-| 1 | A S D | A S D | Kohle | 16 | nur linke Hand (A S D F) |
-| 2 | K L Ö | K L Ö | Kohle | 16 | nur rechte Hand (J K L Ö) |
-| 3 | + G H | G H | Kohle | 16 | |
-| 4 | Ganze Reihe | – | Kohle (zufällig ca. jeder dritte Block) | 32 | Steinspitzhacke |
-| 5 | + E I | E I | Eisen | 16 | |
-| 6 | + R U | R U | Eisen | 16 | |
-| 7 | + T Z | T Z | Eisen | 16 | |
-| 8 | + W O | W O | Eisen | 16 | |
-| 9 | + Q P Ü | Q P Ü | Eisen | 16 | |
-| 10 | Obere Reihe | – | Eisen = Tasten der oberen Reihe | 32 | Eisenspitzhacke |
-| 11 | + C , | C , | Diamant | 16 | |
-| 12 | + V M | V M | Diamant | 16 | |
-| 13 | + B N | B N | Diamant | 16 | |
-| 14 | + X . | X . | Diamant | 16 | |
-| 15 | + Y - | Y - | Diamant | 16 | |
-| 16 | Alle Reihen | – | Diamant = Tasten der unteren Reihe | 48 | Diamantspitzhacke |
+| 0 | Hände auflegen | alle 8 Finger + Daumen | Erde | 9 (F J D S A K L Ö ␣) | – |
+| 1 | Grundhaltung | F J + Leertaste | Holz | 6 (F J Leertaste, zweimal) | Holzspitzhacke |
+| 2 | A S D | A S D | Kohle | 16 | nur linke Hand (A S D F) |
+| 3 | K L Ö | K L Ö | Kohle | 16 | nur rechte Hand (J K L Ö) |
+| 4 | + G H | G H | Kohle | 16 | |
+| 5 | Ganze Reihe | – | Kohle (zufällig ca. jeder dritte Block) | 32 | Steinspitzhacke |
+| 6 | + E I | E I | Eisen | 16 | |
+| 7 | + R U | R U | Eisen | 16 | |
+| 8 | + T Z | T Z | Eisen | 16 | |
+| 9 | + W O | W O | Eisen | 16 | |
+| 10 | + Q P Ü | Q P Ü | Eisen | 16 | |
+| 11 | Obere Reihe | – | Eisen = Tasten der oberen Reihe | 32 | Eisenspitzhacke |
+| 12 | + C , | C , | Diamant | 16 | |
+| 13 | + V M | V M | Diamant | 16 | |
+| 14 | + B N | B N | Diamant | 16 | |
+| 15 | + X . | X . | Diamant | 16 | |
+| 16 | + Y - | Y - | Diamant | 16 | |
+| 17 | Alle Reihen | – | Diamant = Tasten der unteren Reihe | 48 | Diamantspitzhacke |
 
 Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level enthalten.
 
@@ -29,7 +30,7 @@ Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level e
 {name, keys:[...aktive Tasten], neu:[...neue Tasten], hint:'Text', target:Trefferzahl,
  ore:'coal'|'iron'|'diamond',   // Erzart der neuen Tasten (Standard: coal)
  oreRow:0|2,                    // nur in Übungslevels: Tasten dieser Reihe sind Erz (0 oben, 2 unten)
- intro:true,                    // nur Grundhaltung
+ intro:true, haende:true,        // Level 0 (Hände auflegen); intro allein = Grundhaltung
  reward:'holz'|'stein'|'eisen'|'diamant'}   // Spitzhacke im Abschluss-Fenster
 ```
 - Bekannte Tasten erscheinen als **Stein**, neue Tasten des Levels als **Erz** (immer nur ein Block, nie zweimal dieselbe Taste hintereinander). Neue Tasten werden doppelt gewichtet.
@@ -53,9 +54,11 @@ Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level e
 |----|-----|-------|-----------|
 | wolf | Haustier (Emoji 🐺) | 5 | – |
 | katze | Haustier (Emoji 🐱) | 10 | – |
-| hoehle | Biom Höhle | 8 | Level 3 mit Stern |
+| hoehle | Biom Höhle | 8 | Level 4 mit Stern |
 
 Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Verläufe (`wald`, `hoehle`). Skins gibt es noch nicht.
 
 ## Spielstand
-`localStorage['typecraft-v1']` = `{emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
+`localStorage['typecraft-v1']` = `{v:2, emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
+
+Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Sterne (ohne `v`) um eins nach hinten.
