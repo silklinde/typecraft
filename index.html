@@ -23,7 +23,7 @@
   .btn.green{background:#4caf50;}
   .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
   h2{margin:4px 0 8px;font-size:18px;}
-  #biome{position:relative;height:clamp(520px,80vh,760px);--kh:clamp(52px,8.2vh,80px);--sp:calc(var(--kh)*.7);--kbh:calc(var(--kh)*3 + var(--sp) + 24px);margin:12px 0;border:4px solid #000;border-radius:4px;overflow:hidden;}
+  #biome{position:relative;height:clamp(520px,80vh,760px);--kh:clamp(52px,8.2vh,80px);--sp:calc(var(--kh)*.7);--ext:calc(var(--kh)*.9);--kbb:calc(110px + var(--ext));--kbh:calc(var(--kh)*3 + var(--sp) + 24px);margin:12px 0;border:4px solid #000;border-radius:4px;overflow:hidden;}
   .biome-wald{background:linear-gradient(#7ec8ff 0%,#a8e6a1 60%,#3c7d2e 100%);}
   .biome-hoehle{background:linear-gradient(#3a3a3a,#2b2b2b 60%,#555);}
   .pet{position:absolute;bottom:10px;font-size:44px;transition:transform .2s;}
@@ -67,7 +67,7 @@
 
   /* ---------- Spielfeld mit Tastatur und Händen (Grundhaltung und alle Level) ---------- */
   /* Fallbereich: endet an der Oberkante der Tastatur (obere Reihe) */
-  .lanes{position:absolute;left:16px;right:16px;top:0;height:calc(100% - var(--kbh) - 60px);}
+  .lanes{position:absolute;left:16px;right:16px;top:0;height:calc(100% - var(--kbh) - var(--kbb));}
   .block{position:absolute;transform:translateX(-50%);width:64px;height:64px;border:3px solid #000;box-sizing:border-box;
          display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:28px;color:#fff;text-shadow:2px 2px 0 #000;
          box-shadow:inset -4px -4px 0 rgba(0,0,0,.35),inset 4px 4px 0 rgba(255,255,255,.2);background-size:100% 100%;image-rendering:pixelated;}
@@ -90,7 +90,7 @@
   .crumb{position:absolute;pointer-events:none;image-rendering:pixelated;}
 
   /* Tastatur: 1 Taste = 4 Spaltenviertel, damit die Reihen wie bei QWERTZ versetzt liegen (Q: 0, A: +1/4, Y: +3/4 Taste) */
-  .kb{position:absolute;left:16px;right:16px;bottom:60px;display:grid;grid-template-columns:repeat(45,1fr);
+  .kb{position:absolute;left:16px;right:16px;bottom:var(--kbb);display:grid;grid-template-columns:repeat(45,1fr);
       grid-template-rows:var(--kh) var(--kh) var(--kh) var(--sp);row-gap:8px;}
   .ikey{box-sizing:border-box;margin:0 4px;background:#444;border:3px solid #000;border-radius:4px;z-index:1;
         box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);transition:transform .12s,background .12s,box-shadow .12s,opacity .2s;}
@@ -107,7 +107,7 @@
   .lbl.next{color:#ffd166;}
 
   /* Minecraft-Arme: Finger reichen von der Grundreihe über die untere Reihe bis zum Arm (der Arm beginnt unter der unteren Reihe) */
-  .fing{z-index:2;grid-row:2 / 4;align-self:start;height:calc(100% - var(--dy,0px));margin:0 4px;
+  .fing{z-index:2;grid-row:2 / 4;align-self:start;height:calc(100% + var(--ext) - var(--dy,0px));margin:0 4px;
         background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;
         border:3px solid #000;border-bottom:0;border-radius:3px 3px 0 0;box-sizing:border-box;
         transition:transform .15s,filter .15s;transform:translate(var(--dx,0px),var(--dy,0px));}
@@ -115,13 +115,13 @@
   .fing.away:not(.hover),.thumb.away:not(.hover){transform:translate(var(--dx,0px),calc(var(--dy,0px) - 20px));filter:brightness(.55);}
   .fing.hover{transform:translate(var(--dx,0px),calc(var(--dy,0px) - 8px));filter:brightness(1.15) drop-shadow(0 0 6px #ffd166) drop-shadow(0 0 3px #ffd166);}
   .fing.press{transform:translate(var(--dx,0px),calc(var(--dy,0px) + 8px));}
-  .arm{z-index:3;grid-row:4;align-self:start;height:600px;margin:-8px 4px 0;box-sizing:border-box;border:3px solid #000;background-color:#00a0b8;
+  .arm{z-index:3;grid-row:4;align-self:start;height:600px;margin:calc(var(--ext) - 8px) 4px 0;box-sizing:border-box;border:3px solid #000;background-color:#00a0b8;
        background-image:var(--askin),var(--sleeve);background-size:100% 110px,100% 110px;
        background-position:0 0,0 110px;background-repeat:no-repeat,repeat-y;}
   .arm.l{grid-column:2 / 18;}
   .arm.r{grid-column:26 / 42;}
   /* Daumen: kommen von der Innenseite der Arme und liegen auf der Leertaste */
-  .thumb{z-index:4;grid-row:4;align-self:stretch;box-sizing:border-box;border:3px solid #000;pointer-events:none;
+  .thumb{z-index:4;grid-row:4;align-self:start;height:calc(100% + var(--ext));box-sizing:border-box;border:3px solid #000;pointer-events:none;
          background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;transition:transform .15s,filter .15s;}
   .thumb.l{grid-column:18 / 22;margin-left:-6px;margin-right:4px;border-radius:0 10px 10px 0;}
   .thumb.r{grid-column:22 / 26;margin-left:4px;margin-right:-6px;border-radius:10px 0 0 10px;}
