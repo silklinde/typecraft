@@ -15,7 +15,7 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 4. **Der Block steht in der Spalte der passenden Taste** auf der Bildschirmtastatur. Ein Tastendruck baut ihn mit einer Minecraft-Animation ab (Risse, Wackeln, Krümel), danach kommt der nächste.
 5. **Nur Blöcke, die man mit der aktuellen Spitzhacke abbauen kann, kommen ins Spiel.** Keine grauen „noch gesperrt“-Blöcke.
 6. **Schneller sichtbarer Erfolg** zu Beginn: Level 0 ist „Hände auflegen“ (kein Zuschauen, kaum Text: der passende Finger hebt sich, sein Name steht darüber, ein Erdblock mit dem Buchstaben erscheint, das Kind tippt ihn ab; 9 Tastendrücke, überspringbar), danach ist die Grundhaltung (Level 1, Holzblöcke mit Abbau-Animation) kurz (6 Tastendrücke) und gibt die Holzspitzhacke.
-7. **Jedes Level mit neuen Tasten beginnt mit einer Einführung** wie die Grundhaltung: die neuen Tasten erscheinen als große Erzblöcke über ihrer Taste, das Kind tippt sie mehrmals (6 Tastendrücke), danach erscheinen die Blöcke einzeln.
+7. **Jedes Level mit neuen Tasten beginnt mit einer Einführung** wie die Grundhaltung: die neuen Tasten erscheinen als große Erzblöcke über ihrer Taste, das Kind tippt jede neue Taste genau einmal, oben im schwarzen Bereich steht dabei das Fenster „Neue Buchstaben freigeschaltet“ (wie das Rezept-Fenster in Minecraft), danach erscheinen die Blöcke einzeln.
 8. Nicht kommerziell. Eigene Pixelgrafik für alles (Texturen, Spitzhacken, Smaragd), **keine Mojang-Dateien** verwenden. Minecraft ist eine Marke von Mojang.
 9. Das Abschluss-Fenster (Modal) liegt immer über allem, erscheint 1 Sekunde nach dem letzten Treffer und wächst aus der Mitte. Mit Enter geht es weiter. In dieser Sekunde zählen keine Anschläge mehr.
 
