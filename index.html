@@ -597,10 +597,10 @@ function playTippTon(){
   o.type = 'sine';
   o.frequency.setValueAtTime(1200, t);
   o.frequency.linearRampToValueAtTime(900, t + 0.03);
-  g.gain.setValueAtTime(0.05, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  g.gain.setValueAtTime(0.3, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
   o.connect(g); g.connect(c.destination);
-  o.start(t); o.stop(t + 0.04);
+  o.start(t); o.stop(t + 0.06);
 }
 
 // ---------- Tastatur mit Händen (für Grundhaltung und alle Level) ----------
@@ -1151,6 +1151,8 @@ document.getElementById('hintBtn').onclick = useHint;
 document.getElementById('emIcon').innerHTML = emeraldSVG(30);
 document.getElementById('hintBtn').innerHTML = `Hinweis (3 ${emeraldSVG(16)})`;
 window.addEventListener('keydown', onKey);
+// Audio beim ersten Tastendruck oder Klick freischalten (Browser erlauben Ton erst nach einer Eingabe)
+['keydown', 'pointerdown'].forEach(ev => window.addEventListener(ev, getAudio, { once: true }));
 
 renderMenu();
 </script>
