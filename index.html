@@ -49,14 +49,15 @@
   .hidden{display:none !important;}
   .stars{color:#ffd166;font-size:28px;letter-spacing:4px;}
   /* Live-Anzeige im Spiel: Fortschritt und Sterne */
-  #goal{display:flex;align-items:center;gap:14px;min-height:30px;}
-  #goal .bar{width:200px;flex:none;height:14px;background:#222;border:3px solid #000;box-sizing:border-box;position:relative;}
-  #goal .bar i{position:absolute;left:0;top:0;bottom:0;background:#7ed957;box-shadow:inset 0 3px 0 rgba(255,255,255,.35);transition:width .3s;}
-  #goal .cnt{min-width:60px;font-size:16px;}
-  #goal .gs{color:#ffd166;font-size:26px;letter-spacing:3px;text-shadow:2px 2px 0 #000;}
-  #goal .gs b{font-weight:normal;color:#555;}
-  #goal .gs.lost{animation:wackel .3s;}
-  #goal .note{color:#ddd;font-size:15px;}
+  #goal{display:flex;flex-direction:column;gap:4px;min-height:30px;width:460px;font-family:"VT323",monospace;}
+  #goal .top{display:flex;align-items:flex-end;gap:14px;}
+  #goal .cnt{font-size:52px;line-height:34px;font-weight:bold;color:#80ff20;text-shadow:2px 2px 0 #1b3a08;}
+  #goal .hearts{display:flex;gap:3px;}
+  #goal .hearts.lost{animation:wackel .3s;}
+  #goal .bar{height:20px;background:#1d2a14;border:3px solid #000;box-sizing:border-box;position:relative;overflow:hidden;}
+  #goal .bar i{position:absolute;left:0;top:0;bottom:0;background:#8fe05a;box-shadow:inset 0 4px 0 rgba(255,255,255,.4),inset 0 -3px 0 rgba(0,0,0,.25);transition:width .3s;}
+  #goal .bar u{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(100%/var(--n) - 3px),#1d2a14 calc(100%/var(--n) - 3px),#1d2a14 calc(100%/var(--n)));}
+  #goal .note{color:#ddd;font-size:18px;}
 
   /* ---------- Spielfeld mit Tastatur und Händen (Grundhaltung und alle Level) ---------- */
   /* Fallbereich: endet an der Oberkante der Tastatur (obere Reihe) */
@@ -853,10 +854,9 @@ function updateGoal(lost){
   const note = stars === 3 ? (run.wrong ? `Noch ${b[0] - run.wrong} Fehler für ★★★` : 'Fehlerfrei bisher!')
     : stars > 0 ? `Noch ${b[3 - stars] - run.wrong} Fehler für ${'★'.repeat(stars)}`
     : 'Weiter so! Danach kannst du es nochmal probieren.';
-  el.innerHTML = `<span class="cnt">${run.correct} / ${run.target}</span>
-    <div class="bar"><i style="width:${Math.min(100, run.correct / run.target * 100)}%"></i></div>
-    <span class="gs${lost ? ' lost' : ''}">${'★'.repeat(stars)}<b>${'★'.repeat(3 - stars)}</b></span>
-    <span class="note">${note}</span>`;
+  const hearts = [0,1,2].map(i => heartSVG(34, i < stars)).join('');
+  el.innerHTML = `<div class="top"><span class="cnt">${run.correct}</span><span class="hearts${lost ? ' lost' : ''}">${hearts}</span><span class="note">${note}</span></div>
+    <div class="bar" style="--n:${Math.min(run.target, 20)}"><i style="width:${Math.min(100, run.correct / run.target * 100)}%"></i><u></u></div>`;
   el.classList.remove('hidden');
 }
 
