@@ -572,15 +572,15 @@ function xpPing(){
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     const c = audioCtx, t = c.currentTime;
     const base = 2200 * (0.97 + Math.random() * 0.06);
-    [[1, 0.09, 0.5], [2.76, 0.05, 0.3], [5.4, 0.025, 0.15]].forEach(([m, vol, len]) => {
+    [[1, 0.09, 0.14], [2.76, 0.05, 0.08], [5.4, 0.025, 0.04]].forEach(([m, vol, len]) => {
       const o = c.createOscillator(), g = c.createGain();
       o.type = 'sine';
       o.frequency.value = base * m;
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(vol, t + 0.003);
-      g.gain.exponentialRampToValueAtTime(0.0005, t + len);
+      g.gain.setTargetAtTime(0, t + 0.01, len);
       o.connect(g); g.connect(c.destination);
-      o.start(t); o.stop(t + len + 0.05);
+      o.start(t); o.stop(t + 0.01 + len * 7);
     });
   } catch(e){}
 }
