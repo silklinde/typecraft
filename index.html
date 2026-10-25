@@ -572,12 +572,30 @@ function xpPing(){
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     const c = audioCtx, t = c.currentTime;
     const base = 2200 * (0.97 + Math.random() * 0.06);
-    [[1, 0.09, 0.14], [2.76, 0.05, 0.08], [5.4, 0.025, 0.04]].forEach(([m, vol, len]) => {
+    [[1, 0.05, 0.14], [2.76, 0.028, 0.08], [5.4, 0.014, 0.04]].forEach(([m, vol, len]) => {
       const o = c.createOscillator(), g = c.createGain();
       o.type = 'sine';
       o.frequency.value = base * m;
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(vol, t + 0.003);
+      g.gain.setTargetAtTime(0, t + 0.01, len);
+      o.connect(g); g.connect(c.destination);
+      o.start(t); o.stop(t + 0.01 + len * 7);
+    });
+  } catch(e){}
+}
+
+// Glocke für das Abschluss-Fenster (wie der Glockenblock in Minecraft): tiefer, voller, lang nachklingend
+function bellRing(){
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const c = audioCtx, t = c.currentTime;
+    [[1, 0.16, 0.45], [2.0, 0.09, 0.3], [2.76, 0.07, 0.22], [4.1, 0.04, 0.14], [5.4, 0.025, 0.09]].forEach(([m, vol, len]) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = 'sine';
+      o.frequency.value = 880 * m;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.004);
       g.gain.setTargetAtTime(0, t + 0.01, len);
       o.connect(g); g.connect(c.destination);
       o.start(t); o.stop(t + 0.01 + len * 7);
@@ -1131,6 +1149,7 @@ function finish(){
   pendingTimer = setTimeout(() => {
     topBar();
     document.getElementById('overlay').style.display = 'flex';
+    if (stars > 0) bellRing();
   }, 1000);
 }
 
