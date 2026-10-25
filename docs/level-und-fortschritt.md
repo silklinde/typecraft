@@ -34,31 +34,31 @@ Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level e
  reward:'holz'|'stein'|'eisen'|'diamant'}   // Spitzhacke im Abschluss-Fenster
 ```
 - Bekannte Tasten erscheinen als **Stein**, neue Tasten des Levels als **Erz** (immer nur ein Block, nie zweimal dieselbe Taste hintereinander). Neue Tasten werden doppelt gewichtet.
-- Ein Level ist freigeschaltet, wenn das vorige mindestens 1 Stern hat.
+- Ein Level ist freigeschaltet, wenn das vorige mindestens 1 Herz hat.
 
-## Sterne und Smaragde
-- Die Sterne hängen an der Zahl der Fehler (`starBudget(target)`, `starsFor()`), nicht an einer sichtbaren Prozentzahl. Intern gilt weiter: Genauigkeit ≥ 95 % → 3 Sterne, ≥ 85 % → 2, ≥ 70 % → 1, sonst 0 (nochmal, ohne Druck). Die Grundhaltung und alle Einführungen geben immer 3 Sterne.
+## Herzen und Smaragde
+- Die Herzen hängen an der Zahl der Fehler (`starBudget(target)`, `starsFor()`), nicht an einer sichtbaren Prozentzahl. Intern gilt weiter: Genauigkeit ≥ 95 % → 3 Herzen, ≥ 85 % → 2, ≥ 70 % → 1, sonst 0 (nochmal, ohne Druck). Die Grundhaltung und alle Einführungen geben immer 3 Herzen.
 
-  | Level-Länge | ★★★ | ★★ | ★ |
+  | Level-Länge | ❤❤❤ | ❤❤ | ❤ |
   |---|---|---|---|
   | 16 Tasten | 0 Fehler | bis 2 | bis 6 |
   | 32 Tasten | bis 1 | bis 5 | bis 13 |
   | 48 Tasten | bis 2 | bis 8 | bis 20 |
-- Live-Leiste im Spiel (`#goal` in der Kopfzeile, `updateGoal()`): „Treffer / Ziel“, Fortschrittsbalken, drei Sterne und „Noch N Fehler für ★★“. Jeder Fehler über dem Budget lässt einen Stern erlöschen (er kommt nicht zurück). Nur in der Spielphase sichtbar.
-- Abschluss-Fenster zeigt „16 Blöcke, 2 Fehler“ und was für den nächsten Stern nötig ist, keine Prozent.
-- +1 Smaragd pro Treffer, +3 bei mindestens 1 Stern. Hinweis-Knopf kostet 3 Smaragde (hebt den aktuellen Block 3 Sekunden hervor).
-- Eine Spitzhacke gehört dem Kind, sobald das Level mit ihrer `reward` mindestens 1 Stern hat (`hasPick`).
+- Live-Leiste im Spiel (`#goal` in der Kopfzeile, `updateGoal()`): „Treffer / Ziel“, Fortschrittsbalken, drei Herzen und „Noch N Fehler für ❤❤“. Jeder Fehler über dem Budget lässt ein Herz erlöschen (er kommt nicht zurück). Nur in der Spielphase sichtbar.
+- Abschluss-Fenster zeigt „16 Blöcke, 2 Fehler“ und was für den nächsten Herz nötig ist, keine Prozent.
+- +1 Smaragd pro Treffer, +3 bei mindestens 1 Herz. Hinweis-Knopf kostet 3 Smaragde (hebt den aktuellen Block 3 Sekunden hervor).
+- Eine Spitzhacke gehört dem Kind, sobald das Level mit ihrer `reward` mindestens 1 Herz hat (`hasPick`).
 
 ## Shop (Array `SHOP`)
 | Id | Art | Preis | Bedingung |
 |----|-----|-------|-----------|
 | wolf | Haustier (Emoji 🐺) | 5 | – |
 | katze | Haustier (Emoji 🐱) | 10 | – |
-| hoehle | Biom Höhle | 8 | Level 4 mit Stern |
+| hoehle | Biom Höhle | 8 | Level 4 mit Herz |
 
 Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Verläufe (`wald`, `hoehle`). Skins gibt es noch nicht.
 
 ## Spielstand
 `localStorage['typecraft-v1']` = `{v:2, emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
 
-Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Sterne (ohne `v`) um eins nach hinten.
+Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.

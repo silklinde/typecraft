@@ -49,7 +49,7 @@
   @keyframes grow{0%{transform:scale(.05);opacity:0}100%{transform:scale(1);opacity:1}}
   .hidden{display:none !important;}
   .stars{color:#ffd166;font-size:28px;letter-spacing:4px;}
-  /* Live-Anzeige im Spiel: Fortschritt und Sterne */
+  /* Live-Anzeige im Spiel: Fortschritt und Herzen */
   #goal{display:flex;flex-direction:column;gap:4px;min-height:30px;width:460px;font-family:"VT323",monospace;}
   #goal .top{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:14px;}
   #goal .top .note{text-align:right;}
@@ -534,7 +534,7 @@ function renderMenu(){
     b.className = 'btn';
     b.disabled = !unlocked(i);
     const s = st.stars[i] || 0;
-    b.textContent = `${L.name} ${'★'.repeat(s)}${unlocked(i) ? '' : ' 🔒'}`;
+    b.innerHTML = `${L.name} ${Array.from({length: s}, () => heartSVG(16, true)).join('')}${unlocked(i) ? '' : ' 🔒'}`;
     b.onclick = () => start(i);
     lv.appendChild(b);
   });
@@ -846,7 +846,7 @@ function starsFor(wrong, target){
   return wrong <= b[0] ? 3 : wrong <= b[1] ? 2 : wrong <= b[2] ? 1 : 0;
 }
 
-// Live-Leiste: Fortschritt und Sterne; jeder Fehler über dem Budget lässt einen Stern erlöschen
+// Live-Leiste: Fortschritt und Herzen; jeder Fehler über dem Budget lässt ein Herz erlöschen
 function updateGoal(lost){
   const el = document.getElementById('goal');
   if (phase !== 'play' || !run || LEVELS[cur].intro) { el.classList.add('hidden'); return; }
@@ -1141,10 +1141,10 @@ function finish(){
   const fehler = n => n === 1 ? '1 Fehler' : `${n} Fehler`;
   const detail = L.intro ? '' : `${run.correct} Blöcke, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
   const ziel = (L.intro || stars === 3) ? ''
-    : `<div style="margin-top:6px;color:#ddd;">${stars === 0 ? `Für ★ höchstens ${fehler(bud[2])}` : `Für ${stars + 1} ${stars === 0 ? 'Herz' : 'Herzen'} höchstens ${fehler(bud[3 - stars - 1])}`}.</div>`;
+    : `<div style="margin-top:6px;color:#ddd;">${`Für ${stars + 1} ${stars === 0 ? 'Herz' : 'Herzen'} höchstens ${fehler(bud[2 - stars])}`}.</div>`;
   const msg = stars > 0
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
-    : `Noch nicht ganz. ${detail}${ziel}<br>Ohne Druck, einfach nochmal probieren!`;
+    : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
