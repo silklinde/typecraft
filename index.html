@@ -23,7 +23,7 @@
   .btn.green{background:#4caf50;}
   .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
   h2{margin:4px 0 8px;font-size:18px;}
-  #biome{position:relative;height:clamp(520px,calc(100vh - 128px),1000px);--kh:clamp(52px,8.2vh,80px);--sp:calc(var(--kh)*.7);--ext:calc(var(--kh)*.9);--kbb:calc(110px + var(--ext));--kbh:calc(var(--kh)*3 + var(--sp) + 24px);margin:12px 0;border:4px solid #000;border-radius:4px;overflow:hidden;}
+  #biome{position:relative;height:clamp(520px,calc(100vh - 128px),1000px);--kh:clamp(52px,8.2vh,80px);--sp:calc(var(--kh)*.7);--ext:calc(var(--kh)*.9);--kw:calc((100vw - 72px)/45*4);--bw:calc(var(--kw) - 8px);--kbb:calc(110px + var(--ext));--kbh:calc(var(--kh)*3 + var(--sp) + 24px);margin:12px 0;border:4px solid #000;border-radius:4px;overflow:hidden;}
   .biome-wald{background:linear-gradient(#7ec8ff 0%,#a8e6a1 60%,#3c7d2e 100%);}
   .biome-hoehle{background:linear-gradient(#3a3a3a,#2b2b2b 60%,#555);}
   .pet{position:absolute;bottom:10px;font-size:44px;transition:transform .2s;}
@@ -81,7 +81,7 @@
   .block.redstone{background-image:var(--redstone);}
   .block.glow{outline:4px solid #ffd166;}
   /* Ein einzelner, ruhig stehender Block über seiner Taste (ab Level 2) */
-  .block.big{top:24px;width:clamp(96px,17vh,150px);height:clamp(96px,17vh,150px);border-width:4px;font-size:clamp(56px,10vh,92px);
+  .block.big{top:24px;width:var(--bw);height:var(--bw);border-width:4px;font-size:calc(var(--bw)*.6);
              text-shadow:3px 3px 0 #000;box-shadow:inset -8px -8px 0 rgba(0,0,0,.3),inset 8px 8px 0 rgba(255,255,255,.18);}
   .block.big .crack{position:absolute;inset:0;background-size:100% 100%;image-rendering:pixelated;pointer-events:none;}
   .block.shake{animation:wackel .3s;}
@@ -137,10 +137,10 @@
   #hrow{--hf:clamp(28px,5.2vh,48px);}
   .hname{position:absolute;top:0;translate:-50% 0;height:calc(var(--hf) * 2.15);display:flex;align-items:flex-end;justify-content:center;
          text-align:center;line-height:1.05;font-size:var(--hf);font-weight:bold;color:#ffd166;text-shadow:3px 3px 0 #000;white-space:nowrap;}
-  #hrow .nk{top:calc(var(--hf) * 2.3);width:clamp(96px,17vh,150px);font-size:clamp(56px,10vh,92px);}
+  #hrow .nk{top:calc(var(--hf) * 2.3);width:var(--bw);font-size:calc(var(--bw)*.6);}
   .nk.dirt{background-image:var(--dirt);}
   .nk.wood{background-image:var(--wood);}
-  #hrow .nk.wide{width:clamp(150px,24vh,230px);height:clamp(56px,10vh,90px);font-size:clamp(20px,3.4vh,34px);}
+  #hrow .nk.wide{width:calc(var(--bw)*1.6);height:calc(var(--bw)*.6);font-size:calc(var(--bw)*.22);}
   .nk.shake{animation:wackel .3s;}
   .nk.mining{animation:wackel .12s infinite;}
   .nk .crack{position:absolute;inset:0;background-size:100% 100%;image-rendering:pixelated;pointer-events:none;}
@@ -150,9 +150,9 @@
 
   /* Einführung neuer Tasten: Erzblöcke über der Mitte ihrer Taste */
   .newrow{position:absolute;left:16px;right:16px;top:74px;}
-  .nk{position:absolute;translate:-50% 0;width:clamp(72px,12vh,108px);aspect-ratio:1 / 1;box-sizing:border-box;
+  .nk{position:absolute;translate:-50% 0;width:var(--bw);aspect-ratio:1 / 1;box-sizing:border-box;
       display:flex;align-items:center;justify-content:center;
-      font-size:clamp(36px,7vh,64px);line-height:1;font-weight:bold;color:#fff;text-shadow:3px 3px 0 #000;
+      font-size:calc(var(--bw)*.6);line-height:1;font-weight:bold;color:#fff;text-shadow:3px 3px 0 #000;
       background-size:100% 100%;image-rendering:pixelated;border:4px solid #000;
       box-shadow:inset -8px -8px 0 rgba(0,0,0,.3),inset 8px 8px 0 rgba(255,255,255,.18);transition:scale .15s;}
   .nk.coal{background-image:var(--coal);}
