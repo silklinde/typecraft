@@ -852,9 +852,7 @@ function updateGoal(lost){
   const el = document.getElementById('goal');
   if (phase !== 'play' || !run || LEVELS[cur].intro) { el.classList.add('hidden'); return; }
   const b = starBudget(run.target), stars = starsFor(run.wrong, run.target);
-  const note = stars === 3 ? (run.wrong ? `Noch ${b[0] - run.wrong} Fehler für ★★★` : 'Fehlerfrei bisher!')
-    : stars > 0 ? `Noch ${b[3 - stars] - run.wrong} Fehler für ${'★'.repeat(stars)}`
-    : 'Weiter so! Danach kannst du es nochmal probieren.';
+  const note = `Fehler: ${run.wrong}`;
   const hearts = [0,1,2].map(i => heartSVG(34, i < stars)).join('');
   el.innerHTML = `<div class="top"><span class="hearts${lost ? ' lost' : ''}">${hearts}</span><span class="cnt">${run.correct}</span><span class="note">${note}</span></div>
     <div class="bar" style="--n:${run.target}"><i style="width:${Math.min(100, run.correct / run.target * 100)}%"></i><u></u></div>`;
