@@ -22,8 +22,9 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 | 15 | + X . | X . | Diamant | 16 | |
 | 16 | + Y - | Y - | Gold | 16 | |
 | 17 | Alle Reihen | – | Erze der Tasten der unteren Reihe (je Taste wie oben) | 48 | Diamantspitzhacke |
+| 18 | + Ä ß | Ä ß | Redstone | 16 | |
 
-Die Taste **Ä** ist auf der Bildschirmtastatur sichtbar, aber in keinem Level enthalten.
+**Ä** ist ab Level 18 dabei. **ß** liegt in einer zusätzlichen Reihe über Q–Ü (Zahlenreihe nur mit ß, `KEYPOS['ß']` = Reihe −1, Spalte 39). Diese Reihe erscheint nur in Levels, deren `keys` ß enthalten; dann bekommt `.kb` die Klasse `num` und alles darunter rutscht per `--o` eine Reihe nach unten. Beide tippt der rechte kleine Finger.
 
 ## Level-Felder
 ```js
