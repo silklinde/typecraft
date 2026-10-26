@@ -114,15 +114,16 @@
         transition:transform .15s,height .15s,filter .15s;transform:translate(var(--dx,0px),var(--dy,0px));}
   /* Nur in "Hände auflegen": Finger sind angehoben und gedimmt, bis sie auf ihrer Taste liegen */
   .fing.away:not(.hover),.thumb.away:not(.hover){transform:translate(var(--dx,0px),calc(var(--dy,0px) - 20px));filter:brightness(.55);}
+  .fing.hover,.fing.press{z-index:3;}   /* der tippende Finger liegt über den Nachbarfingern */
   .fing.hover{transform:translate(var(--dx,0px),calc(var(--dy,0px) - 8px));filter:brightness(1.15) drop-shadow(0 0 6px #ffd166) drop-shadow(0 0 3px #ffd166);}
   .fing.press{transform:translate(var(--dx,0px),calc(var(--dy,0px) + 8px));}
-  .arm{z-index:3;grid-row:4;align-self:start;height:600px;margin:calc(var(--ext) - 8px) 4px 0;box-sizing:border-box;border:3px solid #000;background-color:#00a0b8;
+  .arm{z-index:4;grid-row:4;align-self:start;height:600px;margin:calc(var(--ext) - 8px) 4px 0;box-sizing:border-box;border:3px solid #000;background-color:#00a0b8;
        background-image:var(--askin),var(--sleeve);background-size:100% 110px,100% 110px;
        background-position:0 0,0 110px;background-repeat:no-repeat,repeat-y;}
   .arm.l{grid-column:2 / 18;}
   .arm.r{grid-column:26 / 42;}
   /* Daumen: kommen von der Innenseite der Arme und liegen auf der Leertaste */
-  .thumb{z-index:4;grid-row:4;align-self:start;height:calc(100% + var(--ext));box-sizing:border-box;border:3px solid #000;pointer-events:none;
+  .thumb{z-index:5;grid-row:4;align-self:start;height:calc(100% + var(--ext));box-sizing:border-box;border:3px solid #000;pointer-events:none;
          background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;transition:transform .15s,filter .15s;}
   .thumb.l{grid-column:18 / 22;margin-left:-6px;margin-right:4px;border-radius:0 10px 10px 0;}
   .thumb.r{grid-column:22 / 26;margin-left:4px;margin-right:-6px;border-radius:10px 0 0 10px;}
