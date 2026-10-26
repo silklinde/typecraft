@@ -108,10 +108,10 @@
   .lbl.next{color:#ffd166;}
 
   /* Minecraft-Arme: Finger reichen von der Grundreihe über die untere Reihe bis zum Arm (der Arm beginnt unter der unteren Reihe) */
-  .fing{z-index:2;grid-row:2 / 4;align-self:start;height:calc(100% + var(--ext) + var(--kh)*2 + 40px);margin:0 4px;
+  .fing{z-index:2;grid-row:2 / 4;align-self:start;height:calc(100% + var(--ext) - var(--dy,0px) + 40px);margin:0 4px;
         background-image:var(--fskin);background-size:100% 100%;background-color:#b08468;
         border:3px solid #000;border-bottom:0;border-radius:3px 3px 0 0;box-sizing:border-box;
-        transition:transform .15s,filter .15s;transform:translate(var(--dx,0px),var(--dy,0px));}
+        transition:transform .15s,height .15s,filter .15s;transform:translate(var(--dx,0px),var(--dy,0px));}
   /* Nur in "Hände auflegen": Finger sind angehoben und gedimmt, bis sie auf ihrer Taste liegen */
   .fing.away:not(.hover),.thumb.away:not(.hover){transform:translate(var(--dx,0px),calc(var(--dy,0px) - 20px));filter:brightness(.55);}
   .fing.hover{transform:translate(var(--dx,0px),calc(var(--dy,0px) - 8px));filter:brightness(1.15) drop-shadow(0 0 6px #ffd166) drop-shadow(0 0 3px #ffd166);}
