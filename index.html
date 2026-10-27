@@ -348,6 +348,10 @@ const ROWSTART = [1, 2, 4];
 const NCOL = 45;
 // Umschalt (rechts) steht in der Zeile der Leertaste ganz rechts, neben dem rechten Arm; bedient vom rechten kleinen Finger
 const SHIFT_C = 42, SHIFT_CX = (SHIFT_C + 1) / NCOL;
+// Linke Umschalt (linker kleiner Finger) steht links neben Y, dreiviertel Tasten breit; sie braucht man für Großbuchstaben der rechten Hand
+const SHIFTL_C = 1, SHIFTL_CX = (SHIFTL_C + 0.5) / NCOL;
+const LEFTHAND = 'qwertasdfgyxcvb';
+const shiftFor = k => LEFTHAND.includes(k) ? 'shift' : 'shiftl';   // Großbuchstaben tippt man mit der Umschalt der anderen Hand
 const KEYPOS = {};
 KEYROWS.forEach((row, r) => row.forEach((k, i) => { KEYPOS[k] = {r, c: ROWSTART[r] + i * 4}; }));
 // ß liegt in der Zahlenreihe (Reihe -1), die es sonst noch nicht gibt: dort steht nur ß, Spalte wie auf der echten Tastatur
@@ -363,8 +367,8 @@ const FINGERS = {a:'ayq', s:'sxw', d:'dce', f:'fgrtvb', j:'jhzumn', k:'ki,', l:'
 const FNAME = {a:'linker kleiner Finger', s:'linker Ringfinger', d:'linker Mittelfinger', f:'linker Zeigefinger',
                j:'rechter Zeigefinger', k:'rechter Mittelfinger', l:'rechter Ringfinger', 'ö':'rechter kleiner Finger'};
 const FCOL = {a:'#4a2f18', s:'#6b4423', d:'#8a5a2b', f:'#b07a3c', j:'#b07a3c', k:'#8a5a2b', l:'#6b4423', 'ö':'#4a2f18'};
-function fingerOf(k){ if (k === 'shift') return 'ö'; for (const h in FINGERS) if (FINGERS[h].includes(k)) return h; return null; }
-const FINGER = {shift:'rechter kleiner Finger (Umschalt gedrückt halten)'}, COLOR = {};
+function fingerOf(k){ if (k === 'shift') return 'ö'; if (k === 'shiftl') return 'a'; for (const h in FINGERS) if (FINGERS[h].includes(k)) return h; return null; }
+const FINGER = {shift:'rechter kleiner Finger (Umschalt gedrückt halten)', shiftl:'linker kleiner Finger (Umschalt gedrückt halten)'}, COLOR = {};
 Object.keys(KEYPOS).forEach(k => {
   const h = fingerOf(k), r = KEYPOS[k].r;
   const side = 'gh'.includes(k) || 'tzbn'.includes(k);
@@ -386,6 +390,9 @@ const HAENDE_SEQ = ['f', 'j', 'd', 's', 'a', 'k', 'l', 'ö', ' '];
 const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeigefinger',
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
 const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Dada','Fass','As'];
+const CHEST2_WORDS = ['Ja','Öl','Fall','Falls','Kalk','Lass','Salsa','Kajak','Alaska','Jaffa'];
+const CHEST3_WORDS = ['Glas','Hals','Hass','Saga','Jagd','Kahl','Gala','Ölfass','Gaga','Hall'];
+const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
   {name:'Level 0: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9},
@@ -431,10 +438,12 @@ const LEVELS = [
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
-  {chest:true, name:'Truhe 1', label:'A S D F', keys:['a','s','d','f'], neu:[], shift:true, need:2, ready:true,
-   words:CHEST1_WORDS, target:CHEST1_WORDS.join('').length * 2},
-  {chest:true, name:'Truhe 2', label:'A S D F J K L Ö', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, need:3},
-  {chest:true, name:'Truhe 3', label:'A S D F J K L Ö G H', keys:HOME10, neu:[], shift:true, need:4},
+  {chest:true, name:'Truhe 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', need:2, ready:true,
+   words:CHEST1_WORDS, rounds:2, target:wordsLen(CHEST1_WORDS, 2)},
+  {chest:true, name:'Truhe 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', need:3, ready:true,
+   words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
+  {chest:true, name:'Truhe 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
+   words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
   {chest:true, name:'Truhe 4', label:'', keys:[], neu:[], shift:true, need:5},
   {chest:true, name:'Truhe 5', label:'', keys:[], neu:[], shift:true, need:11},
   {chest:true, name:'Truhe 6', label:'', keys:[], neu:[], shift:true, need:17},
@@ -770,7 +779,7 @@ function buildBoard(field, L, mode){
     : L.intro
     ? `<div class="newrow" id="hrow"></div>`
     : mode === 'cshift'
-    ? `<div class="newrow"><div id="big-shift" class="nk iron" style="left:${(SHIFT_CX * 100).toFixed(3)}%">⇧</div></div>`
+    ? `<div class="newrow"><div id="big-${L.newShift}" class="nk iron" style="left:${((L.newShift === 'shiftl' ? SHIFTL_CX : SHIFT_CX) * 100).toFixed(3)}%">⇧</div></div>`
     : mode === 'learn'
     ? `<div class="newrow">
          ${L.neu.map(k => `<div id="big-${k}" class="nk ${ore}" style="left:${(cxOf(k) * 100).toFixed(3)}%">${KLBL(k)}</div>`).join('')}
@@ -799,6 +808,8 @@ function buildBoard(field, L, mode){
       <div class="ikey space" data-k=" "></div>
       ${L.shift ? `<div class="ikey shift" data-k="shift" style="grid-row:calc(4 + var(--o,0));grid-column:${SHIFT_C} / span 4"></div>` +
                   `<div class="lbl" data-lk="shift" style="grid-row:calc(4 + var(--o,0));grid-column:${SHIFT_C} / span 4">⇧</div>` : ''}
+      ${L.shiftl ? `<div class="ikey shift" data-k="shiftl" style="grid-row:calc(3 + var(--o,0));grid-column:${SHIFTL_C} / span 3"></div>` +
+                   `<div class="lbl" data-lk="shiftl" style="grid-row:calc(3 + var(--o,0));grid-column:${SHIFTL_C} / span 3">⇧</div>` : ''}
       ${fing('a', 2)}${fing('s', 6)}${fing('d', 10)}${fing('f', 14)}
       ${fing('j', 26)}${fing('k', 30)}${fing('l', 34)}${fing('ö', 38)}
       <div class="arm l"></div><div class="arm r"></div>
@@ -846,8 +857,8 @@ function setExpected(k, withShift){
   if (f) f.classList.add('hover');
   const big = bigFor(k);
   if (big) big.classList.add('next');
-  if (withShift) {      // Großbuchstabe: Umschalt und der rechte kleine Finger leuchten mit
-    const sk = wrap.querySelector('.ikey[data-k="shift"]'), sl = wrap.querySelector('.lbl[data-lk="shift"]'), sf = fingerFor(wrap, 'shift');
+  if (withShift) {      // Großbuchstabe: die passende Umschalt (withShift = 'shift' oder 'shiftl') und ihr kleiner Finger leuchten mit
+    const sk = wrap.querySelector(`.ikey[data-k="${withShift}"]`), sl = wrap.querySelector(`.lbl[data-lk="${withShift}"]`), sf = fingerFor(wrap, withShift);
     if (sk) sk.classList.add('next');
     if (sl) sl.classList.add('next');
     if (sf && !sf.classList.contains('press')) sf.classList.add('hover');
@@ -855,11 +866,12 @@ function setExpected(k, withShift){
 }
 
 // Umschalt gedrückt halten: Taste und kleiner Finger bleiben unten, bis die Taste losgelassen wird
-function shiftVisual(down){
+function shiftVisual(down, id){
+  if (!id) { shiftVisual(down, 'shift'); shiftVisual(down, 'shiftl'); return; }   // ohne Angabe (Loslassen): beide
   const wrap = document.getElementById('intro');
-  const keyEl = wrap && wrap.querySelector('.ikey[data-k="shift"]');
+  const keyEl = wrap && wrap.querySelector(`.ikey[data-k="${id}"]`);
   if (!keyEl) return;
-  const f = fingerFor(wrap, 'shift');
+  const f = fingerFor(wrap, id);
   keyEl.classList.toggle('pressed', down);
   if (down) { f.classList.remove('hover'); f.classList.add('press'); }
   else { f.classList.remove('press'); if (!f.classList.contains('hover')) resetFinger(f); }
@@ -1001,7 +1013,7 @@ function showToast(L){
   hideToast();
   const t = document.createElement('div');
   t.id = 'toast'; t.className = 'toast';
-  const [title, txt] = L.chest ? ['Neue Taste freigeschaltet', 'Umschalt ⇧'] : ['Neue Buchstaben freigeschaltet', L.neu.map(k => KLBL(k)).join(' ')];
+  const [title, txt] = L.chest ? ['Neue Taste freigeschaltet', L.shiftName] : ['Neue Buchstaben freigeschaltet', L.neu.map(k => KLBL(k)).join(' ')];
   t.innerHTML = `<div class="ticon ${L.chest ? 'iron' : (L.ore || 'coal')}"></div><div class="ttxt"><b>${title}</b><span>${txt}</span></div>`;
   document.body.appendChild(t);
 }
@@ -1027,7 +1039,7 @@ function beginPlay(L){
 // Truhe: jedes Wort zweimal in zufälliger Reihenfolge (nie dasselbe Wort direkt hintereinander)
 function chestSeq(L){
   const seq = [];
-  const pool = [...L.words, ...L.words];
+  const pool = Array.from({length: L.rounds}, () => L.words).flat();
   while (pool.length) {
     const ok = pool.filter(w => w !== seq[seq.length - 1]);
     const w = (ok.length ? ok : pool)[Math.floor(Math.random() * (ok.length || pool.length))];
@@ -1058,7 +1070,7 @@ function chestNext(){
   run.cur = {key, el, kind, cap};
   run.busy = false;
   renderWord(w, run.ci);
-  setExpected(key, cap);
+  setExpected(key, cap && shiftFor(key));
 }
 function chestKey(e, k){
   const L = LEVELS[cur];
@@ -1092,7 +1104,7 @@ function chestKey(e, k){
     beep(200);
     b.el.classList.remove('shake'); void b.el.offsetWidth; b.el.classList.add('shake');
     if (b.key === k && b.cap) {     // richtige Taste, aber Umschalt vergessen: Umschalt wackelt
-      const sk = document.querySelector('#intro .ikey[data-k="shift"]');
+      const sk = document.querySelector(`#intro .ikey[data-k="${shiftFor(b.key)}"]`);
       if (sk) { sk.classList.remove('nudge'); void sk.offsetWidth; sk.classList.add('nudge'); }
     }
   }
@@ -1116,10 +1128,14 @@ function start(i){
   hz = null;
   if (L.chest) {
     // Truhe: erst die Umschalt-Taste einmal kennenlernen, dann die Wörter
-    phase = 'cshift';
-    buildBoard(field, L, 'cshift');
-    showToast(L);
-    setExpected('shift');
+    if (L.newShift) {
+      phase = 'cshift';
+      buildBoard(field, L, 'cshift');
+      showToast(L);
+      setExpected(L.newShift);
+    } else {
+      beginPlay(L);      // keine neue Taste: gleich die Wörter
+    }
   } else if (L.haende) {
     phase = 'haende';
     buildBoard(field, L, 'haende');
@@ -1266,10 +1282,10 @@ function onKey(e){
   if (L.chest) {
     if (k === 'shift') {
       if (phase !== 'cshift' && phase !== 'play') return;
-      shiftVisual(true);
+      shiftVisual(true, e.code === 'ShiftLeft' ? 'shiftl' : 'shift');
       if (phase === 'cshift' && !e.repeat) {
         phase = 'wait';
-        pressKey('shift'); xpPing(); bounce();
+        pressKey(L.newShift); xpPing(); bounce();
         setExpected(null);
         pendingTimer = setTimeout(() => beginPlay(L), 1000);
       }
@@ -1423,7 +1439,7 @@ document.getElementById('logo').onclick = renderMenu;
 // Smaragd-Symbol im Kopf
 document.getElementById('emIcon').innerHTML = emeraldSVG(30);
 window.addEventListener('keydown', onKey);
-window.addEventListener('keyup', e => { if (e.key === 'Shift') shiftVisual(false); });
+window.addEventListener('keyup', e => { if (e.key === 'Shift') shiftVisual(false, e.code === 'ShiftLeft' ? 'shiftl' : e.code === 'ShiftRight' ? 'shift' : null); });
 
 renderMenu();
 </script>

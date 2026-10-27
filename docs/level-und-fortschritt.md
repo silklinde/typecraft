@@ -70,8 +70,10 @@ Eigener Bereich „Truhen“ im Menü, 6 Truhen. Sie stehen als Einträge mit `c
 | Truhe | Tasten | Freigeschaltet durch | Stand |
 |-------|--------|----------------------|-------|
 | 1 | A S D F + Umschalt | Level 2 | spielbar |
-| 2 | A S D F J K L Ö | Level 3 | noch gesperrt (keine Wörter) |
-| 3 | + G H | Level 4 | noch gesperrt (keine Wörter) |
+| 2 | A S D F J K L Ö + linke Umschalt | Level 3 | spielbar (10 Wörter einmal, 42 Buchstaben) |
+| 3 | + G H | Level 4 | spielbar (10 Wörter einmal, 42 Buchstaben) |
 | 4–6 | offen | – | noch gesperrt |
 
 Truhe 1: Beginn mit Einführung der Umschalt-Taste (Block „⇧“, Fenster „Neue Taste freigeschaltet“). Danach 16 Wörter (`CHEST1_WORDS`, jedes zweimal, zufällig), 50 Buchstaben, Herzen und Smaragde wie bei Leveln. Alle Anfangsbuchstaben sind groß: Kohleblock = Großbuchstabe (Umschalt gedrückt halten), Steinblock = Kleinbuchstabe. Oben steht das Wort, der aktuelle Buchstabe ist gelb. Umschalt steht rechts neben dem rechten Arm (Zeile der Leertaste) und wird vom rechten kleinen Finger bedient.
+
+Umschalt: Großbuchstaben tippt man mit der Umschalt der **anderen** Hand. Rechte Umschalt (`shift`, rechter kleiner Finger) für Buchstaben der linken Hand, linke Umschalt (`shiftl`, linker kleiner Finger, links neben Y) für Buchstaben der rechten Hand (`shiftFor(k)`). Akzeptiert wird jede Umschalt-Taste, hervorgehoben wird die passende. Truhe 2 führt die linke Umschalt ein (`newShift`), Truhe 3 hat keine Einführung und startet gleich mit den Wörtern. `rounds` = wie oft jedes Wort vorkommt.
