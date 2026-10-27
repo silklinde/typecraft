@@ -147,6 +147,12 @@
          text-align:center;line-height:1.05;font-size:var(--hf);font-weight:bold;color:#ffd166;text-shadow:3px 3px 0 #000;white-space:nowrap;}
   #hrow .nk{top:calc(var(--hf) * 2.3);width:var(--bw);font-size:calc(var(--bw)*.6);}
   .nk.dirt{background-image:var(--dirt);}
+  .nk.stone{background-image:var(--stone);}
+  .nk.pop{animation:pop .3s ease-out;}
+  /* Umschalt-Einführung in den Truhen: kleinerer Fingername, Block etwas höher */
+  #hrow.cs{top:4px;}
+  #hrow.cs .nk{top:calc(var(--hf) * 1.9);}
+  #hrow.cs .hname{height:calc(var(--hf) * 1.9);font-size:calc(var(--hf) * .7);}
   .nk.wood{background-image:var(--wood);}
   #hrow .nk.wide{width:calc(var(--bw)*1.6);height:calc(var(--bw)*.6);font-size:calc(var(--bw)*.22);}
   .nk.shake{animation:wackel .3s;}
@@ -438,9 +444,9 @@ const LEVELS = [
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
-  {chest:true, name:'Truhe 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', need:2, ready:true,
+  {chest:true, name:'Truhe 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:2, ready:true,
    words:CHEST1_WORDS, rounds:2, target:wordsLen(CHEST1_WORDS, 2)},
-  {chest:true, name:'Truhe 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', need:3, ready:true,
+  {chest:true, name:'Truhe 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:3, ready:true,
    words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
   {chest:true, name:'Truhe 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
@@ -459,6 +465,7 @@ let cur = -1, active = false, run = null, raf = 0, last = 0;
 let introExpected = 'f', shownKey = null;
 let phase = 'play';          // 'haende' (Hände auflegen), 'grund' (Grundhaltung), 'learn' (Einführung neuer Tasten), 'wait', 'play'
 let hz = null;               // Hände auflegen: {step:'show'|'tippen'|'done', idx, blk, busy}
+let cs = null, shiftHeld = false;   // Umschalt-Einführung der Truhen: {step:'press'|'morph', idx, letters, blk, busy}; shiftHeld = Umschalt gerade gedrückt
 let learn = null;            // Ablauf der Einführung: {seq, idx}
 let pendingTimer = null;     // Pause vor dem Modal bzw. vor dem Start der Blöcke
 
@@ -779,7 +786,10 @@ function buildBoard(field, L, mode){
     : L.intro
     ? `<div class="newrow" id="hrow"></div>`
     : mode === 'cshift'
-    ? `<div class="newrow"><div id="big-${L.newShift}" class="nk iron" style="left:${((L.newShift === 'shiftl' ? SHIFTL_CX : SHIFT_CX) * 100).toFixed(3)}%">⇧</div></div>`
+    ? (() => {
+        const x = ((L.newShift === 'shiftl' ? SHIFTL_CX : SHIFT_CX) * 100).toFixed(3);
+        return `<div class="newrow cs" id="hrow"><div id="big-${L.newShift}" class="nk iron" style="left:${x}%">⇧</div><div class="hname" id="csname" style="left:${x}%">Kleiner<br>Finger</div></div>`;
+      })()
     : mode === 'learn'
     ? `<div class="newrow">
          ${L.neu.map(k => `<div id="big-${k}" class="nk ${ore}" style="left:${(cxOf(k) * 100).toFixed(3)}%">${KLBL(k)}</div>`).join('')}
@@ -1072,6 +1082,59 @@ function chestNext(){
   renderWord(w, run.ci);
   setExpected(key, cap && shiftFor(key));
 }
+// Umschalt-Einführung, Schritt 2: ein kleiner Block verwandelt sich in einen Großbuchstaben, solange Umschalt gehalten wird
+function csNext(){
+  const hrow = document.getElementById('hrow');
+  if (!hrow || !cs) return;
+  const k = cs.letters[cs.idx];
+  const el = document.createElement('div');
+  el.className = 'nk stone'; el.style.left = (cxOf(k) * 100).toFixed(3) + '%';
+  hrow.appendChild(el);
+  const cap = document.createElement('div');
+  cap.className = 'hname'; cap.style.left = el.style.left; cap.textContent = '⇧ halten';
+  hrow.appendChild(cap);
+  cs.blk = {key:k, el, kind:'stone', cap}; cs.busy = false; cs.upper = null;
+  csMorph();
+  setExpected(k, shiftFor(k));
+}
+function csMorph(){
+  if (!cs || !cs.blk || cs.busy) return;
+  const b = cs.blk;
+  if (cs.upper === shiftHeld) return;
+  cs.upper = shiftHeld;
+  b.kind = shiftHeld ? 'coal' : 'stone';
+  b.el.className = 'nk ' + b.kind;
+  b.el.textContent = shiftHeld ? b.key.toUpperCase() : b.key;
+  void b.el.offsetWidth; b.el.classList.add('pop');
+}
+// Nur mit gehaltener Umschalt zählt der Anschlag; sonst wackeln Block und Umschalt, ohne Fehler (Einführung)
+function csKey(e, k, L){
+  if (cs.step !== 'morph' || cs.busy || !cs.blk || e.key.length !== 1) return;
+  e.preventDefault();
+  const b = cs.blk;
+  if (k !== b.key || !e.shiftKey) {
+    b.el.classList.remove('shake'); void b.el.offsetWidth; b.el.classList.add('shake');
+    if (k === b.key) {
+      const sk = document.querySelector(`#intro .ikey[data-k="${shiftFor(b.key)}"]`);
+      if (sk) { sk.classList.remove('nudge'); void sk.offsetWidth; sk.classList.add('nudge'); }
+    }
+    return;
+  }
+  cs.busy = true;
+  b.cap.remove();
+  pressKey(k); xpPing(); bounce();
+  mineBlock(b);
+  setExpected(null);
+  cs.idx++;
+  if (cs.idx >= cs.letters.length) {
+    phase = 'wait';
+    setHint('Super!');
+    pendingTimer = setTimeout(() => beginPlay(L), 1000);
+    return;
+  }
+  later(csNext, 500);
+}
+
 function chestKey(e, k){
   const L = LEVELS[cur];
   if (!L.keys.includes(k)) return;
@@ -1130,6 +1193,7 @@ function start(i){
     // Truhe: erst die Umschalt-Taste einmal kennenlernen, dann die Wörter
     if (L.newShift) {
       phase = 'cshift';
+      cs = {step:'press', idx:0, letters:L.introKeys, blk:null, busy:false, upper:null};
       buildBoard(field, L, 'cshift');
       showToast(L);
       setExpected(L.newShift);
@@ -1282,15 +1346,24 @@ function onKey(e){
   if (L.chest) {
     if (k === 'shift') {
       if (phase !== 'cshift' && phase !== 'play') return;
+      shiftHeld = true;
       shiftVisual(true, e.code === 'ShiftLeft' ? 'shiftl' : 'shift');
-      if (phase === 'cshift' && !e.repeat) {
-        phase = 'wait';
-        pressKey(L.newShift); xpPing(); bounce();
-        setExpected(null);
-        pendingTimer = setTimeout(() => beginPlay(L), 1000);
+      if (phase === 'cshift') {
+        if (cs.step === 'press' && !e.repeat) {
+          // Schritt 1: Umschalt gedrückt -> der Block ist abgebaut, danach kommen die Verwandlungs-Übungen
+          cs.step = 'morph'; cs.busy = true;
+          setExpected(null);
+          const nm = document.getElementById('csname'); if (nm) nm.remove();
+          const big = document.getElementById('big-' + L.newShift);
+          if (big) mineBlock({el: big, kind: 'iron'});
+          xpPing(); bounce();
+          later(csNext, 700);
+        }
+        csMorph();
       }
       return;
     }
+    if (phase === 'cshift') { csKey(e, k, L); return; }
     if (phase === 'play') chestKey(e, k);
     return;
   }
@@ -1439,7 +1512,13 @@ document.getElementById('logo').onclick = renderMenu;
 // Smaragd-Symbol im Kopf
 document.getElementById('emIcon').innerHTML = emeraldSVG(30);
 window.addEventListener('keydown', onKey);
-window.addEventListener('keyup', e => { if (e.key === 'Shift') shiftVisual(false, e.code === 'ShiftLeft' ? 'shiftl' : e.code === 'ShiftRight' ? 'shift' : null); });
+window.addEventListener('keyup', e => {
+  if (e.key !== 'Shift') return;
+  shiftHeld = false;
+  shiftVisual(false, e.code === 'ShiftLeft' ? 'shiftl' : e.code === 'ShiftRight' ? 'shift' : null);
+  csMorph();
+});
+window.addEventListener('blur', () => { shiftHeld = false; shiftVisual(false); csMorph(); });
 
 renderMenu();
 </script>
