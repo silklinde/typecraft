@@ -81,6 +81,7 @@
   .block.gold{background-image:var(--gold);}
   .block.redstone{background-image:var(--redstone);}
   .block.obsidian{background-image:var(--obsidian);}
+  .block.wood{background-image:var(--wood);}
   .block.glow{outline:4px solid #ffd166;}
   /* Ein einzelner, ruhig stehender Block über seiner Taste (ab Level 2) */
   .block.big{top:24px;width:var(--bw);height:var(--bw);border-width:4px;font-size:calc(var(--bw)*.6);
@@ -260,7 +261,7 @@
   .citem svg{width:48px;height:48px;image-rendering:pixelated;}
   .citem .n{font-size:20px;color:#ffd166;}
   .citem .t{font-size:18px;min-height:18px;}
-  .citem.none{opacity:.7;}
+  .cempty{width:112px;height:112px;box-sizing:border-box;background:#8b8b8b;border:4px solid;border-color:#373737 #fff #fff #373737;box-shadow:0 0 0 3px #000;margin:3px;}
   .citem.lock{background:#2a2a2a;box-shadow:inset 0 0 0 3px #3a3a3a;opacity:.6;}
   .citem.lock svg{filter:grayscale(1) brightness(.4);}
   .citem.lock .t{color:#aaa;font-size:16px;}
@@ -687,21 +688,35 @@ const ITEM_ART = {
             '....dcccccmd....','.....dcccmd.....','......dmmd......','.......dd.......'],
   dust:    ['................','................','................','.......dd.......','......drrd......','.....drRrrd.....','....drrrrRrd....','...drrRrrrrrd...',
             '..drrrrrrRrrrd..','..dddddddddddd..'],
+  chest: CHEST_ART.closed,
+  bed: ['dddddddddddddddd', 'dwwwwwrrrrrrrrrd', 'dwwwwwrrrRrrrrrd', 'dwwwwwrrrrrrrrrd', 'dwwwwwrrrrRrrrrd', 'dwwwwwrrrrrrrrrd', 'dbbbbbbbbbbbbbbd', 'dd............dd', 'dd............dd'],
+  bench: ['dddddddddddddddd', 'dlllllllllllllld', 'dlbbbbbdbbbbbbld', 'dlbbbbbdbbbbbbld', 'dlbbbbbdbbbbbbld', 'dddddddddddddddd', 'dmmmmmmmmmmmmmmd', 'dmmgggmmmmmmmmmd', 'dmmgmmmmmmmmgmmd', 'dmmmmmmmmmmmgmmd', 'dmmmmmmmmmmmmmmd', 'dmmmmmmmmmmmmmmd', 'dmmmmmmmmmmmmmmd', 'dddddddddddddddd'],
+  lantern: ['......dddddd....', '.....d......d...', '....dddddddddd..', '...dkkkkkkkkkkd.', '...dkyyyyyyyykd.', '...dkyooYYooykd.', '...dkyooYYooykd.', '...dkyyyyyyyykd.', '...dkkkkkkkkkkd.', '....dddddddddd..'],
+  cauldron: ['dkd..........dkd', 'dkkddddddddddkkd', 'dkkwwwwwwwwwwkkd', 'dkkkkkkkkkkkkkkd', 'dkkkkkkkkkkkkkkd', 'dkkkkkkkkkkkkkkd', '.dkkkkkkkkkkkkd.', '.dkkkkkkkkkkkkd.', '.ddd........ddd.'],
+  rod: ['.......oo.......', '......oOOo......', '......oOOo......', '.......oo.......', '.......oo.......', '.......oo.......', '.......oo.......', '.......oo.......', '.......oo.......', '......oooo......', '.....oooooo.....'],
+  clock: ['dddddddddddddddd', 'dyyyyyyyyyyyyyyd', 'dywwwwwwwwwwwwyd', 'dywwwwwkwwwwwwyd', 'dywwwwwkwwwwwwyd', 'dywwwwwkwwwwwwyd', 'dywwwwwkkkkwwwyd', 'dywwwwwwwwwwwwyd', 'dywwwwwwwwwwwwyd', 'dyyyyyyyyyyyyyyd', 'dddddddddddddddd'],
+  enchant: ['..cc........cc..', '..cc........cc..', 'rrrrrrrrrrrrrrrr', 'rRrrrrrrrrrrrrRr', 'dddddddddddddddd', 'dddddddddddddddd', 'doopoooooooopood', 'dooooooooooooood', 'dooooooooooooood', 'dddddddddddddddd'],
   portal:  ['..oooooooooooo..','..oooooooooooo..','..oopppqppppoo..','..oopqppppqpoo..','..ooppppppppoo..','..oopppqppppoo..','..oopqppppqpoo..','..ooppppppppoo..',
             '..oopppqppppoo..','..oooooooooooo..','..oooooooooooo..']
 };
 const METAL = (d, l, m) => ({d, l, m});
 // Gegenstand je Material: `tier` = ab welcher Spitzhacke (0 Holz, 1 Stein, 2 Eisen, 3 Diamant) das Material abbaubar ist
 const CRAFT = [
-  {id:'ofen',     name:'Ofen',            ore:'stone',    tier:0, art:'furnace', pal:{t:'#a8a8a8', s:'#8a8a8a', u:'#6e6e6e', k:'#1a1a1a', f:'#f08a1c'}},
-  {id:'fackel',   name:'Fackel',          ore:'coal',     tier:0, art:'torch',   pal:{o:'#f08a1c', y:'#ffe14a', k:'#2b2b2b', b:'#8a5f2c', B:'#a8793a'}},
-  {id:'eisen',    name:'Eisenbarren',     ore:'iron',     tier:1, art:'ingot',   pal:METAL('#555555', '#f2f2f2', '#c4c4c4')},
-  {id:'kupfer',   name:'Kupferbarren',    ore:'copper',   tier:1, art:'ingot',   pal:METAL('#6b3216', '#f0a070', '#c8774a')},
-  {id:'lapis',    name:'Lapislazuli',     ore:'lapis',    tier:1, art:'gem',     pal:{d:'#10246a', l:'#7a9af0', c:'#2a52be', m:'#1c3a94', w:'#b0c4ff'}},
-  {id:'gold',     name:'Goldbarren',      ore:'gold',     tier:2, art:'ingot',   pal:METAL('#8a6a00', '#fff07a', '#f5d33b')},
-  {id:'diamant',  name:'Diamant',         ore:'diamond',  tier:2, art:'gem',     pal:{d:'#0e6b5c', l:'#c8fbf3', c:'#33ebcb', m:'#1fb89e', w:'#ffffff'}},
-  {id:'redstone', name:'Redstone-Staub',  ore:'redstone', tier:2, art:'dust',    pal:{d:'#4a0808', r:'#d02020', R:'#ff4a3a'}},
-  {id:'portal',   name:'Netherportal',    ore:'obsidian', tier:3, art:'portal',  pal:{o:'#1b1030', p:'#7a2bd6', q:'#c58cff'}}
+  // Einrichtung und Funktionsblöcke: Holzspitzhacke (Holz, Stein, Kohle)
+  {id:'werkbank', name:'Werkbank',     ore:'wood',     tier:0, art:'bench',   pal:{d:'#2a170a', l:'#c08a4a', b:'#9a6a30', m:'#6f4a20', g:'#d8d8d8'}},
+  {id:'truhe',    name:'Truhe',        ore:'wood',     tier:0, art:'chest',   pal:CHEST_PAL},
+  {id:'bett',     name:'Bett',         ore:'wood',     tier:0, art:'bed',     pal:{d:'#2a170a', w:'#f2f2f2', r:'#c62828', R:'#e04848', b:'#9a6a30'}},
+  {id:'ofen',     name:'Ofen',         ore:'stone',    tier:0, art:'furnace', pal:{t:'#a8a8a8', s:'#8a8a8a', u:'#6e6e6e', d:'#3a3a3a', k:'#1a1a1a', f:'#f08a1c'}},
+  {id:'fackel',   name:'Fackel',       ore:'coal',     tier:0, art:'torch',   pal:{o:'#f08a1c', y:'#ffe14a', k:'#2b2b2b', b:'#8a5f2c', B:'#a8793a', d:'#6e4a22'}},
+  // Steinspitzhacke: Eisen und Kupfer
+  {id:'laterne',  name:'Laterne',      ore:'iron',     tier:1, art:'lantern', pal:{d:'#222222', k:'#555555', y:'#ffe14a', o:'#f08a1c', Y:'#fff7b0'}},
+  {id:'kessel',   name:'Kessel',       ore:'iron',     tier:1, art:'cauldron',pal:{d:'#222222', k:'#4a4a4a', w:'#3a6fe0'}},
+  {id:'blitz',    name:'Blitzableiter',ore:'copper',   tier:1, art:'rod',     pal:{o:'#c8774a', O:'#f0a070'}},
+  // Eisenspitzhacke: Gold und Diamant
+  {id:'uhr',      name:'Uhr',          ore:'gold',     tier:2, art:'clock',   pal:{d:'#6a4a00', y:'#f5d33b', w:'#f2f2f2', k:'#222222'}},
+  {id:'zauber',   name:'Zaubertisch',  ore:'diamond',  tier:2, art:'enchant', pal:{c:'#33ebcb', r:'#b01818', R:'#e04040', d:'#14091f', o:'#1b1030', p:'#5a3a8a'}},
+  // Diamantspitzhacke: Obsidian
+  {id:'portal',   name:'Netherportal', ore:'obsidian', tier:3, art:'portal',  pal:{o:'#1b1030', p:'#7a2bd6', q:'#c58cff'}}
 ];
 const TIERNAME = ['Holz', 'Stein', 'Eisen', 'Diamant'];
 function itemSVG(it){ return pixSVG(ITEM_ART[it.art], 'it', it.pal); }
@@ -741,11 +756,14 @@ function renderMenu(){
 
   const co = document.getElementById('collection'); co.innerHTML = '';
   CRAFT.forEach(it => {
-    const n = st.items[it.id] || 0, locked = it.tier > pickTier();
+    const n = st.items[it.id] || 0;
     const d = document.createElement('div');
-    d.className = 'citem' + (locked ? ' lock' : n ? '' : ' none');
-    d.innerHTML = itemSVG(it) + `<div>${it.name}</div>` +
-      (locked ? `<div class="t">braucht ${TIERNAME[it.tier]}spitzhacke</div>` : `<div class="n">${n ? '× ' + n : '–'}</div>`);
+    if (n) {
+      d.className = 'citem';
+      d.innerHTML = itemSVG(it) + `<div>${it.name}</div><div class="n">× ${n}</div>`;
+    } else {
+      d.className = 'cempty';     // noch nicht gecraftet: nur ein leerer Inventar-Slot
+    }
     co.appendChild(d);
   });
 
