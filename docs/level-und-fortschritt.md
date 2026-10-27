@@ -79,3 +79,15 @@ Truhe 1: Beginn mit Einführung der Umschalt-Taste (Block „⇧“, Fenster „
 Umschalt: Großbuchstaben tippt man mit der Umschalt der **anderen** Hand. Rechte Umschalt (`shift`, rechter kleiner Finger) für Buchstaben der linken Hand, linke Umschalt (`shiftl`, linker kleiner Finger, links neben Y) für Buchstaben der rechten Hand (`shiftFor(k)`). Akzeptiert wird jede Umschalt-Taste, hervorgehoben wird die passende. Truhe 2 führt die linke Umschalt ein (`newShift`), Truhe 3 hat keine Einführung und startet gleich mit den Wörtern. `rounds` = wie oft jedes Wort vorkommt.
 
 **Umschalt-Einführung** (Phase `cshift`, Zustand `cs`, `introKeys` je Truhe: D F A bzw. J K L): 1. Umschalt-Block ⇧ mit Fingername „Kleiner Finger“, das Kind drückt Umschalt. 2. Danach steht ein kleiner Steinblock („d“) mit „⇧ halten“ über der Taste. Solange Umschalt gehalten wird, verwandelt er sich in einen Kohleblock „D“ (`csMorph`, loslassen = wieder klein). 3. Nur mit gehaltener Umschalt zählt der Anschlag, sonst wackeln Block und Umschalt-Taste, ohne Fehler. Nach drei Buchstaben beginnen die Wörter.
+
+## Crafting in den Truhen und Sammlung
+Oben in der Mitte steht eine Werkbank-Leiste (`#craft`): ein Slot pro Buchstabe, Pfeil, Ergebnis-Slot; rechts eine kleine Truhe mit Zähler. Jeder abgebaute Block fliegt als kleiner Block in seinen Slot. Ist das Wort fertig, entsteht im Ergebnis-Slot ein Gegenstand (mit Namen) und wandert in die Truhe. Jedes Wort hat einen Gegenstand, seine Blöcke bestehen aus dem passenden Material (`CRAFT`, `chestSeq`). Welche Gegenstände vorkommen, hängt an der besten Spitzhacke (`pickTier()`); bessere Gegenstände sind häufiger (Gewicht 1 + 2 × Stufe).
+
+| Spitzhacke | Material → Gegenstand |
+|---|---|
+| Holz | Stein → Ofen, Kohle → Fackel |
+| Stein | Eisen → Eisenbarren, Kupfer → Kupferbarren, Lapis → Lapislazuli |
+| Eisen | Gold → Goldbarren, Diamant → Diamant, Redstone → Redstone-Staub |
+| Diamant | Obsidian → Netherportal |
+
+Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Sammlung“ alle Gegenstände mit Anzahl, noch nicht erreichbare abgedunkelt mit „braucht …spitzhacke“. Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.

@@ -80,6 +80,7 @@
   .block.lapis{background-image:var(--lapis);}
   .block.gold{background-image:var(--gold);}
   .block.redstone{background-image:var(--redstone);}
+  .block.obsidian{background-image:var(--obsidian);}
   .block.glow{outline:4px solid #ffd166;}
   /* Ein einzelner, ruhig stehender Block über seiner Taste (ab Level 2) */
   .block.big{top:24px;width:var(--bw);height:var(--bw);border-width:4px;font-size:calc(var(--bw)*.6);
@@ -190,6 +191,7 @@
   .nk.lapis{background-image:var(--lapis);}
   .nk.gold{background-image:var(--gold);}
   .nk.redstone{background-image:var(--redstone);}
+  .nk.obsidian{background-image:var(--obsidian);}
   .nk.next{scale:1.1;outline:4px solid #ffd166;}
   .nk.hit{scale:.9;}
 
@@ -233,12 +235,39 @@
   .chest .lock{position:absolute;right:-6px;bottom:-4px;width:22px;height:auto;image-rendering:pixelated;}
   .chest:disabled .lock{width:20px;}
   /* Truhen-Level: das Wort steht oben, der Block darunter über seiner Taste */
-  #intro.cplay{--wf:clamp(44px,7vh,80px);}
-  #intro.cplay .block.big{top:calc(var(--wf) * 1.3 + 8px);}
-  #word{position:absolute;left:0;right:0;top:4px;text-align:center;font-family:"VT323",monospace;font-size:var(--wf);line-height:1.1;letter-spacing:.12em;color:#fff;text-shadow:3px 3px 0 #000;}
-  #word span{color:#e8e8e8;}
-  #word span.done{color:#80ff20;}
-  #word span.now{color:#ffd166;text-decoration:underline;text-underline-offset:.1em;}
+  #intro.cplay{--cs:clamp(40px,6.2vh,64px);}
+  #intro.cplay .block.big{top:calc(var(--cs) + 30px);}
+  /* Werkbank-Leiste: ein Slot pro Buchstabe, Pfeil, Ergebnis; rechts die kleine Truhe */
+  #craft{position:absolute;left:0;right:0;top:4px;height:var(--cs);display:flex;justify-content:center;align-items:center;gap:6px;}
+  .cslot{position:relative;width:var(--cs);height:var(--cs);box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;
+         display:flex;align-items:center;justify-content:center;font-size:calc(var(--cs)*.58);font-weight:bold;line-height:1;color:rgba(0,0,0,.3);
+         background-size:100% 100%;image-rendering:pixelated;}
+  .cslot.full{color:#fff;text-shadow:2px 2px 0 #000;border-color:#000;box-shadow:inset -4px -4px 0 rgba(0,0,0,.3),inset 4px 4px 0 rgba(255,255,255,.18);}
+  .cslot.now{outline:3px solid #ffd166;z-index:1;}
+  .cslot.pop{animation:pop .3s ease-out;}
+  .cslot svg{width:80%;height:80%;image-rendering:pixelated;}
+  .carrow{font-size:calc(var(--cs)*.8);line-height:1;color:#fff;text-shadow:3px 3px 0 #000;opacity:.5;margin:0 6px;transition:opacity .2s,color .2s;}
+  .carrow.on{opacity:1;color:#ffd166;}
+  .rname{position:absolute;top:calc(100% + 2px);left:50%;translate:-50% 0;white-space:nowrap;font-family:"VT323",monospace;font-size:calc(var(--cs)*.5);color:#fff;text-shadow:2px 2px 0 #000;}
+  #cchest{position:absolute;right:12px;top:4px;display:flex;align-items:center;gap:6px;font-family:"VT323",monospace;font-size:calc(var(--cs)*.7);color:#fff;text-shadow:2px 2px 0 #000;}
+  #cchest svg{width:calc(var(--cs)*1.1);height:auto;image-rendering:pixelated;}
+  #cchest.wobble svg{animation:wackel .3s;}
+  .fly{position:fixed;z-index:20;pointer-events:none;box-sizing:border-box;background-size:100% 100%;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;text-shadow:2px 2px 0 #000;}
+  .fly svg{width:100%;height:100%;}
+  /* Sammlung im Menü und Beute im Abschluss-Fenster */
+  .loot{display:flex;flex-wrap:wrap;gap:12px;}
+  .citem{display:flex;flex-direction:column;align-items:center;gap:2px;width:112px;padding:8px 4px;background:#3b2a1a;border:3px solid #000;border-radius:4px;box-shadow:inset 0 0 0 3px #7a5528;font-family:"VT323",monospace;color:#fff;text-align:center;line-height:1;}
+  .citem svg{width:48px;height:48px;image-rendering:pixelated;}
+  .citem .n{font-size:20px;color:#ffd166;}
+  .citem .t{font-size:18px;min-height:18px;}
+  .citem.none{opacity:.7;}
+  .citem.lock{background:#2a2a2a;box-shadow:inset 0 0 0 3px #3a3a3a;opacity:.6;}
+  .citem.lock svg{filter:grayscale(1) brightness(.4);}
+  .citem.lock .t{color:#aaa;font-size:16px;}
+  .lootrow{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:10px 0;}
+  .lootitem{display:flex;flex-direction:column;align-items:center;font-size:22px;line-height:1.1;}
+  .lootitem svg{width:44px;height:44px;image-rendering:pixelated;}
+  .lootitem b{font-weight:normal;color:#ffd166;font-size:18px;}
   .ikey.shift{box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);}
   .ikey.nudge{animation:nudge .3s;}
   @keyframes nudge{0%,100%{translate:0 0}25%{translate:-5px 0}75%{translate:5px 0}}
@@ -263,6 +292,10 @@
     <div class="panel">
       <h2>Truhen</h2>
       <div class="chests" id="chests"></div>
+    </div>
+    <div class="panel">
+      <h2>Sammlung</h2>
+      <div class="loot" id="collection"></div>
     </div>
     <div class="panel">
       <h2>Shop</h2>
@@ -337,6 +370,9 @@ const KEY = 'typecraft-v1';
   r.setProperty('--redstone', px(tex(8, 8, '#8a8a8a', [
     [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
     [1,1,2,2,'#d02020'],[5,2,2,3,'#d02020'],[2,5,3,2,'#9c1414'],[6,6,2,2,'#ff4a3a'],[1,1,1,1,'#ff8a7a']
+  ])));
+  r.setProperty('--obsidian', px(tex(8, 8, '#1b1030', [
+    [1,1,2,2,'#2e1a4a'],[5,0,2,2,'#3d2566'],[3,3,3,2,'#0e0818'],[0,5,2,2,'#3d2566'],[6,5,2,2,'#2e1a4a'],[2,7,3,1,'#0e0818'],[1,1,1,1,'#5a3a8a']
   ])));
   r.setProperty('--coal', px(tex(8, 8, '#8a8a8a', [
     [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
@@ -480,10 +516,11 @@ function load(){
         if (n[1]) n[0] = 3;
         s.stars = n; s.v = 2;
       }
+      if (!s.items) s.items = {};
       return s;
     }
   } catch(e){}
-  return {v:2, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald'};
+  return {v:2, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}};
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
 function unlocked(i){
@@ -629,14 +666,47 @@ const CHEST_ART = {
   padlock: [
     '...dddd...','..ds..sd..','..ds..sd..','..ds..sd..','.dddddddd.','.dooooood.','.dooddood.','.dooddood.','.dooooood.','.dddddddd.']
 };
-function pixSVG(rows, cls){
+function pixSVG(rows, cls, pal = CHEST_PAL){
   const w = Math.max(...rows.map(r => r.length));
   let r = '';
-  rows.forEach((row, y) => { for (let x = 0; x < row.length; x++) if (row[x] !== '.') r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${CHEST_PAL[row[x]]}"/>`; });
+  rows.forEach((row, y) => { for (let x = 0; x < row.length; x++) if (row[x] !== '.') r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${pal[row[x]]}"/>`; });
   return `<svg class="${cls}" viewBox="0 0 ${w} ${rows.length}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">${r}</svg>`;
 }
 function chestSVG(state){ return pixSVG(CHEST_ART[state], 'ch'); }
 function padlockSVG(){ return pixSVG(CHEST_ART.padlock, 'lock'); }
+
+// ---------- Gegenstände zum Craften (eigene Pixelgrafik, 16 x 16) ----------
+const ITEM_ART = {
+  furnace: ['dddddddddddddddd','dtttttttttttttud','dtssssssssssssud','dtssssssssssssud','dtsddddddddddsud','dtsdkkkkkkkkdsud','dtsdkkkffkkkdsud','dtsdkkfffffkdsud',
+            'dtsdkkkkkkkkdsud','dtsddddddddddsud','dtssssssssssssud','dtssssssssssssud','duuuuuuuuuuuuuud','dddddddddddddddd'],
+  torch:   ['................','.......oo.......','......oyyo......','......oyyo......','.......kk.......','.......kk.......','.......bB.......','.......bB.......','.......bB.......',
+            '.......bB.......','.......bB.......','.......bB.......','.......bB.......','.......dd.......'],
+  ingot:   ['................','................','................','................','..dddddddddddd..','.dllllllllllllmd','.dlmmmmmmmmmmmmd','.dlmmmmmmmmmmmmd',
+            '.dlmmmmmmmmmmmmd','.dmmmmmmmmmmmmmd','..dddddddddddd..'],
+  gem:     ['................','....dddddddd....','...dlccccccmd...','..dlcwwcccccmd..','.dlccwwccccccmd.','.dcccccccccccmd.','..dcccccccccmd..','...dcccccccmd...',
+            '....dcccccmd....','.....dcccmd.....','......dmmd......','.......dd.......'],
+  dust:    ['................','................','................','.......dd.......','......drrd......','.....drRrrd.....','....drrrrRrd....','...drrRrrrrrd...',
+            '..drrrrrrRrrrd..','..dddddddddddd..'],
+  portal:  ['..oooooooooooo..','..oooooooooooo..','..oopppqppppoo..','..oopqppppqpoo..','..ooppppppppoo..','..oopppqppppoo..','..oopqppppqpoo..','..ooppppppppoo..',
+            '..oopppqppppoo..','..oooooooooooo..','..oooooooooooo..']
+};
+const METAL = (d, l, m) => ({d, l, m});
+// Gegenstand je Material: `tier` = ab welcher Spitzhacke (0 Holz, 1 Stein, 2 Eisen, 3 Diamant) das Material abbaubar ist
+const CRAFT = [
+  {id:'ofen',     name:'Ofen',            ore:'stone',    tier:0, art:'furnace', pal:{t:'#a8a8a8', s:'#8a8a8a', u:'#6e6e6e', k:'#1a1a1a', f:'#f08a1c'}},
+  {id:'fackel',   name:'Fackel',          ore:'coal',     tier:0, art:'torch',   pal:{o:'#f08a1c', y:'#ffe14a', k:'#2b2b2b', b:'#8a5f2c', B:'#a8793a'}},
+  {id:'eisen',    name:'Eisenbarren',     ore:'iron',     tier:1, art:'ingot',   pal:METAL('#555555', '#f2f2f2', '#c4c4c4')},
+  {id:'kupfer',   name:'Kupferbarren',    ore:'copper',   tier:1, art:'ingot',   pal:METAL('#6b3216', '#f0a070', '#c8774a')},
+  {id:'lapis',    name:'Lapislazuli',     ore:'lapis',    tier:1, art:'gem',     pal:{d:'#10246a', l:'#7a9af0', c:'#2a52be', m:'#1c3a94', w:'#b0c4ff'}},
+  {id:'gold',     name:'Goldbarren',      ore:'gold',     tier:2, art:'ingot',   pal:METAL('#8a6a00', '#fff07a', '#f5d33b')},
+  {id:'diamant',  name:'Diamant',         ore:'diamond',  tier:2, art:'gem',     pal:{d:'#0e6b5c', l:'#c8fbf3', c:'#33ebcb', m:'#1fb89e', w:'#ffffff'}},
+  {id:'redstone', name:'Redstone-Staub',  ore:'redstone', tier:2, art:'dust',    pal:{d:'#4a0808', r:'#d02020', R:'#ff4a3a'}},
+  {id:'portal',   name:'Netherportal',    ore:'obsidian', tier:3, art:'portal',  pal:{o:'#1b1030', p:'#7a2bd6', q:'#c58cff'}}
+];
+const TIERNAME = ['Holz', 'Stein', 'Eisen', 'Diamant'];
+function itemSVG(it){ return pixSVG(ITEM_ART[it.art], 'it', it.pal); }
+// Die beste Spitzhacke bestimmt, welche Materialien (und Gegenstände) vorkommen
+function pickTier(){ return Math.max(0, HOTBAR.indexOf(currentPick())); }
 
 function renderMenu(){
   cur = -1; active = false; cancelAnimationFrame(raf); clearTimeout(pendingTimer); hideToast();
@@ -667,6 +737,16 @@ function renderMenu(){
     b.innerHTML = `<div class="cimg">${chestSVG('closed')}${open ? '' : padlockSVG()}</div><div class="cname">${L.name}</div><div class="csub">${sub}</div>`;
     b.onclick = () => start(i);
     ch.appendChild(b);
+  });
+
+  const co = document.getElementById('collection'); co.innerHTML = '';
+  CRAFT.forEach(it => {
+    const n = st.items[it.id] || 0, locked = it.tier > pickTier();
+    const d = document.createElement('div');
+    d.className = 'citem' + (locked ? ' lock' : n ? '' : ' none');
+    d.innerHTML = itemSVG(it) + `<div>${it.name}</div>` +
+      (locked ? `<div class="t">braucht ${TIERNAME[it.tier]}spitzhacke</div>` : `<div class="n">${n ? '× ' + n : '–'}</div>`);
+    co.appendChild(d);
   });
 
   const sh = document.getElementById('shop'); sh.innerHTML = '';
@@ -794,7 +874,7 @@ function buildBoard(field, L, mode){
     ? `<div class="newrow">
          ${L.neu.map(k => `<div id="big-${k}" class="nk ${ore}" style="left:${(cxOf(k) * 100).toFixed(3)}%">${KLBL(k)}</div>`).join('')}
        </div>`
-    : `<div class="lanes" id="lanes">${L.chest ? '<div id="word"></div>' : ''}</div>`;
+    : `<div class="lanes" id="lanes">${L.chest ? '<div id="craft"></div><div id="cchest"></div>' : ''}</div>`;
 
   const num = !haende && L.keys.includes('ß');
   const rows = num ? [['ß']].concat(KEYROWS) : KEYROWS;
@@ -1046,40 +1126,118 @@ function beginPlay(L){
   showBlock();
 }
 
-// Truhe: jedes Wort zweimal in zufälliger Reihenfolge (nie dasselbe Wort direkt hintereinander)
+// Truhe: jedes Wort `rounds`-mal in zufälliger Reihenfolge (nie dasselbe Wort direkt hintereinander).
+// Jedes Wort bekommt einen Gegenstand, den die Spitzhacke des Kindes hergibt; seine Blöcke bestehen aus dem passenden Material.
+// Neu freigeschaltete, bessere Gegenstände sind häufiger (Gewicht 1 + 2 * Stufe), damit der Fortschritt spürbar ist.
 function chestSeq(L){
-  const seq = [];
+  const words = [];
   const pool = Array.from({length: L.rounds}, () => L.words).flat();
   while (pool.length) {
-    const ok = pool.filter(w => w !== seq[seq.length - 1]);
+    const ok = pool.filter(w => w !== words[words.length - 1]);
     const w = (ok.length ? ok : pool)[Math.floor(Math.random() * (ok.length || pool.length))];
-    seq.push(w); pool.splice(pool.indexOf(w), 1);
+    words.push(w); pool.splice(pool.indexOf(w), 1);
   }
-  return seq;
+  const avail = CRAFT.filter(it => it.tier <= pickTier());
+  let prev = null;
+  return words.map(w => {
+    const opts = avail.filter(it => it !== prev || avail.length === 1);
+    const total = opts.reduce((n, it) => n + 1 + 2 * it.tier, 0);
+    let r = Math.random() * total, item = opts[opts.length - 1];
+    for (const it of opts) { r -= 1 + 2 * it.tier; if (r < 0) { item = it; break; } }
+    prev = item;
+    return {w, item};
+  });
 }
 function chestStart(L){
-  run.seq = chestSeq(L); run.wi = 0; run.ci = 0;
+  run.seq = chestSeq(L); run.wi = 0; run.ci = 0; run.got = {}; run.newIds = []; run.crafted = 0;
+  renderChest();
   chestNext();
 }
-function renderWord(w, ci){
-  const el = document.getElementById('word');
-  if (el) el.innerHTML = [...w].map((c, i) => `<span class="${i < ci ? 'done' : i === ci ? 'now' : ''}">${c}</span>`).join('');
+// ---------- Werkbank-Leiste oben ----------
+function renderChest(){
+  const c = document.getElementById('cchest');
+  if (c) c.innerHTML = `${chestSVG('closed')}<span>${run.crafted}</span>`;
 }
-// Ein Block pro Buchstabe über seiner Taste: Kleinbuchstaben sind Stein, Großbuchstaben (Umschalt nötig) Kohle
+function craftBuild(w){
+  const el = document.getElementById('craft');
+  if (!el) return;
+  el.innerHTML = [...w].map(ch => `<div class="cslot">${ch}</div>`).join('') + `<div class="carrow">→</div><div class="cslot cres"></div>`;
+}
+function craftNow(i){
+  document.querySelectorAll('#craft .cslot').forEach((e, j) => e.classList.toggle('now', j === i && !e.classList.contains('cres')));
+}
+function craftSlot(i){ return document.querySelectorAll('#craft .cslot')[i]; }
+// Ein kleines Stück fliegt vom Start-Rechteck zum Ziel-Element (Slot oder Truhe)
+function flyTo(rect, dst, fill, delay, dur, done){
+  setTimeout(() => {
+    if (!dst || !dst.isConnected) return;
+    const f = document.createElement('div');
+    f.className = 'fly';
+    fill(f);
+    f.style.cssText += `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;font-size:${rect.height * .6}px;`;
+    document.body.appendChild(f);
+    const d = dst.getBoundingClientRect();
+    const dx = d.left + d.width / 2 - (rect.left + rect.width / 2), dy = d.top + d.height / 2 - (rect.top + rect.height / 2);
+    f.animate([{transform:'translate(0,0) scale(1)'}, {transform:`translate(${dx}px,${dy}px) scale(${d.width / rect.width})`}],
+              {duration:dur, easing:'ease-in', fill:'forwards'}).onfinish = () => { f.remove(); if (done) done(); };
+  }, delay);
+}
+// Buchstabe abgebaut: ein kleiner Block fliegt in seinen Slot
+function craftLetter(b, i){
+  const slot = craftSlot(i);
+  if (!slot) return;
+  const rect = b.el.getBoundingClientRect();
+  flyTo(rect, slot, f => { f.style.cssText += `background-image:var(--${b.kind});border:3px solid #000;`; f.textContent = b.ch; }, 250, 400, () => {
+    slot.classList.add('full', 'pop');
+    slot.style.backgroundImage = `var(--${b.kind})`;
+    slot.textContent = b.ch;
+  });
+}
+// Wort fertig: der Gegenstand entsteht im Ergebnis-Slot und wandert in die Truhe
+function craftDone(item){
+  const first = !st.items[item.id];
+  st.items[item.id] = (st.items[item.id] || 0) + 1;
+  save();
+  run.got[item.id] = (run.got[item.id] || 0) + 1;
+  if (first) run.newIds.push(item.id);
+  run.crafted++;
+  setTimeout(() => {
+    const res = document.querySelector('#craft .cres'), arrow = document.querySelector('#craft .carrow');
+    if (!res) return;
+    if (arrow) arrow.classList.add('on');
+    res.innerHTML = itemSVG(item) + `<div class="rname">${item.name}</div>`;
+    res.classList.add('pop');
+    xpPing();
+  }, 700);
+  setTimeout(() => {
+    const res = document.querySelector('#craft .cres'), chest = document.getElementById('cchest');
+    if (!res || !chest) return;
+    const svg = res.querySelector('svg');
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    res.innerHTML = '';
+    flyTo(rect, chest.querySelector('svg'), f => { f.innerHTML = itemSVG(item); }, 0, 350, () => {
+      renderChest();
+      chest.classList.remove('wobble'); void chest.offsetWidth; chest.classList.add('wobble');
+    });
+  }, 1250);
+}
+// Ein Block pro Buchstabe über seiner Taste, Material passend zum Gegenstand des Wortes
 function chestNext(){
   const lanes = document.getElementById('lanes');
   if (!lanes || !run) return;
-  const w = run.seq[run.wi], ch = w[run.ci];
+  const {w, item} = run.seq[run.wi], ch = w[run.ci];
   const key = ch.toLowerCase(), cap = ch !== key;
   const el = document.createElement('div');
-  const kind = cap ? 'coal' : 'stone';
+  const kind = item.ore;
   el.className = 'block big ' + kind;
   el.textContent = ch;
   el.style.left = (cxOf(key) * 100).toFixed(3) + '%';
   lanes.appendChild(el);
-  run.cur = {key, el, kind, cap};
+  run.cur = {key, el, kind, cap, ch};
   run.busy = false;
-  renderWord(w, run.ci);
+  if (run.ci === 0) craftBuild(w);
+  craftNow(run.ci);
   setExpected(key, cap && shiftFor(key));
 }
 // Umschalt-Einführung, Schritt 2: ein kleiner Block verwandelt sich in einen Großbuchstaben, solange Umschalt gehalten wird
@@ -1152,13 +1310,15 @@ function chestKey(e, k){
     mineBlock(b);
     xpPing(); bounce();
     updateGoal();
-    const w = run.seq[run.wi];
+    const {w, item} = run.seq[run.wi];
+    craftLetter(b, run.ci);
     run.ci++;
-    renderWord(w, run.ci);
+    const wordDone = run.ci >= w.length;
+    if (wordDone) craftDone(item);
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     setExpected(null);
     let delay = 450;
-    if (run.ci >= w.length) { run.wi++; run.ci = 0; delay = 800; }   // nach einem fertigen Wort etwas länger Pause
+    if (wordDone) { run.wi++; run.ci = 0; delay = 1700; }   // nach einem fertigen Wort: Gegenstand entsteht und wandert in die Truhe
     pendingTimer = setTimeout(chestNext, delay);
   } else {
     const before = starsFor(run.wrong, run.target);
@@ -1283,7 +1443,7 @@ function crackStage(n){
 }
 
 const CRUMB_COLORS = {wood:['#a8793a','#8a5f2c','#c9985a'], dirt:['#7a5230','#5e3d20','#8f6339'], stone:['#8a8a8a','#6e6e6e','#a0a0a0'], coal:['#8a8a8a','#2b2b2b','#6e6e6e'], iron:['#8a8a8a','#d8af93','#a0a0a0'], diamond:['#8a8a8a','#4aedd9','#a0a0a0'],
-  copper:['#8a8a8a','#c8774a','#a0a0a0'], lapis:['#8a8a8a','#2a52be','#a0a0a0'], gold:['#8a8a8a','#f5d33b','#a0a0a0'], redstone:['#8a8a8a','#d02020','#a0a0a0']};
+  copper:['#8a8a8a','#c8774a','#a0a0a0'], lapis:['#8a8a8a','#2a52be','#a0a0a0'], gold:['#8a8a8a','#f5d33b','#a0a0a0'], redstone:['#8a8a8a','#d02020','#a0a0a0'], obsidian:['#1b1030','#3d2566','#0e0818']};
 
 // Abbau wie in Minecraft: Risse wachsen, der Block wackelt, Krümel springen ab, dann zerplatzt er
 function mineBlock(b){
@@ -1484,7 +1644,9 @@ function finish(){
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
-  const chestImg = L.chest ? `<div style="width:120px;margin:0 auto 6px;">${chestSVG(stars > 0 ? 'open' : 'closed')}</div>` : '';
+  const loot = L.chest ? CRAFT.filter(it => run.got[it.id]).map(it =>
+    `<div class="lootitem">${itemSVG(it)}<span>${it.name} × ${run.got[it.id]}</span>${run.newIds.includes(it.id) ? '<b>neu!</b>' : ''}</div>`).join('') : '';
+  const chestImg = L.chest ? `<div style="width:120px;margin:0 auto 6px;">${chestSVG(stars > 0 ? 'open' : 'closed')}</div><div class="lootrow">${loot}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
