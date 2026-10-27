@@ -63,3 +63,15 @@ Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Ver
 `localStorage['typecraft-v1']` = `{v:2, emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
 
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
+
+## Truhen (Wörter-Level)
+Eigener Bereich „Truhen“ im Menü, 6 Truhen. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–24, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
+
+| Truhe | Tasten | Freigeschaltet durch | Stand |
+|-------|--------|----------------------|-------|
+| 1 | A S D F + Umschalt | Level 2 | spielbar |
+| 2 | A S D F J K L Ö | Level 3 | noch gesperrt (keine Wörter) |
+| 3 | + G H | Level 4 | noch gesperrt (keine Wörter) |
+| 4–6 | offen | – | noch gesperrt |
+
+Truhe 1: Beginn mit Einführung der Umschalt-Taste (Block „⇧“, Fenster „Neue Taste freigeschaltet“). Danach 16 Wörter (`CHEST1_WORDS`, jedes zweimal, zufällig), 50 Buchstaben, Herzen und Smaragde wie bei Leveln. Alle Anfangsbuchstaben sind groß: Kohleblock = Großbuchstabe (Umschalt gedrückt halten), Steinblock = Kleinbuchstabe. Oben steht das Wort, der aktuelle Buchstabe ist gelb. Umschalt steht rechts neben dem rechten Arm (Zeile der Leertaste) und wird vom rechten kleinen Finger bedient.

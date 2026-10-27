@@ -209,6 +209,33 @@
   .slot svg{image-rendering:pixelated;}
   .slot.sel::after{content:'';position:absolute;inset:-6px;border:4px solid #fff;box-shadow:0 0 0 2px #000,inset 0 0 0 2px #000;pointer-events:none;}
   .slot.got svg{animation:pop .5s ease-out;}
+
+  /* Truhen im Menü: freigeschaltete leuchten, gesperrte sind klein, grau und haben ein Vorhängeschloss */
+  .chests{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+  .chest{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;width:160px;padding:12px 8px 10px;font-family:"VT323",monospace;color:#fff;
+         background:#3b2a1a;border:3px solid #000;border-radius:4px;cursor:pointer;transition:transform .12s;
+         box-shadow:inset 0 0 0 3px #7a5528,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(255,209,102,.3);}
+  .chest:hover:not(:disabled){transform:translateY(-4px);}
+  .chest .cimg{position:relative;width:104px;display:flex;justify-content:center;}
+  .chest .cimg svg.ch{width:104px;height:auto;image-rendering:pixelated;display:block;}
+  .chest .cname{font-size:28px;line-height:1;text-shadow:2px 2px 0 #000;}
+  .chest .csub{font-size:22px;line-height:1;color:#ffd166;text-shadow:2px 2px 0 #000;min-height:22px;display:flex;align-items:center;gap:2px;}
+  .chest:disabled{cursor:not-allowed;width:112px;padding:8px 6px;background:#2a2a2a;box-shadow:inset 0 0 0 3px #3a3a3a;opacity:.65;}
+  .chest:disabled .cimg,.chest:disabled .cimg svg.ch{width:60px;}
+  .chest:disabled .cimg svg.ch{filter:grayscale(.75) brightness(.55);}
+  .chest:disabled .cname{font-size:22px;color:#aaa;}
+  .chest .lock{position:absolute;right:-6px;bottom:-4px;width:22px;height:auto;image-rendering:pixelated;}
+  .chest:disabled .lock{width:20px;}
+  /* Truhen-Level: das Wort steht oben, der Block darunter über seiner Taste */
+  #intro.cplay{--wf:clamp(44px,7vh,80px);}
+  #intro.cplay .block.big{top:calc(var(--wf) * 1.3 + 8px);}
+  #word{position:absolute;left:0;right:0;top:4px;text-align:center;font-family:"VT323",monospace;font-size:var(--wf);line-height:1.1;letter-spacing:.12em;color:#fff;text-shadow:3px 3px 0 #000;}
+  #word span{color:#e8e8e8;}
+  #word span.done{color:#80ff20;}
+  #word span.now{color:#ffd166;text-decoration:underline;text-underline-offset:.1em;}
+  .ikey.shift{box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);}
+  .ikey.nudge{animation:nudge .3s;}
+  @keyframes nudge{0%,100%{translate:0 0}25%{translate:-5px 0}75%{translate:5px 0}}
 </style>
 </head>
 <body>
@@ -226,6 +253,10 @@
     <div class="panel">
       <h2>Level</h2>
       <div id="levels"></div>
+    </div>
+    <div class="panel">
+      <h2>Truhen</h2>
+      <div class="chests" id="chests"></div>
     </div>
     <div class="panel">
       <h2>Shop</h2>
@@ -315,6 +346,8 @@ const KEYROWS = [
 ];
 const ROWSTART = [1, 2, 4];
 const NCOL = 45;
+// Umschalt (rechts) steht in der Zeile der Leertaste ganz rechts, neben dem rechten Arm; bedient vom rechten kleinen Finger
+const SHIFT_C = 42, SHIFT_CX = (SHIFT_C + 1) / NCOL;
 const KEYPOS = {};
 KEYROWS.forEach((row, r) => row.forEach((k, i) => { KEYPOS[k] = {r, c: ROWSTART[r] + i * 4}; }));
 // ß liegt in der Zahlenreihe (Reihe -1), die es sonst noch nicht gibt: dort steht nur ß, Spalte wie auf der echten Tastatur
@@ -330,8 +363,8 @@ const FINGERS = {a:'ayq', s:'sxw', d:'dce', f:'fgrtvb', j:'jhzumn', k:'ki,', l:'
 const FNAME = {a:'linker kleiner Finger', s:'linker Ringfinger', d:'linker Mittelfinger', f:'linker Zeigefinger',
                j:'rechter Zeigefinger', k:'rechter Mittelfinger', l:'rechter Ringfinger', 'ö':'rechter kleiner Finger'};
 const FCOL = {a:'#4a2f18', s:'#6b4423', d:'#8a5a2b', f:'#b07a3c', j:'#b07a3c', k:'#8a5a2b', l:'#6b4423', 'ö':'#4a2f18'};
-function fingerOf(k){ for (const h in FINGERS) if (FINGERS[h].includes(k)) return h; return null; }
-const FINGER = {}, COLOR = {};
+function fingerOf(k){ if (k === 'shift') return 'ö'; for (const h in FINGERS) if (FINGERS[h].includes(k)) return h; return null; }
+const FINGER = {shift:'rechter kleiner Finger (Umschalt gedrückt halten)'}, COLOR = {};
 Object.keys(KEYPOS).forEach(k => {
   const h = fingerOf(k), r = KEYPOS[k].r;
   const side = 'gh'.includes(k) || 'tzbn'.includes(k);
@@ -352,6 +385,7 @@ const HAENDE_SEQ = ['f', 'j', 'd', 's', 'a', 'k', 'l', 'ö', ' '];
 // Kurze Fingernamen für Hände auflegen (die Seite sieht man an der Hand)
 const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeigefinger',
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
+const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Dada','Fass','As'];
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
   {name:'Level 0: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9},
@@ -394,6 +428,16 @@ const LEVELS = [
    hint:'Übung: Die ganze Tastatur. Erze sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
   {name:'Level 18: + Ä ß', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß']), neu:['ä','ß'], ore:'redstone',
    hint:'Neu: Ä (rechts neben Ö) und ß (ganz rechts in der obersten Reihe). Beide tippt der rechte kleine Finger.', target:16},
+
+  // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
+  // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
+  {chest:true, name:'Truhe 1', label:'A S D F', keys:['a','s','d','f'], neu:[], shift:true, need:2, ready:true,
+   words:CHEST1_WORDS, target:CHEST1_WORDS.join('').length * 2},
+  {chest:true, name:'Truhe 2', label:'A S D F J K L Ö', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, need:3},
+  {chest:true, name:'Truhe 3', label:'A S D F J K L Ö G H', keys:HOME10, neu:[], shift:true, need:4},
+  {chest:true, name:'Truhe 4', label:'', keys:[], neu:[], shift:true, need:5},
+  {chest:true, name:'Truhe 5', label:'', keys:[], neu:[], shift:true, need:11},
+  {chest:true, name:'Truhe 6', label:'', keys:[], neu:[], shift:true, need:17},
 ];
 const SHOP = [
   {id:'wolf',  label:'🐺 Wolf',        cost:5,  type:'pet'},
@@ -426,7 +470,11 @@ function load(){
   return {v:2, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald'};
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
-function unlocked(i){ return i === 0 || (st.stars[i-1] || 0) >= 1; }
+function unlocked(i){
+  const L = LEVELS[i];
+  if (L.chest) return !!L.ready && (st.stars[L.need] || 0) >= 1;
+  return i === 0 || (st.stars[i-1] || 0) >= 1;
+}
 
 // ---------- Spitzhacken (eigene Pixelgrafik) ----------
 const PICKS = {
@@ -553,6 +601,27 @@ function show(id){
   document.getElementById('game').classList.toggle('hidden', id !== 'game');
 }
 
+// ---------- Truhen (eigene Pixelgrafik, 16 Pixel breit) ----------
+const CHEST_PAL = {d:'#2a170a', l:'#c08a4a', b:'#9a6a30', m:'#6f4a20', g:'#d8d8d8', k:'#1a1208', y:'#f5d33b', e:'#41ea7a', s:'#8d8d8d', o:'#c9a227'};
+const CHEST_ART = {
+  closed: [
+    'dddddddddddddddd','dlllllllllllllld','dlbbbbbbbbbbbbld','dlbbbbbbbbbbbbld','dlmmmmmmmmmmmmld','dddddddggddddddd',
+    'dlbbbbbggbbbbbld','dlbbbbbbbbbbbbld','dlbbbbbbbbbbbbld','dlbbbbbbbbbbbbld','dlbbbbbbbbbbbbld','dlmmmmmmmmmmmmld','dmmmmmmmmmmmmmmd','dddddddddddddddd'],
+  open: [
+    'dddddddddddddddd','dmmmmmmmmmmmmmmd','dmmmmmmmmmmmmmmd','dmmmmmmmmmmmmmmd','dddddddddddddddd','................',
+    'dlllllllllllllld','dkkkyykkkkeekkkd','dkkyyykkeekkkykd','dlbbbbbbbbbbbbld','dlbbbbbbbbbbbbld','dlbbbbbbbbbbbbld','dlmmmmmmmmmmmmld','dmmmmmmmmmmmmmmd','dddddddddddddddd'],
+  padlock: [
+    '...dddd...','..ds..sd..','..ds..sd..','..ds..sd..','.dddddddd.','.dooooood.','.dooddood.','.dooddood.','.dooooood.','.dddddddd.']
+};
+function pixSVG(rows, cls){
+  const w = Math.max(...rows.map(r => r.length));
+  let r = '';
+  rows.forEach((row, y) => { for (let x = 0; x < row.length; x++) if (row[x] !== '.') r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${CHEST_PAL[row[x]]}"/>`; });
+  return `<svg class="${cls}" viewBox="0 0 ${w} ${rows.length}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">${r}</svg>`;
+}
+function chestSVG(state){ return pixSVG(CHEST_ART[state], 'ch'); }
+function padlockSVG(){ return pixSVG(CHEST_ART.padlock, 'lock'); }
+
 function renderMenu(){
   cur = -1; active = false; cancelAnimationFrame(raf); clearTimeout(pendingTimer); hideToast();
   document.getElementById('lvName').textContent = '';
@@ -560,6 +629,7 @@ function renderMenu(){
 
   const lv = document.getElementById('levels'); lv.innerHTML = '';
   LEVELS.forEach((L, i) => {
+    if (L.chest) return;
     const b = document.createElement('button');
     b.className = 'btn';
     b.disabled = !unlocked(i);
@@ -567,6 +637,20 @@ function renderMenu(){
     b.innerHTML = `${L.name} ${Array.from({length: s}, () => heartSVG(16, true)).join('')}${unlocked(i) ? '' : ' 🔒'}`;
     b.onclick = () => start(i);
     lv.appendChild(b);
+  });
+
+  const ch = document.getElementById('chests'); ch.innerHTML = '';
+  LEVELS.forEach((L, i) => {
+    if (!L.chest) return;
+    const open = unlocked(i), s = st.stars[i] || 0;
+    const b = document.createElement('button');
+    b.className = 'chest';
+    b.disabled = !open;
+    b.title = open ? '' : (L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald');
+    const sub = open ? (s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : L.label) : '';
+    b.innerHTML = `<div class="cimg">${chestSVG('closed')}${open ? '' : padlockSVG()}</div><div class="cname">${L.name}</div><div class="csub">${sub}</div>`;
+    b.onclick = () => start(i);
+    ch.appendChild(b);
   });
 
   const sh = document.getElementById('shop'); sh.innerHTML = '';
@@ -685,11 +769,13 @@ function buildBoard(field, L, mode){
        <div class="hbtns"><button class="btn" id="hSkip" tabindex="-1">Überspringen</button></div>`
     : L.intro
     ? `<div class="newrow" id="hrow"></div>`
+    : mode === 'cshift'
+    ? `<div class="newrow"><div id="big-shift" class="nk iron" style="left:${(SHIFT_CX * 100).toFixed(3)}%">⇧</div></div>`
     : mode === 'learn'
     ? `<div class="newrow">
          ${L.neu.map(k => `<div id="big-${k}" class="nk ${ore}" style="left:${(cxOf(k) * 100).toFixed(3)}%">${KLBL(k)}</div>`).join('')}
        </div>`
-    : `<div class="lanes" id="lanes"></div>`;
+    : `<div class="lanes" id="lanes">${L.chest ? '<div id="word"></div>' : ''}</div>`;
 
   const num = !haende && L.keys.includes('ß');
   const rows = num ? [['ß']].concat(KEYROWS) : KEYROWS;
@@ -705,11 +791,14 @@ function buildBoard(field, L, mode){
   wrap.id = 'intro';
   wrap.style.cssText = 'position:absolute;inset:0;';
   if (num) wrap.classList.add('num');
+  if (L.chest) wrap.classList.add('cplay');
   wrap.innerHTML = `
     ${top}
     <div class="kb${haende ? ' keysoff fresh' : ''}${num ? ' num' : ''}" id="kb">
       ${keysHtml}
       <div class="ikey space" data-k=" "></div>
+      ${L.shift ? `<div class="ikey shift" data-k="shift" style="grid-row:calc(4 + var(--o,0));grid-column:${SHIFT_C} / span 4"></div>` +
+                  `<div class="lbl" data-lk="shift" style="grid-row:calc(4 + var(--o,0));grid-column:${SHIFT_C} / span 4">⇧</div>` : ''}
       ${fing('a', 2)}${fing('s', 6)}${fing('d', 10)}${fing('f', 14)}
       ${fing('j', 26)}${fing('k', 30)}${fing('l', 34)}${fing('ö', 38)}
       <div class="arm l"></div><div class="arm r"></div>
@@ -740,7 +829,7 @@ function bigFor(k){
   return document.getElementById('big-' + k);
 }
 
-function setExpected(k){
+function setExpected(k, withShift){
   const wrap = document.getElementById('intro');
   if (!wrap) return;
   wrap.querySelectorAll('.ikey.next, .lbl.next').forEach(e => e.classList.remove('next'));
@@ -757,6 +846,23 @@ function setExpected(k){
   if (f) f.classList.add('hover');
   const big = bigFor(k);
   if (big) big.classList.add('next');
+  if (withShift) {      // Großbuchstabe: Umschalt und der rechte kleine Finger leuchten mit
+    const sk = wrap.querySelector('.ikey[data-k="shift"]'), sl = wrap.querySelector('.lbl[data-lk="shift"]'), sf = fingerFor(wrap, 'shift');
+    if (sk) sk.classList.add('next');
+    if (sl) sl.classList.add('next');
+    if (sf && !sf.classList.contains('press')) sf.classList.add('hover');
+  }
+}
+
+// Umschalt gedrückt halten: Taste und kleiner Finger bleiben unten, bis die Taste losgelassen wird
+function shiftVisual(down){
+  const wrap = document.getElementById('intro');
+  const keyEl = wrap && wrap.querySelector('.ikey[data-k="shift"]');
+  if (!keyEl) return;
+  const f = fingerFor(wrap, 'shift');
+  keyEl.classList.toggle('pressed', down);
+  if (down) { f.classList.remove('hover'); f.classList.add('press'); }
+  else { f.classList.remove('press'); if (!f.classList.contains('hover')) resetFinger(f); }
 }
 
 function pressKey(k){
@@ -895,7 +1001,8 @@ function showToast(L){
   hideToast();
   const t = document.createElement('div');
   t.id = 'toast'; t.className = 'toast';
-  t.innerHTML = `<div class="ticon ${L.ore || 'coal'}"></div><div class="ttxt"><b>Neue Buchstaben freigeschaltet</b><span>${L.neu.map(k => KLBL(k)).join(' ')}</span></div>`;
+  const [title, txt] = L.chest ? ['Neue Taste freigeschaltet', 'Umschalt ⇧'] : ['Neue Buchstaben freigeschaltet', L.neu.map(k => KLBL(k)).join(' ')];
+  t.innerHTML = `<div class="ticon ${L.chest ? 'iron' : (L.ore || 'coal')}"></div><div class="ttxt"><b>${title}</b><span>${txt}</span></div>`;
   document.body.appendChild(t);
 }
 
@@ -913,7 +1020,82 @@ function beginPlay(L){
   buildBoard(field, L);
   setHint(L.hint);
   updateGoal();
+  if (L.chest) { chestStart(L); return; }
   showBlock();
+}
+
+// Truhe: jedes Wort zweimal in zufälliger Reihenfolge (nie dasselbe Wort direkt hintereinander)
+function chestSeq(L){
+  const seq = [];
+  const pool = [...L.words, ...L.words];
+  while (pool.length) {
+    const ok = pool.filter(w => w !== seq[seq.length - 1]);
+    const w = (ok.length ? ok : pool)[Math.floor(Math.random() * (ok.length || pool.length))];
+    seq.push(w); pool.splice(pool.indexOf(w), 1);
+  }
+  return seq;
+}
+function chestStart(L){
+  run.seq = chestSeq(L); run.wi = 0; run.ci = 0;
+  chestNext();
+}
+function renderWord(w, ci){
+  const el = document.getElementById('word');
+  if (el) el.innerHTML = [...w].map((c, i) => `<span class="${i < ci ? 'done' : i === ci ? 'now' : ''}">${c}</span>`).join('');
+}
+// Ein Block pro Buchstabe über seiner Taste: Kleinbuchstaben sind Stein, Großbuchstaben (Umschalt nötig) Kohle
+function chestNext(){
+  const lanes = document.getElementById('lanes');
+  if (!lanes || !run) return;
+  const w = run.seq[run.wi], ch = w[run.ci];
+  const key = ch.toLowerCase(), cap = ch !== key;
+  const el = document.createElement('div');
+  const kind = cap ? 'coal' : 'stone';
+  el.className = 'block big ' + kind;
+  el.textContent = ch;
+  el.style.left = (cxOf(key) * 100).toFixed(3) + '%';
+  lanes.appendChild(el);
+  run.cur = {key, el, kind, cap};
+  run.busy = false;
+  renderWord(w, run.ci);
+  setExpected(key, cap);
+}
+function chestKey(e, k){
+  const L = LEVELS[cur];
+  if (!L.keys.includes(k)) return;
+  e.preventDefault();
+  const b = run.cur;
+  if (!b || run.busy) return;      // während des Abbaus zählen keine Anschläge
+  // Ein Großbuchstabe braucht gedrückte Umschalt-Taste; Kleinbuchstaben zählen auch, wenn Umschalt noch gehalten wird
+  if (b.key === k && (!b.cap || e.shiftKey)) {
+    run.busy = true;
+    run.cur = null;
+    run.correct++;
+    st.emeralds++;
+    save(); topBar();
+    pressKey(k);
+    mineBlock(b);
+    xpPing(); bounce();
+    updateGoal();
+    const w = run.seq[run.wi];
+    run.ci++;
+    renderWord(w, run.ci);
+    if (run.correct >= run.target) { setExpected(null); finish(); return; }
+    setExpected(null);
+    let delay = 450;
+    if (run.ci >= w.length) { run.wi++; run.ci = 0; delay = 800; }   // nach einem fertigen Wort etwas länger Pause
+    pendingTimer = setTimeout(chestNext, delay);
+  } else {
+    const before = starsFor(run.wrong, run.target);
+    run.wrong++;
+    updateGoal(starsFor(run.wrong, run.target) < before);
+    beep(200);
+    b.el.classList.remove('shake'); void b.el.offsetWidth; b.el.classList.add('shake');
+    if (b.key === k && b.cap) {     // richtige Taste, aber Umschalt vergessen: Umschalt wackelt
+      const sk = document.querySelector('#intro .ikey[data-k="shift"]');
+      if (sk) { sk.classList.remove('nudge'); void sk.offsetWidth; sk.classList.add('nudge'); }
+    }
+  }
 }
 
 function start(i){
@@ -921,7 +1103,7 @@ function start(i){
   hideToast();
   if (document.activeElement) document.activeElement.blur();   // kein Button mit Fokus, den die Leertaste auslösen könnte
   cur = i;
-  document.getElementById('lvName').textContent = 'Level ' + i;
+  document.getElementById('lvName').textContent = LEVELS[i].chest ? LEVELS[i].name : 'Level ' + i;
   show('game');
   setBiome();
   const field = document.getElementById('field');
@@ -932,7 +1114,13 @@ function start(i){
   shownKey = null;
 
   hz = null;
-  if (L.haende) {
+  if (L.chest) {
+    // Truhe: erst die Umschalt-Taste einmal kennenlernen, dann die Wörter
+    phase = 'cshift';
+    buildBoard(field, L, 'cshift');
+    showToast(L);
+    setExpected('shift');
+  } else if (L.haende) {
     phase = 'haende';
     buildBoard(field, L, 'haende');
     haendeStart();
@@ -1075,6 +1263,22 @@ function onKey(e){
   if (k === ' ') e.preventDefault();   // die Leertaste soll weder scrollen noch einen Button auslösen
   const L = LEVELS[cur];
 
+  if (L.chest) {
+    if (k === 'shift') {
+      if (phase !== 'cshift' && phase !== 'play') return;
+      shiftVisual(true);
+      if (phase === 'cshift' && !e.repeat) {
+        phase = 'wait';
+        pressKey('shift'); xpPing(); bounce();
+        setExpected(null);
+        pendingTimer = setTimeout(() => beginPlay(L), 1000);
+      }
+      return;
+    }
+    if (phase === 'play') chestKey(e, k);
+    return;
+  }
+
   if (phase === 'haende') {
     // Nur beim Tippen zählen Tasten; während des Abbaus zählen keine Anschläge
     if (hz.step !== 'tippen' || hz.busy || !HAENDE_SEQ.includes(k)) return;
@@ -1182,16 +1386,17 @@ function finish(){
   save();
 
   const box = document.getElementById('overlayBox');
-  const next = cur < LEVELS.length - 1 && stars > 0;
+  const next = cur < LEVELS.length - 1 && stars > 0 && !L.chest;
   const fehler = n => n === 1 ? '1 Fehler' : `${n} Fehler`;
-  const detail = L.intro ? '' : `${run.correct} Blöcke, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
+  const detail = L.intro ? '' : `${run.correct} ${L.chest ? 'Buchstaben' : 'Blöcke'}, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
   const ziel = (L.intro || stars === 3) ? ''
     : `<div style="margin-top:6px;color:#ddd;">${`Für ${stars + 1} ${stars === 0 ? 'Herz' : 'Herzen'} höchstens ${fehler(bud[2 - stars])}`}.</div>`;
   const msg = stars > 0
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
-  box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
+  const chestImg = L.chest ? `<div style="width:120px;margin:0 auto 6px;">${chestSVG(stars > 0 ? 'open' : 'closed')}</div>` : '';
+  box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
   retry.onclick = () => { hideOverlay(); start(cur); };
@@ -1218,6 +1423,7 @@ document.getElementById('logo').onclick = renderMenu;
 // Smaragd-Symbol im Kopf
 document.getElementById('emIcon').innerHTML = emeraldSVG(30);
 window.addEventListener('keydown', onKey);
+window.addEventListener('keyup', e => { if (e.key === 'Shift') shiftVisual(false); });
 
 renderMenu();
 </script>

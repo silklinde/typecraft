@@ -30,3 +30,6 @@ Eine Datei: `<style>` (CSS), HTML-Gerüst (Menü `#menu`, Spiel `#game`, Modal `
 
 ## Eingabe
 `keydown` auf `window`; `e.key.toLowerCase()`. Strg/Meta/Alt werden ignoriert. Leertaste: `preventDefault`, Fokus wird beim Levelstart von Buttons genommen.
+
+## Truhen
+`start(i)` bei `L.chest`: Phase `cshift` (Umschalt-Einführung, Block `#big-shift`), danach `beginPlay` → `chestStart` (Phase `play` mit `run.seq/wi/ci`), pro Buchstabe `chestNext()` (Block, `renderWord`) und `chestKey()` (Eingabe; Großbuchstabe braucht `e.shiftKey`, Kleinbuchstaben zählen auch bei noch gehaltener Umschalt). Die Umschalt-Taste (`.ikey.shift`, `SHIFT_C` = Spalte 42) gibt es nur, wenn `L.shift`; `setExpected(k, true)` lässt sie samt Finger mitleuchten, `shiftVisual(down)` hält Taste und kleinen Finger unten, solange Umschalt gedrückt ist (`keyup`-Listener).
