@@ -1875,8 +1875,19 @@ function showBlock(){
   const lanes = document.getElementById('lanes');
   if (!lanes || !run) return;
   const pool = L.keys.filter(k => k !== run.last);
-  const weighted = pool.flatMap(k => L.neu.includes(k) ? [k, k] : [k]);
-  const key = weighted[Math.floor(Math.random() * weighted.length)];
+  // Neue Tasten kommen überdurchschnittlich oft: zuerst nur die neuen (jede zweimal, reihum),
+  // danach nach einer alten Taste immer eine neue, sonst mit 60 % wieder eine neue (ca. 70 % neue Tasten).
+  const nPool = pool.filter(k => L.neu.includes(k)), oPool = pool.filter(k => !L.neu.includes(k));
+  run.n = (run.n || 0) + 1; run.count = run.count || {};
+  let cand;
+  if (!nPool.length) cand = oPool;
+  else if (!oPool.length || run.n <= Math.min(L.neu.length * 2, 8)) cand = nPool;
+  else cand = (run.lastOld || Math.random() < 0.6) ? nPool : oPool;
+  const least = Math.min(...cand.map(k => run.count[k] || 0));
+  const fewest = cand.filter(k => (run.count[k] || 0) === least);
+  const key = fewest[Math.floor(Math.random() * fewest.length)];
+  run.count[key] = (run.count[key] || 0) + 1;
+  run.lastOld = !L.neu.includes(key);
   const el = document.createElement('div');
   // Neue Tasten des Levels sind Erz, die Wiederholung ist Stein. In Übungslevels ist das Erz die Reihe der Stufe
   // (Level 4: zufällig etwa jeder dritte Block).
