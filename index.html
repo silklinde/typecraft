@@ -24,16 +24,10 @@
   .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
   h2{margin:4px 0 8px;font-size:18px;}
   /* Menü-Raster: links Minen (5x5), rechts oben Craften (2x5), rechts unten Inventar (3x5), unten der Shop über die ganze Breite */
-  #menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:stretch;grid-template-rows:auto 1fr;min-height:calc(100vh - 124px);}
+  #menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:stretch;}
   #menu .panel{margin:6px 0;}
   #pMinen{grid-column:1;grid-row:1;}
   #pCraften{grid-column:2;grid-row:1;}
-  #dock{grid-column:1 / -1;grid-row:2;display:flex;gap:16px;margin:6px 0;align-self:end;align-items:flex-end;}
-  #dock .chest{width:160px;padding:4px;background:none;border:none;box-shadow:none;gap:8px;}
-  #dock .chest .cname{font-size:30px;}
-  #dock .chest .cimg{width:128px;height:100px;align-items:center;}
-  #dock .chest .cimg svg.ch{width:128px;}
-  #dock .chest .cimg svg.emsvg{width:112px;height:112px;}
   #overlay .box.wide{width:min(760px,94vw);}
   #overlay .box.wide .minner{max-height:68vh;overflow:auto;}
   #overlay .box .g5{gap:8px;}
@@ -240,6 +234,9 @@
   .counter{display:flex;align-items:center;gap:8px;font-size:26px;font-weight:bold;color:#fff;text-shadow:2px 2px 0 #3f3f3f;
            background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:4px 14px 4px 8px;}
   .counter #emIcon{display:inline-flex;}
+  .counter#btnShop,.counter#btnInv{cursor:pointer;}
+  .counter #invIcon{display:inline-flex;}
+  .counter #invIcon svg{width:34px;height:auto;image-rendering:pixelated;display:block;}
   .hotbar{display:flex;gap:4px;background:#c6c6c6;border:3px solid #000;padding:4px;border-radius:2px;
           box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 #555;}
   .slot{position:relative;width:46px;height:46px;box-sizing:border-box;background:#8b8b8b;border:3px solid;
@@ -312,7 +309,8 @@
   <header>
     <div class="logo-wrap"><div class="badge" id="logo" title="Zur Levelübersicht">Typecraft</div><span id="lvName"></span></div>
     <div class="hud">
-      <div class="counter"><span id="emIcon"></span><span id="emeralds">0</span></div>
+      <div class="counter" id="btnShop" title="Shop"><span id="emIcon"></span><span id="emeralds">0</span></div>
+      <div class="counter" id="btnInv" title="Inventar"><span id="invIcon"></span><span id="invCount">0</span></div>
       <div class="hotbar" id="hotbar"></div>
     </div>
   </header>
@@ -325,10 +323,6 @@
     <div class="panel" id="pCraften">
       <h2>Craften</h2>
       <div class="g5" id="chests"></div>
-    </div>
-    <div id="dock">
-      <button class="chest" id="btnInv"><div class="cname">Inventar</div><div class="cimg"></div></button>
-      <button class="chest" id="btnShop"><div class="cname">Shop</div><div class="cimg"></div></button>
     </div>
   </div>
 
@@ -685,6 +679,7 @@ function renderHotbar(){
 
 function topBar(){
   document.getElementById('emeralds').textContent = st.emeralds;
+  document.getElementById('invCount').textContent = Object.values(st.items).reduce((a, n) => a + n, 0);
   renderHotbar();
 }
 
@@ -841,10 +836,6 @@ function renderMenu(){
     ch.appendChild(b);
   }
 
-  document.querySelector('#btnInv .cimg').innerHTML = chestSVG('closed');
-  document.querySelector('#btnShop .cimg').innerHTML = emeraldSVG(88);
-  document.getElementById('btnInv').onclick = openInventory;
-  document.getElementById('btnShop').onclick = openShop;
 }
 
 // Inventar und Shop öffnen als Fenster über dem Menü (gleiches Fenster wie das Abschluss-Fenster)
@@ -1801,6 +1792,11 @@ function hideOverlay(){ document.getElementById('overlay').style.display = 'none
 document.getElementById('logo').onclick = renderMenu;
 // Smaragd-Symbol im Kopf
 document.getElementById('emIcon').innerHTML = emeraldSVG(30);
+document.getElementById('invIcon').innerHTML = chestSVG('closed');
+// Smaragd-Anzeige öffnet den Shop, Truhen-Anzeige das Inventar (nur im Menü)
+const inMenu = () => !document.getElementById('menu').classList.contains('hidden');
+document.getElementById('btnShop').onclick = () => { if (inMenu()) openShop(); };
+document.getElementById('btnInv').onclick = () => { if (inMenu()) openInventory(); };
 window.addEventListener('keydown', onKey);
 window.addEventListener('keyup', e => {
   if (e.key !== 'Shift') return;
