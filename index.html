@@ -23,6 +23,23 @@
   .btn.green{background:#4caf50;}
   .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
   h2{margin:4px 0 8px;font-size:18px;}
+  /* Menü-Raster: links Minen (5x5), rechts oben Craften (2x5), rechts unten Inventar (3x5), unten der Shop über die ganze Breite */
+  #menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:start;}
+  #menu .panel{margin:6px 0;}
+  #pMinen{grid-column:1;grid-row:1 / span 2;}
+  #pCraften{grid-column:2;grid-row:1;}
+  #pInventar{grid-column:2;grid-row:2;}
+  #pShop{grid-column:1 / -1;grid-row:3;}
+  #menu.hidden{display:none;}
+  .g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch;}
+  .g5 .chest,.g5 .chest:disabled,.g5 .citem,.g5 .cempty{width:auto;min-width:0;margin:0;}
+  .g5 .chest .cimg,.g5 .chest:disabled .cimg{width:100%;}
+  .g5 .chest .cimg svg.ch{width:min(104px,100%);}
+  .g5 .chest:disabled .cimg svg.ch{width:min(80px,100%);}
+  .g5 .chest .cname,.g5 .chest:disabled .cname{font-size:22px;}
+  .g5 .chest.lvl .cimg svg,.g5 .chest.lvl:disabled .cimg svg{width:min(64px,100%);height:auto;aspect-ratio:1;}
+  .g5 .chest .csub{min-height:18px;}
+  .g5 .cempty{height:auto;aspect-ratio:1;}
   #biome{position:relative;height:clamp(520px,calc(100vh - 128px),1000px);--kh:clamp(52px,8.2vh,80px);--sp:calc(var(--kh)*.7);--ext:calc(var(--kh)*.9);--kw:calc((100vw - 72px)/45*4);--bw:calc(var(--kw) - 8px);--kbb:calc(110px + var(--ext));--kbh:calc(var(--kh)*3 + var(--sp) + 24px);margin:12px 0;border:4px solid #000;border-radius:4px;overflow:hidden;}
   .biome-wald{background:linear-gradient(#7ec8ff 0%,#a8e6a1 60%,#3c7d2e 100%);}
   .biome-hoehle{background:linear-gradient(#3a3a3a,#2b2b2b 60%,#555);}
@@ -289,19 +306,19 @@
   </header>
 
   <div id="menu">
-    <div class="panel">
+    <div class="panel" id="pMinen">
       <h2>Minen</h2>
-      <div class="chests" id="levels"></div>
+      <div class="g5" id="levels"></div>
     </div>
-    <div class="panel">
+    <div class="panel" id="pCraften">
       <h2>Craften</h2>
-      <div class="chests" id="chests"></div>
+      <div class="g5" id="chests"></div>
     </div>
-    <div class="panel">
+    <div class="panel" id="pInventar">
       <h2>Inventar</h2>
-      <div class="loot" id="collection"></div>
+      <div class="g5" id="collection"></div>
     </div>
-    <div class="panel">
+    <div class="panel" id="pShop">
       <h2>Shop</h2>
       <div id="shop"></div>
     </div>
