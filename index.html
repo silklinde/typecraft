@@ -133,7 +133,9 @@
   .block.big{top:24px;width:var(--bw);height:var(--bw);border-width:4px;font-size:calc(var(--bw)*.6);
              text-shadow:3px 3px 0 #000;box-shadow:inset -8px -8px 0 rgba(0,0,0,.3),inset 8px 8px 0 rgba(255,255,255,.18);}
   .block.big .crack{position:absolute;inset:0;background-size:100% 100%;image-rendering:pixelated;pointer-events:none;}
-  .block.shake{animation:wackel .3s;}
+  .block.shake,.cb.shake,.sch.shake{animation:wackel .3s;}
+  .cb.mining{animation:wackel .12s infinite;}
+  .cb .crack{position:absolute;inset:0;background-size:100% 100%;image-rendering:pixelated;pointer-events:none;}
   .block.mining{animation:wackel .12s infinite;}
   @keyframes wackel{0%,100%{margin-left:0}25%{margin-left:-5px}75%{margin-left:5px}}
   .crumb{position:absolute;pointer-events:none;image-rendering:pixelated;}
@@ -326,7 +328,8 @@
   .carrow.on{opacity:1;color:#ffd166;}
   .rname{position:absolute;top:calc(100% + 2px);left:50%;translate:-50% 0;white-space:nowrap;font-family:"VT323",monospace;font-size:calc(var(--cs)*.5);color:#fff;text-shadow:2px 2px 0 #000;}
   /* Wort-Werkbank: links das Wort (aktueller Block gelb gerahmt, Dreieck darüber), rechts das 3×3-Gitter */
-  #craft.words{--ts:calc(var(--cs)*.72);left:0;right:0;padding-right:calc(var(--ts)*3 + var(--cs)*1.9 + 70px);box-sizing:border-box;top:26px;}
+  #craft.words{--ts:calc(var(--cs)*.72);--wb:max(40px,min(calc(var(--cs)*2),calc((100vw - 580px)/8.6)));left:0;right:0;top:0;height:100%;padding-right:calc(var(--ts)*3 + var(--cs)*3 + 120px);box-sizing:border-box;}
+  #craft.words .cb{width:var(--wb);height:var(--wb);font-size:calc(var(--wb)*.6);}
   #craft.words .cword{display:flex;justify-content:center;align-items:center;gap:8px;}
   .cb{position:relative;width:var(--cs);height:var(--cs);box-sizing:border-box;border:3px solid #000;background-size:100% 100%;image-rendering:pixelated;
       display:flex;align-items:center;justify-content:center;font-size:calc(var(--cs)*.58);font-weight:bold;line-height:1;color:#fff;text-shadow:2px 2px 0 #000;
@@ -335,11 +338,11 @@
   .cb.now{outline:4px solid #ffd166;z-index:1;box-shadow:inset -4px -4px 0 rgba(0,0,0,.3),inset 4px 4px 0 rgba(255,255,255,.25),0 0 18px 3px rgba(255,209,102,.55);}
   .cb.now::before{content:"";position:absolute;top:-26px;left:50%;margin-left:-9px;border:9px solid transparent;border-top:12px solid #ffd166;animation:bob 1s ease-in-out infinite;}
   @keyframes bob{50%{transform:translateY(5px);}}
-  .cb.gone{background:rgba(0,0,0,.25);border:3px dashed #555;box-shadow:none;color:transparent;text-shadow:none;}
-  .ctable{position:absolute;right:12px;top:-22px;display:flex;align-items:center;gap:10px;padding:8px 12px;background:#c6c6c6;border:4px solid #000;border-radius:4px;
+  .cb.gone::before{display:none;}
+  .cb.gone{outline:none;background:rgba(0,0,0,.25);border:3px dashed #555;box-shadow:none;color:transparent;text-shadow:none;}
+  .ctable{position:absolute;right:calc(var(--cs)*1.1 + 50px);top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;padding:8px 12px;background:#c6c6c6;border:4px solid #000;border-radius:4px;
           box-shadow:inset 3px 3px 0 #fff,inset -3px -3px 0 #8b8b8b;transition:opacity .25s;}
-  .ctable.under{opacity:.3;}
-  .tgrid{display:grid;grid-template-columns:repeat(3,var(--ts));gap:3px;}
+    .tgrid{display:grid;grid-template-columns:repeat(3,var(--ts));gap:3px;}
   .tsl{width:var(--ts);height:var(--ts);box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;}
   .tsl i{display:flex;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;border:3px solid #000;background-size:100% 100%;image-rendering:pixelated;
          font-style:normal;font-weight:bold;font-size:calc(var(--ts)*.5);line-height:1;color:#fff;text-shadow:2px 2px 0 #000;animation:pop .25s ease-out;}
@@ -350,7 +353,8 @@
   .ctable .cres.pop{background:#9ee37d;}
   .ctable .cslot.cres{position:static;}
   .ctable .rname{top:calc(100% + 6px);left:auto;right:0;translate:none;font-size:calc(var(--cs)*.5);}
-  #cchest{position:absolute;left:12px;top:4px;display:flex;align-items:center;gap:6px;font-family:"VT323",monospace;font-size:calc(var(--cs)*.7);color:#fff;text-shadow:2px 2px 0 #000;}
+  .wl #cchest{right:12px;top:50%;translate:0 -50%;}
+  #cchest{position:absolute;right:12px;top:4px;display:flex;align-items:center;gap:6px;font-family:"VT323",monospace;font-size:calc(var(--cs)*.7);color:#fff;text-shadow:2px 2px 0 #000;}
   #cchest svg{width:calc(var(--cs)*1.1);height:auto;image-rendering:pixelated;}
   #cchest.wobble svg{animation:wackel .3s;}
   .fly{position:fixed;z-index:20;pointer-events:none;box-sizing:border-box;background-size:100% 100%;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;text-shadow:2px 2px 0 #000;}
@@ -1526,6 +1530,7 @@ function craftBuild(w){
     return;
   }
   el.classList.add('words');
+  el.parentNode.classList.add('wl');
   el.innerHTML = `<div class="cword">${[...w].map(ch => `<div class="cb" style="background-image:var(--${run.seq[run.wi].item.ore})">${ch}</div>`).join('')}</div>
     <div class="ctable"><div class="tgrid">${'<div class="tsl"></div>'.repeat(9)}</div><div class="carrow">→</div><div class="cslot cres"></div></div>`;
 }
@@ -1556,8 +1561,7 @@ function craftLetter(b, i){
   if (LEVELS[cur].sentences) { slot.classList.add('done'); return; }
   const rect = b.el.getBoundingClientRect();
   const tsl = document.querySelectorAll('#craft .tsl')[i];
-  slot.classList.add('gone');
-  flyTo(rect, tsl, f => { f.style.cssText += `background-image:var(--${b.kind});border:3px solid #000;`; f.textContent = b.ch; }, 250, 400, () => {
+  flyTo(rect, tsl, f => { f.style.cssText += `background-image:var(--${b.kind});border:3px solid #000;`; f.textContent = b.ch; }, 350, 400, () => {
     tsl.innerHTML = `<i style="background-image:var(--${b.kind})">${b.ch}</i>`;
   });
 }
@@ -1571,7 +1575,6 @@ function craftDone(item){
   if (first) run.newIds.push(item.id);
   run.crafted++;
   craftNow(-1);
-  const tb = document.querySelector('#craft .ctable'); if (tb) tb.classList.remove('under');
   setTimeout(() => {
     const res = document.querySelector('#craft .cres'), arrow = document.querySelector('#craft .carrow');
     if (!res) return;
@@ -1593,24 +1596,17 @@ function craftDone(item){
     });
   }, 2400);
 }
-// Ein Block pro Buchstabe über seiner Taste, Material passend zum Gegenstand des Wortes
+// Die Buchstaben stehen nur in der Werkbank-Leiste oben (Wort-Blöcke bzw. Satztext); die Taste zeigt die Tastatur
 function chestNext(){
   const lanes = document.getElementById('lanes');
   if (!lanes || !run) return;
   const {w, item} = run.seq[run.wi], ch = w[run.ci];
   const key = ch.toLowerCase(), cap = ch !== key;
-  const el = document.createElement('div');
   const kind = item.ore;
   const space = ch === ' ';
-  el.className = 'block big ' + kind + (space ? ' space' : '');
-  el.textContent = space ? 'Leertaste' : ch;
-  el.style.left = ((space ? 21 / NCOL : cxOf(key)) * 100).toFixed(3) + '%';
-  lanes.appendChild(el);
-  const tb = document.querySelector('#craft .ctable');       // steht die Werkbank im Weg, wird sie blass
-  if (tb) { const a = el.getBoundingClientRect(), t = tb.getBoundingClientRect(); tb.classList.toggle('under', a.right > t.left && a.left < t.right && a.bottom > t.top); }
-  run.cur = {key, el, kind, cap, ch};
-  run.busy = false;
   if (run.ci === 0) craftBuild(w);
+  run.cur = {key, el:craftSlot(run.ci), kind, cap, ch};
+  run.busy = false;
   craftNow(run.ci);
   setExpected(key, cap && shiftFor(key));
   if (space) { const tl = document.querySelector('#intro .thumb.l'); if (tl) tl.classList.add('hover'); }   // beide Daumen
@@ -1822,7 +1818,9 @@ const CRUMB_COLORS = {wood:['#a8793a','#8a5f2c','#c9985a'], dirt:['#7a5230','#5e
 
 // Abbau wie in Minecraft: Risse wachsen, der Block wackelt, Krümel springen ab, dann zerplatzt er
 function mineBlock(b){
-  const el = b.el, lanes = el.parentNode;
+  const el = b.el, lanes = document.getElementById('lanes');
+  if (el.classList.contains('sch')) { setTimeout(() => { xpPing(); burst(b, lanes); }, 150); return; }   // Satz: Krümel am Buchstaben
+  const word = el.classList.contains('cb');
   const crack = document.createElement('div');
   crack.className = 'crack';
   el.appendChild(crack);
@@ -1834,7 +1832,8 @@ function mineBlock(b){
       clearInterval(iv);
       xpPing();   // Bling erst, wenn der Block wirklich abgebaut ist
       burst(b, lanes);
-      el.remove();
+      if (word) { crack.remove(); el.classList.remove('mining'); el.classList.add('gone'); }   // Wortblock bleibt als Mulde
+      else el.remove();
     }
   }, 35);
 }
