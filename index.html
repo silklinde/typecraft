@@ -40,6 +40,9 @@
   #overlay .box .g5 .citem,#overlay .box .g5 .cempty{width:auto;aspect-ratio:1;box-sizing:border-box;justify-content:center;}
   #overlay .box .shoplist{display:flex;flex-direction:column;align-items:stretch;gap:2px;}
   #overlay .box .shoplist .btn{display:flex;align-items:center;justify-content:center;gap:8px;}
+  #overlay .box .sign{position:relative;margin:18px auto 0;width:78%;padding:22px 16px;background:#a8793a;border:4px solid #5a3d1a;box-shadow:inset 0 0 0 3px #c08d4a,inset 0 -6px 0 #8a6228;text-align:center;font-size:22px;line-height:1.4;color:#2a1b08;text-shadow:1px 1px 0 rgba(255,255,255,.18);}
+  #overlay .box .sign b{display:block;font-size:26px;margin-bottom:4px;}
+  #overlay .box .signpost{width:14px;height:56px;margin:0 auto;background:#7a5526;border:3px solid #5a3d1a;border-top:0;}
   #menu.hidden{display:none;}
   .g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch;}
   .g5 .chest,.g5 .chest:disabled,.g5 .citem,.g5 .cempty{width:auto;min-width:0;margin:0;}
@@ -1061,8 +1064,8 @@ function openInventory(){
 }
 
 function openShop(){
-  const box = openMenuModal('Shop', `<div class="shoplist" id="shop"></div><div class="mrow" id="shopEm"></div>`, false);
-  renderShop();
+  const box = openMenuModal('Shop', `<div class="sign"><b>Bald geöffnet!</b>Der Shop eröffnet bald.</div><div class="signpost"></div><div class="mrow" id="shopEm"></div>`, false);
+  document.getElementById('shopEm').innerHTML = `<span class="mem">${st.emeralds} ${emeraldSVG(32)}</span>`;
 }
 
 function renderShop(){
