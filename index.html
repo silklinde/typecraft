@@ -507,7 +507,7 @@ const LEVELS = [
    hint:'Übung: Die ganze Tastatur. Erze sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
   {name:'Level 18: + Ä ß', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß']), neu:['ä','ß'], ore:'redstone',
    hint:'Neu: Ä (rechts neben Ö) und ß (ganz rechts in der obersten Reihe). Beide tippt der rechte kleine Finger.', target:16},
-  {name:'Level 19: Zahlen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß','1','2','3','4','5','6','7','8','9','0']), neu:['1','2','3','4','5','6','7','8','9','0'], ore:'obsidian',
+  {name:'Level 19: Zahlen', keys:['1','2','3','4','5','6','7','8','9','0'], neu:['1','2','3','4','5','6','7','8','9','0'], ore:'obsidian',
    hint:'Neu: Die Zahlen 1 bis 0 in der obersten Reihe. Jeder Finger geht zwei Reihen nach oben und danach zurück auf seine Grundtaste.', target:30},
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
@@ -993,7 +993,7 @@ function buildBoard(field, L, mode){
        </div>`
     : `<div class="lanes" id="lanes">${L.chest ? '<div id="craft"></div><div id="cchest"></div>' : ''}</div>`;
 
-  const num = !haende && L.keys.includes('ß');
+  const num = !haende && (L.keys.includes('ß') || L.keys.includes('1'));
   const rows = num ? [L.keys.includes('1') ? NUMROW : ['ß']].concat(KEYROWS) : KEYROWS;
   const keysHtml = rows.map((row, r) => row.map(k => {
     const pos = `grid-row:${r + 1};grid-column:${KEYPOS[k].c} / span 4`;

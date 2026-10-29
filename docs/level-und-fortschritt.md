@@ -23,7 +23,7 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 | 16 | + Y - | Y - | Gold | 16 | |
 | 17 | Alle Reihen | – | Erze der Tasten der unteren Reihe (je Taste wie oben) | 48 | Diamantspitzhacke |
 | 18 | + Ä ß | Ä ß | Redstone | 16 | |
-| 19 | Zahlen | 1 2 3 4 5 6 7 8 9 0 | Obsidian | 30 | |
+| 19 | Zahlen | 1 2 3 4 5 6 7 8 9 0 (nur die Zahlen, sonst keine Taste aktiv) | Obsidian | 30 | |
 
 **Ä** ist ab Level 18 dabei. **ß** liegt in einer zusätzlichen Reihe über Q–Ü (Zahlenreihe, `KEYPOS` = Reihe −1; in Level 18 steht dort nur ß, ab Level 19 alle Zahlen `NUMROW`: 1 beginnt in Spalte 1 über Q, ß in Spalte 41; die Reihe liegt eine halbe Taste weiter rechts als auf echten Tastaturen, damit sie ins Raster passt). Diese Reihe erscheint nur in Levels, deren `keys` ß enthalten; dann bekommt `.kb` die Klasse `num` und alles darunter rutscht per `--o` eine Reihe nach unten. Beide tippt der rechte kleine Finger. Level 19 führt die Zahlen ein (`FINGERS`: 1 kleiner Finger links, 2 Ring, 3 Mitte, 4 und 5 Zeigefinger links, 6 und 7 Zeigefinger rechts, 8 Mitte, 9 Ring, 0 kleiner Finger rechts). Der Spielstand ist `v:3`: die Werkbänke stehen jetzt bei Index 20–25.
 
