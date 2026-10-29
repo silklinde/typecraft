@@ -236,6 +236,8 @@
   .emsvg{vertical-align:middle;}
 
   /* Oben rechts: Smaragd-Zähler und Schnellzugriffsleiste mit 4 Slots für die Spitzhacken */
+  .userlist{display:flex;flex-wrap:wrap;justify-content:center;}
+  #btnUser{cursor:pointer;font-size:20px;}
   .hud{display:flex;align-items:center;gap:14px;}
   .counter{display:flex;align-items:center;gap:8px;font-size:26px;font-weight:bold;color:#fff;text-shadow:2px 2px 0 #3f3f3f;
            background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:4px 14px 4px 8px;}
@@ -315,6 +317,7 @@
   <header>
     <div class="logo-wrap"><div class="badge" id="logo" title="Zur Levelübersicht">Typecraft</div><span id="lvName"></span></div>
     <div class="hud">
+      <div class="counter" id="btnUser" title="Spieler wechseln"><span id="userLabel"></span></div>
       <div class="counter" id="btnShop" title="Shop"><span id="emIcon"></span><span id="emeralds">0</span></div>
       <div class="counter" id="btnInv" title="Inventar"><span id="invIcon"></span><span id="invCount">0</span></div>
       <div class="hotbar" id="hotbar"></div>
@@ -344,7 +347,14 @@
 <div id="overlay"><div class="box" id="overlayBox"></div></div>
 
 <script>
-const KEY = 'typecraft-v1';
+const KEY_OLD = 'typecraft-v1';        // Spielstand aus der Zeit vor den Nutzernamen
+const KEY_USERS = 'typecraft-users';   // Liste der Namen
+const KEY_CUR = 'typecraft-current';   // zuletzt gewählter Name
+const lsGet = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch(e){} };
+let user = lsGet(KEY_CUR);
+const userList = () => { try { return JSON.parse(lsGet(KEY_USERS)) || []; } catch(e){ return []; } };
+const keyOf = name => 'typecraft-user-' + name.toLowerCase();
 
 // ---------- Pixel-Texturen (Minecraft-Look) ----------
 (function(){
@@ -529,7 +539,7 @@ const SHOP = [
   {id:'hoehle',label:'⛰ Biom Höhle',   cost:8,  type:'biome', need:4},
 ];
 
-let st = load();
+let st = user ? load() : fresh();
 let cur = -1, active = false, run = null, raf = 0, last = 0;
 let introExpected = 'f', shownKey = null;
 let phase = 'play';          // 'haende' (Hände auflegen), 'grund' (Grundhaltung), 'learn' (Einführung neuer Tasten), 'wait', 'play'
@@ -540,7 +550,7 @@ let pendingTimer = null;     // Pause vor dem Modal bzw. vor dem Start der Blöc
 
 function load(){
   try {
-    const s = JSON.parse(localStorage.getItem(KEY));
+    const s = JSON.parse(localStorage.getItem(keyOf(user)));
     if (s) {
       // v2: Level 0 "Hände auflegen" ist neu, alle bisherigen Level rücken um eins nach hinten
       if (!s.v) {
@@ -559,9 +569,42 @@ function load(){
       return s;
     }
   } catch(e){}
-  return {v:3, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}};
+  return fresh();
 }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
+function fresh(){ return {v:3, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}}; }
+function save(){ if (user) lsSet(keyOf(user), JSON.stringify(st)); }
+
+// Nutzer anlegen oder wählen. Der alte Spielstand (typecraft-v1) geht an den ersten Namen, der angelegt wird.
+function pickUser(name){
+  name = name.trim().slice(0, 12);
+  if (!name) return false;
+  const list = userList();
+  const known = list.find(n => n.toLowerCase() === name.toLowerCase());
+  if (known) name = known;
+  else {
+    if (!list.length && lsGet(KEY_OLD) && !lsGet(keyOf(name))) lsSet(keyOf(name), lsGet(KEY_OLD));
+    list.push(name); lsSet(KEY_USERS, JSON.stringify(list));
+  }
+  user = name; lsSet(KEY_CUR, name);
+  st = load(); hotbarSeen = null;
+  hideOverlay(); renderMenu();
+  return true;
+}
+function openUsers(){
+  const box = document.getElementById('overlayBox');
+  box.className = 'box';
+  const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const names = userList().map(n => `<button class="btn userpick" data-n="${esc(n)}">${esc(n)}</button>`).join('');
+  box.innerHTML = `${user ? '<button class="mclose" title="Schließen">✕</button>' : ''}<div class="mtitle">Wer spielt?</div>
+    <div class="minner">${names ? `<div class="userlist">${names}</div>` : ''}
+    <input id="userName" maxlength="12" placeholder="Neuer Name" autocomplete="off" style="font:inherit;font-size:24px;padding:6px 10px;border:3px solid #000;width:80%;margin:8px 0;">
+    <div><button class="btn green" id="userGo">Los</button></div></div>`;
+  if (user) box.querySelector('.mclose').onclick = hideOverlay;
+  box.querySelectorAll('.userpick').forEach(b => b.onclick = () => pickUser(b.dataset.n));
+  box.querySelector('#userGo').onclick = () => { const inp = box.querySelector('#userName'); if (!pickUser(inp.value)) inp.focus(); };
+  document.getElementById('overlay').style.display = 'flex';
+  box.querySelector('#userName').focus();
+}
 function unlocked(i){
   const L = LEVELS[i];
   if (L.chest) return !!L.ready && (st.stars[L.need] || 0) >= 1;
@@ -684,6 +727,7 @@ function renderHotbar(){
 }
 
 function topBar(){
+  document.getElementById('userLabel').textContent = '👤 ' + (user || '');
   document.getElementById('emeralds').textContent = st.emeralds;
   document.getElementById('invCount').textContent = Object.values(st.items).reduce((a, n) => a + n, 0);
   renderHotbar();
@@ -1612,10 +1656,10 @@ function tick(t){
 
 function onKey(e){
   if (document.getElementById('overlay').style.display === 'flex') {
-    if (e.key === 'Escape' && document.getElementById('menu') && !document.getElementById('menu').classList.contains('hidden')) hideOverlay();
+    if (e.key === 'Escape' && user && document.getElementById('menu') && !document.getElementById('menu').classList.contains('hidden')) hideOverlay();
     if (e.key === 'Enter') {
       e.preventDefault();
-      const btn = document.querySelector('#overlayBox .mclose') || document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn');
+      const btn = (document.getElementById('userGo')) || document.querySelector('#overlayBox .mclose') || document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn');
       if (btn) btn.click();
     }
     return;
@@ -1809,6 +1853,7 @@ document.getElementById('invIcon').innerHTML = chestSVG('closed');
 const inMenu = () => !document.getElementById('menu').classList.contains('hidden');
 document.getElementById('btnShop').onclick = () => { if (inMenu()) openShop(); };
 document.getElementById('btnInv').onclick = () => { if (inMenu()) openInventory(); };
+document.getElementById('btnUser').onclick = () => { if (inMenu()) openUsers(); };
 window.addEventListener('keydown', onKey);
 window.addEventListener('keyup', e => {
   if (e.key !== 'Shift') return;
@@ -1819,6 +1864,7 @@ window.addEventListener('keyup', e => {
 window.addEventListener('blur', () => { shiftHeld = false; shiftVisual(false); csMorph(); });
 
 renderMenu();
+if (!user) openUsers();
 </script>
 </body>
 </html>

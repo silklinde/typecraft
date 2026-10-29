@@ -61,7 +61,7 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Verläufe (`wald`, `hoehle`). Skins gibt es noch nicht.
 
 ## Spielstand
-`localStorage['typecraft-v1']` = `{v:2, emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
+Pro Nutzer ein Eintrag: `localStorage['typecraft-user-<name klein>']` (Namensliste in `typecraft-users`, letzter Nutzer in `typecraft-current`). Beim ersten Namen wird der alte Stand `typecraft-v1` übernommen. Inhalt: `{v:2, emeralds, stars:{levelIndex:sterne}, owned:{id:true}, biome}`. Alle Zugriffe sind in try/catch, das Spiel läuft auch ohne Speicher.
 
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
 
