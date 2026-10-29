@@ -468,47 +468,47 @@ const CHEST3_WORDS = ['Glas','Hals','Hass','Saga','Jagd','Kahl','Gala','Gaga','H
 const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
-  {name:'Level 0: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9},
-  {name:'Level 1: Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, target:6, reward:'holz'},
-  {name:'Level 2: A S D', keys:['a','s','d','f'], neu:['a','s','d'],
+  {name:'Level 1: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9},
+  {name:'Level 2: Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, target:6, reward:'holz'},
+  {name:'Level 3: A S D', keys:['a','s','d','f'], neu:['a','s','d'],
    hint:'Neu: A, S und D (nur linke Hand, die rechte ruht). Die Kohleblöcke zeigen dir die neuen Tasten. Tippe die Taste, um den Block abzubauen.', target:16},
-  {name:'Level 3: K L Ö', keys:['j','k','l','ö'], neu:['k','l','ö'],
+  {name:'Level 4: K L Ö', keys:['j','k','l','ö'], neu:['k','l','ö'],
    hint:'Neu: K, L und Ö (nur rechte Hand, die linke ruht). Die Kohleblöcke zeigen dir die neuen Tasten.', target:16},
-  {name:'Level 4: + G H', keys:HOME10, neu:['g','h'],
+  {name:'Level 5: + G H', keys:HOME10, neu:['g','h'],
    hint:'Neu: G und H (Kohle). Dafür streckt sich der Zeigefinger zur Seite und geht danach zurück auf F bzw. J.', target:16},
-  {name:'Level 5: Ganze Reihe', keys:HOME10, neu:[],
+  {name:'Level 6: Ganze Reihe', keys:HOME10, neu:[],
    hint:'Übung: Alle Tasten der Grundreihe, Stein und Kohle. Lass die Hände ruhig liegen und bewege nur die Finger.', target:32, reward:'stein'},
 
   // Obere Reihe: Eisen, Kupfer, Lapislazuli (mit der Steinspitzhacke abbaubar). Die Finger greifen eine Reihe nach oben und gehen zurück auf die Grundtaste.
-  {name:'Level 6: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
+  {name:'Level 7: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
    hint:'Neu: E und I (Eisenerz, beide Mittelfinger). Greife eine Reihe nach oben und gehe danach zurück auf D bzw. K.', target:16},
-  {name:'Level 7: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'copper',
+  {name:'Level 8: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'copper',
    hint:'Neu: R (Kupfererz, linker Zeigefinger) und U (rechter Zeigefinger). Nach dem Tippen geht der Finger zurück auf F bzw. J.', target:16},
-  {name:'Level 8: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'lapis',
+  {name:'Level 9: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'lapis',
    hint:'Neu: T und Z (Lapislazuli). Die Zeigefinger strecken sich nach oben und zur Seite. Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 9: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
+  {name:'Level 10: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
    hint:'Neu: W (linker Ringfinger) und O (rechter Ringfinger).', target:16},
-  {name:'Level 10: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'copper',
+  {name:'Level 11: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'copper',
    hint:'Neu: Q (Kupfererz, linker kleiner Finger), P und Ü (rechter kleiner Finger).', target:16},
-  {name:'Level 11: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
+  {name:'Level 12: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
    hint:'Übung: Grundreihe und obere Reihe. Erze sind die Tasten der oberen Reihe.', target:32, reward:'eisen'},
 
   // Untere Reihe: Diamant, Gold, Redstone (mit der Eisenspitzhacke abbaubar)
-  {name:'Level 12: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
+  {name:'Level 13: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
    hint:'Neu: C (linker Mittelfinger) und Komma (rechter Mittelfinger). Greife eine Reihe nach unten und gehe zurück auf D bzw. K.', target:16},
-  {name:'Level 13: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'gold',
+  {name:'Level 14: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'gold',
    hint:'Neu: V (Golderz, linker Zeigefinger) und M (rechter Zeigefinger). Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 14: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'redstone',
+  {name:'Level 15: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'redstone',
    hint:'Neu: B und N (Redstone). Die Zeigefinger strecken sich nach unten und zur Seite. Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 15: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
+  {name:'Level 16: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
    hint:'Neu: X (linker Ringfinger) und Punkt (rechter Ringfinger).', target:16},
-  {name:'Level 16: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'gold',
+  {name:'Level 17: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'gold',
    hint:'Neu: Y (Golderz, linker kleiner Finger) und Bindestrich (rechter kleiner Finger).', target:16},
-  {name:'Level 17: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
+  {name:'Level 18: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
    hint:'Übung: Die ganze Tastatur. Erze sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
-  {name:'Level 18: + Ä ß', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß']), neu:['ä','ß'], ore:'redstone',
+  {name:'Level 19: + Ä ß', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß']), neu:['ä','ß'], ore:'redstone',
    hint:'Neu: Ä (rechts neben Ö) und ß (ganz rechts in der obersten Reihe). Beide tippt der rechte kleine Finger.', target:16},
-  {name:'Level 19: Zahlen', keys:['1','2','3','4','5','6','7','8','9','0'], neu:['1','2','3','4','5','6','7','8','9','0'], ore:'obsidian',
+  {name:'Level 20: Zahlen', keys:['1','2','3','4','5','6','7','8','9','0'], neu:['1','2','3','4','5','6','7','8','9','0'], ore:'obsidian',
    hint:'Neu: Die Zahlen 1 bis 0 in der obersten Reihe. Jeder Finger geht zwei Reihen nach oben und danach zurück auf seine Grundtaste.', target:30},
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
@@ -811,10 +811,10 @@ function renderMenu(){
     const b = document.createElement('button');
     b.className = 'chest lvl';
     b.disabled = !open;
-    b.title = open ? '' : `Schließe zuerst Level ${i - 1} ab`;
+    b.title = open ? '' : `Schließe zuerst Level ${i} ab`;
     const pick = i <= 5 ? 'holz' : i <= 11 ? 'stein' : i <= 17 ? 'eisen' : 'diamant';   // Spitzhacke, mit der das Level gespielt wird
     const sub = s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : '';
-    b.innerHTML = `<div class="cimg">${pickaxeSVG(pick, 64)}</div><div class="cname">Level ${i}</div><div class="csub">${sub}</div>`;
+    b.innerHTML = `<div class="cimg">${pickaxeSVG(pick, 64)}</div><div class="cname">Level ${i + 1}</div><div class="csub">${sub}</div>`;
     b.onclick = () => start(i);
     lv.appendChild(b);
   });
@@ -884,7 +884,7 @@ function renderShop(){
         b.disabled = true;
       }
     } else {
-      b.innerHTML = locked ? `${item.label} 🔒 (Level ${item.need})` : `${item.label} – ${item.cost} ${emeraldSVG(18)}`;
+      b.innerHTML = locked ? `${item.label} 🔒 (Level ${item.need + 1})` : `${item.label} – ${item.cost} ${emeraldSVG(18)}`;
       b.disabled = locked || st.emeralds < item.cost;
       b.onclick = () => {
         st.emeralds -= item.cost;

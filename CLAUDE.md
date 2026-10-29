@@ -38,6 +38,7 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 - Frage zuerst, wenn eine Änderung die Spielregeln oben berührt.
 
 ## Stolperfallen
+- Anzeige-Nummern der Level sind Index + 1 (Level 1 = „Hände auflegen“ = Index 0). Diese Datei und `docs/` nennen teils noch die alten Nummern (Level 0 = „Hände auflegen“).
 - Level-Nummern stehen im Spielstand als Index (`st.stars[i]`). Neue Level nur **am Ende** anhängen oder alle Verweise (`reward`, Shop `need`) prüfen.
 - Die Taste Ö lässt sich in Playwright nicht per `keyboard.press` senden. Nutze `dispatchEvent(new KeyboardEvent('keydown', {key:'ö'}))`.
 - Alle Positionen der Tastatur hängen an einem 45-Spalten-Raster (Viertel-Tasten). Wer Reihen oder Tasten ändert, muss `ROWSTART`, die CSS-Spalten der Arme und Daumen und `cxOf()` gemeinsam anpassen (siehe `docs/architektur.md`).
