@@ -33,6 +33,7 @@
   html.geraet-an #app,html.geraet-an #overlay,html.geraet-an .toast{display:none !important;}
   #geraet .glogo{display:block;width:min(560px,100%);height:auto;margin-bottom:clamp(8px,3vh,28px);}
   #geraet .sign{box-sizing:border-box;width:min(560px,100%);padding:clamp(16px,4vw,28px) clamp(12px,3vw,20px);background:#a8793a;border:4px solid #5a3d1a;box-shadow:inset 0 0 0 3px #c08d4a,inset 0 -6px 0 #8a6228;text-align:center;font-family:"VT323",monospace;font-size:clamp(24px,5.5vw,36px);line-height:1.3;color:#2a1b08;text-shadow:1px 1px 0 rgba(255,255,255,.18);}
+  #geraet .btn{margin-top:clamp(12px,3vh,28px);font-family:"VT323",monospace;font-size:26px;}
   #geraet .signpost{width:14px;height:clamp(24px,8vh,56px);background:#7a5526;border:3px solid #5a3d1a;border-top:0;}
   #overlay .box{position:relative;}
   #overlay .box .mclose{position:absolute;top:10px;right:10px;width:36px;height:36px;padding:0;font-family:inherit;font-size:26px;line-height:1;color:#fff;background:#8b8b8b;border:3px solid #000;cursor:pointer;box-shadow:inset 3px 3px 0 #c6c6c6,inset -3px -3px 0 #555;}
@@ -413,7 +414,7 @@
 </div>
 
 <div id="overlay"><div class="box" id="overlayBox"></div></div>
-<div id="geraet" class="hidden"><img class="glogo" src="assets/typecraft-logo.svg" alt="Typecraft"><div class="sign" id="geraetText"></div><div class="signpost"></div></div>
+<div id="geraet" class="hidden"><img class="glogo" src="assets/typecraft-logo.svg" alt="Typecraft"><div class="sign" id="geraetText"></div><div class="signpost"></div><button class="btn" id="geraetGo">Trotzdem spielen</button></div>
 
 <script>
 const KEY_OLD = 'typecraft-v1';        // Spielstand aus der Zeit vor den Nutzernamen
@@ -2068,17 +2069,19 @@ document.getElementById('btnInv').onclick = () => { if (inMenu()) openInventory(
 document.getElementById('btnUser').onclick = () => { if (inMenu()) openUsers(); };
 // Geräteprüfung: Mindestgröße des Fensters und reine Touch-Geräte ohne Tastatur
 const MIN_W = 1000, MIN_H = 600;
-let hatTastatur = false;   // wird true, sobald eine echte Taste ankommt
+let hatTastatur = false, trotzdem = false;   // wird true, sobald eine echte Taste ankommt
 function geraetPruefen(){
   const touchOnly = matchMedia('(pointer: coarse)').matches && matchMedia('(hover: none)').matches;
   const zuKlein = innerWidth < MIN_W || innerHeight < MIN_H;
   const g = document.getElementById('geraet');
-  const t = touchOnly && !hatTastatur ? 'Typecraft braucht einen Computer mit Tastatur.'
+  let t = touchOnly && !hatTastatur ? 'Typecraft braucht einen Computer mit Tastatur.'
           : zuKlein ? 'Mach das Fenster größer, dann kann es losgehen.' : '';
+  if (trotzdem) t = '';
   document.getElementById('geraetText').textContent = t;
   g.classList.toggle('hidden', !t);
   document.documentElement.classList.toggle('geraet-an', !!t);
 }
+document.getElementById('geraetGo').onclick = () => { trotzdem = true; geraetPruefen(); };
 window.addEventListener('resize', geraetPruefen);
 window.addEventListener('keydown', onKey);
 window.addEventListener('keyup', e => {
