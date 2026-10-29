@@ -47,6 +47,9 @@
   .g5 .chest .cimg svg.ch{width:min(104px,100%);}
   .g5 .chest:disabled .cimg svg.ch{width:min(80px,100%);}
   .g5{align-content:start;}
+  .g5 .chest.bench .cimg{padding:14px 0;}
+  .g5 .chest.bench,.g5 .chest.bench:disabled{padding-bottom:3px;gap:0;}
+  .g5 .chest.bench .csub{min-height:16px;}
   .g5 .chest .cname,.g5 .chest:disabled .cname{font-size:clamp(15px,1.6vw,22px);white-space:nowrap;}
   .g5 .chest{padding-left:2px;padding-right:2px;}
   .g5 .chest.lvl .cimg svg,.g5 .chest.lvl:disabled .cimg svg{width:min(64px,100%);height:auto;aspect-ratio:1;}
@@ -968,7 +971,7 @@ function renderMenu(){
     if (!L.chest) return;
     const open = unlocked(i), s = st.stars[i] || 0;
     const b = document.createElement('button');
-    b.className = 'chest';
+    b.className = 'chest bench';
     b.disabled = !open;
     b.title = open ? '' : (L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald');
     const sub = open ? (s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : '') : '';
@@ -979,7 +982,7 @@ function renderMenu(){
   // Noch nicht gebaute Werkbänke bis 15: gesperrt, „Kommt bald“
   for (let n = ch.children.length + 1; n <= 15; n++) {
     const b = document.createElement('button');
-    b.className = 'chest';
+    b.className = 'chest bench';
     b.disabled = true;
     b.title = 'Kommt bald';
     b.innerHTML = `<div class="cimg">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="cname">Werkbank ${n}</div><div class="csub"></div>`;
