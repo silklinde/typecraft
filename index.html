@@ -285,6 +285,8 @@
   .cslot.full{color:#fff;text-shadow:2px 2px 0 #000;border-color:#000;box-shadow:inset -4px -4px 0 rgba(0,0,0,.3),inset 4px 4px 0 rgba(255,255,255,.18);}
   .cslot.now{outline:3px solid #ffd166;z-index:1;}
   .cslot.pop{animation:pop .3s ease-out;}
+  .cslot.cres.pop{animation:pop .3s ease-out,bigger .4s ease-out .3s forwards;z-index:2;}
+  @keyframes bigger{to{transform:scale(1.7)}}
   .cslot svg{width:80%;height:80%;image-rendering:pixelated;}
   .carrow{font-size:calc(var(--cs)*.8);line-height:1;color:#fff;text-shadow:3px 3px 0 #000;opacity:.5;margin:0 6px;transition:opacity .2s,color .2s;}
   .carrow.on{opacity:1;color:#ffd166;}
@@ -1408,7 +1410,7 @@ function craftDone(item){
       renderChest();
       chest.classList.remove('wobble'); void chest.offsetWidth; chest.classList.add('wobble');
     });
-  }, 1250);
+  }, 2400);
 }
 // Ein Block pro Buchstabe über seiner Taste, Material passend zum Gegenstand des Wortes
 function chestNext(){
@@ -1468,7 +1470,7 @@ function csKey(e, k, L){
   }
   cs.busy = true;
   b.cap.remove();
-  pressKey(k); xpPing(); bounce();
+  pressKey(k); bounce();
   mineBlock(b);
   setExpected(null);
   cs.idx++;
@@ -1496,7 +1498,7 @@ function chestKey(e, k){
     save(); topBar();
     pressKey(k);
     mineBlock(b);
-    xpPing(); bounce();
+    bounce();
     updateGoal();
     const {w, item} = run.seq[run.wi];
     craftLetter(b, run.ci);
@@ -1506,7 +1508,7 @@ function chestKey(e, k){
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     setExpected(null);
     let delay = 450;
-    if (wordDone) { run.wi++; run.ci = 0; delay = 1700; }   // nach einem fertigen Wort: Gegenstand entsteht und wandert in die Truhe
+    if (wordDone) { run.wi++; run.ci = 0; delay = 2900; }   // nach einem fertigen Wort: Gegenstand entsteht und wandert in die Truhe
     pendingTimer = setTimeout(chestNext, delay);
   } else {
     const before = starsFor(run.wrong, run.target);
@@ -1645,6 +1647,7 @@ function mineBlock(b){
     crack.style.backgroundImage = `url(${crackStage(n)})`;
     if (++n >= 10) {
       clearInterval(iv);
+      xpPing();   // Bling erst, wenn der Block wirklich abgebaut ist
       burst(b, lanes);
       el.remove();
     }
@@ -1705,7 +1708,7 @@ function onKey(e){
           const nm = document.getElementById('csname'); if (nm) nm.remove();
           const big = document.getElementById('big-' + L.newShift);
           if (big) mineBlock({el: big, kind: 'iron'});
-          xpPing(); bounce();
+          bounce();
           later(csNext, 700);
         }
         csMorph();
@@ -1730,7 +1733,6 @@ function onKey(e){
     hz.busy = true;
     document.querySelectorAll('#hrow .hname').forEach(n => n.remove());
     layFinger(k);
-    xpPing();
     mineBlock(hz.blk);
     hz.idx++;
     if (hz.idx >= HAENDE_SEQ.length) {
@@ -1755,7 +1757,6 @@ function onKey(e){
     run.correct++;
     run.busy = true;
     pressKey(k);
-    xpPing();
     mineBlock(run.cur);
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     later(grundAsk, 450);
@@ -1795,7 +1796,7 @@ function onKey(e){
     save(); topBar();
     pressKey(k);
     mineBlock(b);
-    xpPing(); bounce();
+    bounce();
     setHint('Super! +1 Smaragd');
     updateGoal();
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
