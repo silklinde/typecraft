@@ -233,6 +233,8 @@
   .chest:disabled .cimg,.chest:disabled .cimg svg.ch{width:60px;}
   .chest:disabled .cimg svg.ch{filter:grayscale(.75) brightness(.55);}
   .chest:disabled .cname{font-size:22px;color:#aaa;}
+  .chest.lvl .cimg svg{width:64px;height:64px;}
+  .chest.lvl:disabled .cimg svg{width:56px;height:56px;filter:grayscale(1) brightness(.6);}
   .chest .lock{position:absolute;right:-6px;bottom:-4px;width:22px;height:auto;image-rendering:pixelated;}
   .chest:disabled .lock{width:20px;}
   /* Truhen-Level: das Wort steht oben, der Block darunter über seiner Taste */
@@ -289,7 +291,7 @@
   <div id="menu">
     <div class="panel">
       <h2>Minen</h2>
-      <div id="levels"></div>
+      <div class="chests" id="levels"></div>
     </div>
     <div class="panel">
       <h2>Craften</h2>
@@ -769,11 +771,14 @@ function renderMenu(){
   const lv = document.getElementById('levels'); lv.innerHTML = '';
   LEVELS.forEach((L, i) => {
     if (L.chest) return;
+    const open = unlocked(i), s = st.stars[i] || 0;
     const b = document.createElement('button');
-    b.className = 'btn';
-    b.disabled = !unlocked(i);
-    const s = st.stars[i] || 0;
-    b.innerHTML = `${L.name} ${Array.from({length: s}, () => heartSVG(16, true)).join('')}${unlocked(i) ? '' : ' 🔒'}`;
+    b.className = 'chest lvl';
+    b.disabled = !open;
+    b.title = open ? '' : `Schließe zuerst Level ${i - 1} ab`;
+    const pick = i <= 5 ? 'holz' : i <= 11 ? 'stein' : i <= 17 ? 'eisen' : 'diamant';   // Spitzhacke, mit der das Level gespielt wird
+    const sub = s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : '';
+    b.innerHTML = `<div class="cimg">${pickaxeSVG(pick, 64)}</div><div class="cname">Level ${i}</div><div class="csub">${sub}</div>`;
     b.onclick = () => start(i);
     lv.appendChild(b);
   });
