@@ -785,7 +785,7 @@ function renderMenu(){
     b.className = 'chest';
     b.disabled = !open;
     b.title = open ? '' : (L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald');
-    const sub = open ? (s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : L.label) : '';
+    const sub = open ? (s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : '') : '';
     b.innerHTML = `<div class="cimg">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}${open ? '' : padlockSVG()}</div><div class="cname">${L.name}</div><div class="csub">${sub}</div>`;
     b.onclick = () => start(i);
     ch.appendChild(b);

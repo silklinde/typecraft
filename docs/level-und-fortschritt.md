@@ -65,16 +65,16 @@ Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Ver
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
 
 ## Werkbänke (Wörter-Level, früher „Truhen“)
-Menü-Bereiche: „Minen“ (die Level), „Craften“ (6 Werkbänke mit Wörtern), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird eine Truhe mit den erhaltenen Gegenständen gezeigt. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–24, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
+Menü-Bereiche: „Minen“ (die Level), „Craften“ (6 Werkbänke mit Wörtern), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird eine offene Truhe gezeigt, aus der die erhaltenen Gegenstände ragen (Zahl = Anzahl; Vorderwand liegt davor). Im Menü steht unter der Werkbank nur ein freier Platz für die Herzen, keine Buchstaben. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–24, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
 
 | Werkbank | Tasten | Freigeschaltet durch | Stand |
 |-------|--------|----------------------|-------|
 | 1 | A S D F + Umschalt | Level 2 | spielbar |
-| 2 | A S D F J K L Ö + linke Umschalt | Level 3 | spielbar (10 Wörter einmal, 42 Buchstaben) |
-| 3 | + G H | Level 4 | spielbar (10 Wörter einmal, 42 Buchstaben) |
+| 2 | A S D F J K L Ö + linke Umschalt | Level 3 | spielbar (kurz: 5–6 Wörter einmal, ca. 20 Buchstaben) |
+| 3 | + G H | Level 4 | spielbar (kurz: 5–6 Wörter einmal, ca. 20 Buchstaben) |
 | 4–6 | offen | – | noch gesperrt |
 
-Truhe 1: Beginn mit Einführung der Umschalt-Taste (Block „⇧“, Fenster „Neue Taste freigeschaltet“). Danach 16 Wörter (`CHEST1_WORDS`, jedes zweimal, zufällig), 50 Buchstaben, Herzen und Smaragde wie bei Leveln. Alle Anfangsbuchstaben sind groß: Kohleblock = Großbuchstabe (Umschalt gedrückt halten), Steinblock = Kleinbuchstabe. Oben steht das Wort, der aktuelle Buchstabe ist gelb. Umschalt steht rechts neben dem rechten Arm (Zeile der Leertaste) und wird vom rechten kleinen Finger bedient.
+Truhe 1: Beginn mit Einführung der Umschalt-Taste (Block „⇧“, Fenster „Neue Taste freigeschaltet“). Danach 6 Wörter (`CHEST1_WORDS`, je einmal, zufällig), 19 Buchstaben, Herzen und Smaragde wie bei Leveln. Alle Anfangsbuchstaben sind groß: Kohleblock = Großbuchstabe (Umschalt gedrückt halten), Steinblock = Kleinbuchstabe. Oben steht das Wort, der aktuelle Buchstabe ist gelb. Umschalt steht rechts neben dem rechten Arm (Zeile der Leertaste) und wird vom rechten kleinen Finger bedient.
 
 Umschalt: Großbuchstaben tippt man mit der Umschalt der **anderen** Hand. Rechte Umschalt (`shift`, rechter kleiner Finger) für Buchstaben der linken Hand, linke Umschalt (`shiftl`, linker kleiner Finger, links neben Y) für Buchstaben der rechten Hand (`shiftFor(k)`). Akzeptiert wird jede Umschalt-Taste, hervorgehoben wird die passende. Truhe 2 führt die linke Umschalt ein (`newShift`), Truhe 3 hat keine Einführung und startet gleich mit den Wörtern. `rounds` = wie oft jedes Wort vorkommt.
 
