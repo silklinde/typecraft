@@ -265,10 +265,17 @@
   .citem.lock{background:#2a2a2a;box-shadow:inset 0 0 0 3px #3a3a3a;opacity:.6;}
   .citem.lock svg{filter:grayscale(1) brightness(.4);}
   .citem.lock .t{color:#aaa;font-size:16px;}
-  .lootrow{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:10px 0;}
-  .lootitem{display:flex;flex-direction:column;align-items:center;font-size:22px;line-height:1.1;}
-  .lootitem svg{width:44px;height:44px;image-rendering:pixelated;}
-  .lootitem b{font-weight:normal;color:#ffd166;font-size:18px;}
+  /* Modal am Ende einer Werkbank: offene Truhe, die Gegenstände ragen hinten heraus, die Vorderwand liegt davor */
+  .lootchest{position:relative;width:300px;margin:0 auto 4px;}
+  .lootchest svg.ch{width:100%;height:auto;display:block;image-rendering:pixelated;}
+  .lootchest .front{position:absolute;left:0;top:0;clip-path:inset(60% 0 0 0);}
+  .lootchest .stuff{position:absolute;left:9%;right:9%;bottom:40%;display:flex;justify-content:center;align-items:flex-end;}
+  .lootchest .stuff .li{position:relative;width:40px;height:40px;flex:none;margin:0;animation:lootup .5s ease-out backwards;}
+  .lootchest .stuff .li svg{width:40px;height:40px;image-rendering:pixelated;display:block;}
+  .lootchest .stuff .li i{position:absolute;right:-2px;bottom:-4px;font-style:normal;font-size:22px;line-height:1;color:#fff;text-shadow:2px 2px 0 #000;}
+  @keyframes lootup{from{translate:0 40px;opacity:0}to{translate:0 0;opacity:1}}
+  .lootrow{display:flex;justify-content:center;gap:4px 18px;flex-wrap:wrap;margin:6px 0 10px;font-size:22px;line-height:1.1;}
+  .lootrow b{font-weight:normal;color:#ffd166;font-size:18px;margin-left:4px;}
   .ikey.shift{box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);}
   .ikey.nudge{animation:nudge .3s;}
   @keyframes nudge{0%,100%{translate:0 0}25%{translate:-5px 0}75%{translate:5px 0}}
@@ -432,9 +439,9 @@ const HAENDE_SEQ = ['f', 'j', 'd', 's', 'a', 'k', 'l', 'ö', ' '];
 // Kurze Fingernamen für Hände auflegen (die Seite sieht man an der Hand)
 const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeigefinger',
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
-const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Dada','Fass','As'];
-const CHEST2_WORDS = ['Ja','Öl','Fall','Falls','Kalk','Lass','Salsa','Kajak','Alaska','Jaffa'];
-const CHEST3_WORDS = ['Glas','Hals','Hass','Saga','Jagd','Kahl','Gala','Ölfass','Gaga','Hall'];
+const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Fass'];
+const CHEST2_WORDS = ['Ja','Öl','Fall','Kalk','Lass','Salsa'];
+const CHEST3_WORDS = ['Glas','Hals','Saga','Jagd','Kahl'];
 const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
@@ -482,7 +489,7 @@ const LEVELS = [
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
   {chest:true, name:'Werkbank 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:2, ready:true,
-   words:CHEST1_WORDS, rounds:2, target:wordsLen(CHEST1_WORDS, 2)},
+   words:CHEST1_WORDS, rounds:1, target:wordsLen(CHEST1_WORDS, 1)},
   {chest:true, name:'Werkbank 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:3, ready:true,
    words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
   {chest:true, name:'Werkbank 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
@@ -711,6 +718,13 @@ const ITEM_ART = {
   ],
   lantern: ['......dddddd....', '.....d......d...', '....dddddddddd..', '...dkkkkkkkkkkd.', '...dkyyyyyyyykd.', '...dkyooYYooykd.', '...dkyooYYooykd.', '...dkyyyyyyyykd.', '...dkkkkkkkkkkd.', '....dddddddddd..'],
   cauldron: ['dkd..........dkd', 'dkkddddddddddkkd', 'dkkwwwwwwwwwwkkd', 'dkkkkkkkkkkkkkkd', 'dkkkkkkkkkkkkkkd', 'dkkkkkkkkkkkkkkd', '.dkkkkkkkkkkkkd.', '.dkkkkkkkkkkkkd.', '.ddd........ddd.'],
+  door: ['....dddddddd....', '....dbbbbbbd....', '....dbllllbd....', '....dbllllbd....', '....dbbbbbbd....', '....dbllllbd....', '....dbllllbd....', '....dbbbbkbd....', '....dbbbbbbd....', '....dbllllbd....', '....dbllllbd....', '....dbbbbbbd....', '....dddddddd....'],
+  ladder: ['....dbbbbbbd....', '....db....bd....', '....db....bd....', '....dbbbbbbd....', '....db....bd....', '....db....bd....', '....dbbbbbbd....', '....db....bd....', '....db....bd....', '....dbbbbbbd....', '....db....bd....', '....dbbbbbbd....'],
+  fence: ['.db....db....db.', '.db....db....db.', '.db....db....db.', '.dbBBBBdbBBBBdb.', '.dbbbbbdbbbbbdb.', '.db....db....db.', '.db....db....db.', '.db....db....db.', '.dbBBBBdbBBBBdb.', '.dbbbbbdbbbbbdb.', '.db....db....db.', '.db....db....db.'],
+  wall: ['..dddddddddddd..', '..dsssdsssssdd..', '..dstsdsttssdd..', '..dsssdsssssdd..', '..dddsssdddddd..', '..dsssstsdsssd..', '..dsssssddsttd..', '..dddddddddddd..'],
+  lever: ['.......rr.......', '......rRr.......', '......bb........', '.....bb.........', '....bb..........', '..dddddddddddd..', '..dssssssssssd..', '..dddddddddddd..'],
+  bars: ['.dkdkdkdkdkdkd..', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '.dkdkdkdkdkdkd..'],
+  hopper: ['dddddddddddddddd', 'dkkkkkkkkkkkkkkd', 'dkddddddddddddkd', '.dkkkkkkkkkkkkd.', '..dkkkkkkkkkkd..', '...dkkkkkkkkd...', '....dkkkkkkd....', '.....dkkkkd.....', '.....dkkkkd.....', '.....dkkkkd.....', '.....dddddd.....'],
   anvil: ['dddddddddddddddd','dllllllllllllkkd','dkkkkkkkkkkkkkkd','.dddkkkkkkkkddd.','.....dkkkkd.....','.....dkkkkd.....','....dkkkkkkd....','...dkkkkkkkkd...','...dddddddddd...'],
   jukebox: ['dddddddddddddddd','dlllllllllllllld','dlbbbbddddbbbbld','dlbbbddccddbbbld','dlbbbddccddbbbld','dlbbbbddddbbbbld','dlllllllllllllld','dbbbbbbbbbbbbbbd','dbbmbbbbbbbbmbbd','dbbbbbbbbbbbbbbd','dddddddddddddddd'],
   enchant: ['..cc........cc..', '..cc........cc..', 'rrrrrrrrrrrrrrrr', 'rRrrrrrrrrrrrrRr', 'dddddddddddddddd', 'dddddddddddddddd', 'doopoooooooopood', 'dooooooooooooood', 'dooooooooooooood', 'dddddddddddddddd'],
@@ -721,12 +735,20 @@ const BENCH_PAL = {d:'#2a170a', l:'#c08a4a', b:'#9a6a30', m:'#6f4a20', g:'#d8d8d
 const CRAFT = [
   // Einrichtung und Funktionsblöcke: Holzspitzhacke (Holz, Stein, Kohle)
   {id:'bett',     name:'Bett',         ore:'wood',     tier:0, art:'bed',     pal:{d:'#2a170a', w:'#f2f2f2', r:'#c62828', R:'#e04848', b:'#9a6a30'}},
+  {id:'holztuer', name:'Holztür', ore:'wood', tier:0, art:'door', pal:{d:'#2a170a', l:'#c08a4a', b:'#9a6a30', B:'#7a5222', k:'#1a1208', m:'#6f4a20'}},
+  {id:'leiter', name:'Leiter', ore:'wood', tier:0, art:'ladder', pal:{d:'#2a170a', l:'#c08a4a', b:'#9a6a30', B:'#7a5222', k:'#1a1208', m:'#6f4a20'}},
+  {id:'zaun', name:'Zaun', ore:'wood', tier:0, art:'fence', pal:{d:'#2a170a', l:'#c08a4a', b:'#9a6a30', B:'#7a5222', k:'#1a1208', m:'#6f4a20'}},
   {id:'ofen',     name:'Ofen',         ore:'stone',    tier:0, art:'furnace', pal:{t:'#a8a8a8', s:'#8a8a8a', u:'#6e6e6e', d:'#3a3a3a', k:'#1a1a1a', f:'#f08a1c'}},
+  {id:'mauer', name:'Bruchsteinmauer', ore:'stone', tier:0, art:'wall', pal:{d:'#2b2b2b', s:'#8a8a8a', t:'#a8a8a8', b:'#9a6a30', r:'#c62828', R:'#e04848'}},
+  {id:'hebel', name:'Hebel', ore:'stone', tier:0, art:'lever', pal:{d:'#2b2b2b', s:'#8a8a8a', t:'#a8a8a8', b:'#9a6a30', r:'#c62828', R:'#e04848'}},
   {id:'fackel',   name:'Fackel',       ore:'coal',     tier:0, art:'torch',   pal:{o:'#f08a1c', y:'#ffe14a', k:'#2b2b2b', b:'#8a5f2c', B:'#a8793a', d:'#6e4a22'}},
   // Steinspitzhacke: Eisen
   {id:'laterne',  name:'Laterne',      ore:'iron',     tier:1, art:'lantern', pal:{d:'#222222', k:'#555555', y:'#ffe14a', o:'#f08a1c', Y:'#fff7b0'}},
   {id:'kessel',   name:'Kessel',       ore:'iron',     tier:1, art:'cauldron',pal:{d:'#222222', k:'#4a4a4a', w:'#3a6fe0'}},
   {id:'amboss',   name:'Amboss',       ore:'iron',     tier:1, art:'anvil',   pal:{d:'#1a1a1a', k:'#4a4a4a', l:'#7a7a7a'}},
+  {id:'eisentuer', name:'Eisentür', ore:'iron', tier:1, art:'door', pal:{d:'#222222', l:'#cfcfcf', b:'#9a9a9a', k:'#444444'}},
+  {id:'gitter', name:'Eisengitter', ore:'iron', tier:1, art:'bars', pal:{d:'#222222', l:'#cfcfcf', b:'#9a9a9a', k:'#444444'}},
+  {id:'trichter', name:'Trichter', ore:'iron', tier:1, art:'hopper', pal:{d:'#222222', k:'#5a5a5a'}},
   // Eisenspitzhacke: Diamant
   {id:'zauber',   name:'Zaubertisch',  ore:'diamond',  tier:2, art:'enchant', pal:{c:'#33ebcb', r:'#b01818', R:'#e04040', d:'#14091f', o:'#1b1030', p:'#5a3a8a'}},
   {id:'plattens', name:'Plattenspieler',ore:'diamond', tier:2, art:'jukebox', pal:{d:'#2a170a', l:'#c08a4a', b:'#9a6a30', m:'#6f4a20', c:'#33ebcb'}},
@@ -1174,9 +1196,10 @@ function chestSeq(L){
   let prev = null;
   return words.map(w => {
     const opts = avail.filter(it => it !== prev || avail.length === 1);
-    const total = opts.reduce((n, it) => n + 1 + 2 * it.tier, 0);
+    const wt = it => (1 + 2 * it.tier) / opts.filter(o => o.tier === it.tier).length;
+    const total = opts.reduce((n, it) => n + wt(it), 0);
     let r = Math.random() * total, item = opts[opts.length - 1];
-    for (const it of opts) { r -= 1 + 2 * it.tier; if (r < 0) { item = it; break; } }
+    for (const it of opts) { r -= wt(it); if (r < 0) { item = it; break; } }
     prev = item;
     return {w, item};
   });
@@ -1677,9 +1700,10 @@ function finish(){
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
-  const loot = L.chest ? CRAFT.filter(it => run.got[it.id]).map(it =>
-    `<div class="lootitem">${itemSVG(it)}<span>${it.name} × ${run.got[it.id]}</span>${run.newIds.includes(it.id) ? '<b>neu!</b>' : ''}</div>`).join('') : '';
-  const chestImg = L.chest ? `<div style="width:120px;margin:0 auto 6px;">${chestSVG(stars > 0 ? 'open' : 'closed')}</div><div class="lootrow">${loot || 'Die Truhe ist noch leer.'}</div>` : '';
+  const got = L.chest ? CRAFT.filter(it => run.got[it.id]) : [];
+  const names = got.map(it => `<span>${it.name} × ${run.got[it.id]}${run.newIds.includes(it.id) ? '<b>neu!</b>' : ''}</span>`).join('');
+  const stuff = got.map((it, i) => `<div class="li" style="animation-delay:${.15 * i}s">${itemSVG(it)}${run.got[it.id] > 1 ? `<i>${run.got[it.id]}</i>` : ''}</div>`).join('');
+  const chestImg = L.chest ? `<div class="lootchest">${chestSVG('open')}<div class="stuff">${stuff}</div>${chestSVG('open').replace('class="ch"', 'class="ch front"')}</div><div class="lootrow">${names || 'Die Truhe ist noch leer.'}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
