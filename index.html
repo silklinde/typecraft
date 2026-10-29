@@ -725,6 +725,7 @@ const ITEM_ART = {
   lever: ['.......rr.......', '......rRr.......', '......bb........', '.....bb.........', '....bb..........', '..dddddddddddd..', '..dssssssssssd..', '..dddddddddddd..'],
   bars: ['.dkdkdkdkdkdkd..', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '..k.k.k.k.k.k...', '.dkdkdkdkdkdkd..'],
   hopper: ['dddddddddddddddd', 'dkkkkkkkkkkkkkkd', 'dkddddddddddddkd', '.dkkkkkkkkkkkkd.', '..dkkkkkkkkkkd..', '...dkkkkkkkkd...', '....dkkkkkkd....', '.....dkkkkd.....', '.....dkkkkd.....', '.....dkkkkd.....', '.....dddddd.....'],
+  plate: ['................', '................', '................', '................', '.dddddddddddddd.', '.dyyyyyyyyyyyyd.', '.dyllllllllllyd.', '.dyyyyyyyyyyyyd.', '..dddddddddddd..', '................'],
   anvil: ['dddddddddddddddd','dllllllllllllkkd','dkkkkkkkkkkkkkkd','.dddkkkkkkkkddd.','.....dkkkkd.....','.....dkkkkd.....','....dkkkkkkd....','...dkkkkkkkkd...','...dddddddddd...'],
   jukebox: ['dddddddddddddddd','dlllllllllllllld','dlbbbbddddbbbbld','dlbbbddccddbbbld','dlbbbddccddbbbld','dlbbbbddddbbbbld','dlllllllllllllld','dbbbbbbbbbbbbbbd','dbbmbbbbbbbbmbbd','dbbbbbbbbbbbbbbd','dddddddddddddddd'],
   enchant: ['..cc........cc..', '..cc........cc..', 'rrrrrrrrrrrrrrrr', 'rRrrrrrrrrrrrrRr', 'dddddddddddddddd', 'dddddddddddddddd', 'doopoooooooopood', 'dooooooooooooood', 'dooooooooooooood', 'dddddddddddddddd'],
@@ -749,7 +750,13 @@ const CRAFT = [
   {id:'eisentuer', name:'Eisentür', ore:'iron', tier:1, art:'door', pal:{d:'#222222', l:'#cfcfcf', b:'#9a9a9a', k:'#444444'}},
   {id:'gitter', name:'Eisengitter', ore:'iron', tier:1, art:'bars', pal:{d:'#222222', l:'#cfcfcf', b:'#9a9a9a', k:'#444444'}},
   {id:'trichter', name:'Trichter', ore:'iron', tier:1, art:'hopper', pal:{d:'#222222', k:'#5a5a5a'}},
-  // Eisenspitzhacke: Diamant
+  {id:'kupfergitter', name:'Kupfergitter', ore:'copper', tier:1, art:'bars', pal:{d:'#6a3a1e', l:'#f0a070', b:'#c8774a', k:'#c8774a'}},
+  {id:'kupferlaterne', name:'Kupferlaterne', ore:'copper', tier:1, art:'lantern', pal:{d:'#4a2a14', k:'#c8774a', y:'#ffe14a', o:'#f08a1c', Y:'#fff7b0'}},
+  {id:'kupfertruhe', name:'Kupfertruhe', ore:'copper', tier:1, art:'chest', pal:{d:'#4a2a14', l:'#e0905c', b:'#c8774a', m:'#9a5a38', g:'#d8d8d8', k:'#1a1208', y:'#f5d33b', e:'#41ea7a', s:'#8d8d8d', o:'#c9a227'}},
+  {id:'kupferfackel', name:'Kupferfackel', ore:'copper', tier:1, art:'torch', pal:{o:'#f08a1c', y:'#ffe14a', k:'#2b2b2b', b:'#c8774a', B:'#f0a070', d:'#6a3a1e'}},
+  // Eisenspitzhacke: Gold, Redstone, Diamant
+  {id:'feinwaege', name:'Feinwägeplatte', ore:'gold', tier:2, art:'plate', pal:{d:'#6a4a00', y:'#f5d33b', l:'#fff08a'}},
+  {id:'rsfackel', name:'Redstone-Fackel', ore:'redstone', tier:2, art:'torch', pal:{o:'#8a1010', y:'#ff4040', k:'#2b2b2b', b:'#8a5f2c', B:'#a8793a', d:'#6e4a22'}},
   {id:'zauber',   name:'Zaubertisch',  ore:'diamond',  tier:2, art:'enchant', pal:{c:'#33ebcb', r:'#b01818', R:'#e04040', d:'#14091f', o:'#1b1030', p:'#5a3a8a'}},
   {id:'plattens', name:'Plattenspieler',ore:'diamond', tier:2, art:'jukebox', pal:{d:'#2a170a', l:'#c08a4a', b:'#9a6a30', m:'#6f4a20', c:'#33ebcb'}},
   // Diamantspitzhacke: Obsidian

@@ -88,8 +88,8 @@ Gecraftet werden nur Gegenstände der Kategorie Dekoration (https://de.minecraft
 | Spitzhacke | Material → Gegenstand |
 |---|---|
 | Holz | Holz → Bett, Holztür, Leiter, Zaun; Stein → Ofen, Bruchsteinmauer, Hebel; Kohle → Fackel |
-| Stein | Eisen → Laterne, Kessel, Amboss, Eisentür, Eisengitter, Trichter |
-| Eisen | Diamant → Zaubertisch, Plattenspieler |
+| Stein | Eisen → Laterne, Kessel, Amboss, Eisentür, Eisengitter, Trichter; Kupfer → Kupfergitter, Kupferlaterne, Kupfertruhe, Kupferfackel |
+| Eisen | Gold → Feinwägeplatte; Redstone → Redstone-Fackel; Diamant → Zaubertisch, Plattenspieler |
 | Diamant | Obsidian → Endertruhe |
 
 Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Inventar“ gecraftete Gegenstände mit Namen und Anzahl; alles, was noch nicht gecraftet wurde, ist nur ein leerer grauer Inventar-Slot (ohne Namen). Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.
