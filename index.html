@@ -29,10 +29,11 @@
   #pMinen{grid-column:1;grid-row:1;}
   #pCraften{grid-column:2;grid-row:1;}
   #dock{grid-column:1 / -1;grid-row:2;display:flex;gap:16px;margin:6px 0;}
-  #dock .chest{width:200px;padding:14px 8px 12px;}
+  #dock .chest{width:160px;padding:4px;background:none;border:none;box-shadow:none;gap:8px;}
+  #dock .chest .cname{font-size:30px;}
   #dock .chest .cimg{width:128px;height:100px;align-items:center;}
   #dock .chest .cimg svg.ch{width:128px;}
-  #dock .chest .cimg svg.emsvg{width:88px;height:88px;}
+  #dock .chest .cimg svg.emsvg{width:112px;height:112px;}
   #overlay .box.wide{width:min(760px,94vw);}
   #overlay .box.wide .minner{max-height:68vh;overflow:auto;}
   #overlay .box .g5{gap:8px;}
@@ -326,8 +327,8 @@
       <div class="g5" id="chests"></div>
     </div>
     <div id="dock">
-      <button class="chest" id="btnInv"><div class="cimg"></div><div class="cname">Inventar</div><div class="csub"></div></button>
-      <button class="chest" id="btnShop"><div class="cimg"></div><div class="cname">Shop</div><div class="csub"></div></button>
+      <button class="chest" id="btnInv"><div class="cname">Inventar</div><div class="cimg"></div></button>
+      <button class="chest" id="btnShop"><div class="cname">Shop</div><div class="cimg"></div></button>
     </div>
   </div>
 
@@ -842,8 +843,6 @@ function renderMenu(){
 
   document.querySelector('#btnInv .cimg').innerHTML = chestSVG('closed');
   document.querySelector('#btnShop .cimg').innerHTML = emeraldSVG(88);
-  const owned = CRAFT.filter(it => st.items[it.id]).length;
-  document.querySelector('#btnInv .csub').textContent = `${owned} / ${CRAFT.length}`;
   document.getElementById('btnInv').onclick = openInventory;
   document.getElementById('btnShop').onclick = openShop;
 }
