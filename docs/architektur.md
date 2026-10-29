@@ -1,3 +1,6 @@
+
+## Geräteprüfung
+`geraetPruefen()` zeigt `#geraet`, wenn `(pointer: coarse)` und `(hover: none)` zutreffen und noch keine echte Taste kam (`hatTastatur`), oder wenn das Fenster kleiner als `MIN_W`×`MIN_H` (1000×600) ist. Aufruf beim Start, bei `resize` und beim ersten `keydown`. Die Klasse `geraet-an` am `<html>` blendet das Spiel dahinter aus; Spielstand und Phasen bleiben unverändert.
 # Architektur von index.html
 
 Eine Datei: `<style>` (CSS), HTML-Gerüst (Menü `#menu`, Spiel `#game`, Modal `#overlay`) und ein `<script>` ohne Bibliotheken. Zeichnen per DOM und CSS, Spielschleife per `requestAnimationFrame` (`tick`).

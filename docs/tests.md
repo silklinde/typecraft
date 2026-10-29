@@ -1,3 +1,6 @@
+
+## Geräteprüfung
+Viewports 1440×900 bis 1000×600: kein Hinweis. 900×600 und 800×500: Hinweis. Mobil-Emulation (`is_mobile=True`, `has_touch=True`, 390×844): Hinweis „Typecraft braucht einen Computer mit Tastatur.“ Fenster zur Laufzeit verkleinern und vergrößern: Hinweis erscheint und verschwindet wieder.
 # Tests
 
 Es gibt keine automatisierten Unit-Tests. Geprüft wird im echten Browser mit Playwright (in der Cloud-Umgebung ist Chromium vorinstalliert, `from playwright.sync_api import sync_playwright`, nicht neu installieren).

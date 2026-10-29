@@ -7,6 +7,7 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 - 18 Level (Level 0 Hände auflegen, Level 1 Grundhaltung, Level 2–17): Grundreihe, obere Reihe, untere Reihe, mit Spitzhacken-Belohnungen Holz, Stein, Eisen, Diamant.
 - Noch nicht umgesetzt: Skins, weitere Haustiere und Biome, Zahlenreihe, Umschalttaste, Ä. Die Roadmap wird nicht im Repo gepflegt, sondern im Projekt.
 - Lokal getestet nur mit Chromium/Playwright (siehe `docs/tests.md`). Ein Test auf echten Geräten und Fenstergrößen steht aus.
+- Geräteprüfung: Bei reinen Touch-Geräten (ohne erkannte Taste) oder Fenstern kleiner als 1000×600 deckt ein Hinweis das Spiel ab (`geraetPruefen()`, `MIN_W`/`MIN_H` in `index.html`). Der Spielstand bleibt unberührt.
 
 ## Wichtigste Regeln (vom Auftraggeber so entschieden)
 1. **Kein Zeit- oder Tempodruck.** Wichtig sind das Einprägen der Positionen durch Wiederholung und das schrittweise Erweitern der Tasten. Ab Level 1 steht immer nur **ein** Block ruhig da (er fällt nicht), er bleibt stehen, bis die Taste getippt ist.
