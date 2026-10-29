@@ -830,6 +830,15 @@ function renderMenu(){
     b.onclick = () => start(i);
     ch.appendChild(b);
   });
+  // Noch nicht gebaute Werkbänke bis 15: gesperrt, „Kommt bald“
+  for (let n = ch.children.length + 1; n <= 15; n++) {
+    const b = document.createElement('button');
+    b.className = 'chest';
+    b.disabled = true;
+    b.title = 'Kommt bald';
+    b.innerHTML = `<div class="cimg">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}${padlockSVG()}</div><div class="cname">Werkbank ${n}</div><div class="csub"></div>`;
+    ch.appendChild(b);
+  }
 
   document.querySelector('#btnInv .cimg').innerHTML = chestSVG('closed');
   document.querySelector('#btnShop .cimg').innerHTML = emeraldSVG(88);
