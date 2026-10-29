@@ -315,6 +315,17 @@
   .csent .sch{display:inline-block;min-width:.3em;border-bottom:3px solid transparent;}
   .csent .sch.done{color:#9be06f;}
   .csent .sch.now{border-bottom-color:#ffd166;color:#ffd166;}
+  /* Bauplatz: jeder getippte Buchstabe setzt einen Block, am Ende steht ein Haus (Satz-Werkbänke) */
+  #bau{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--cs) + 8px);--bs:calc(var(--cs)*.3);pointer-events:none;}
+  .bau-w{position:relative;}
+  .bau-gr{position:relative;margin:0 auto;}
+  .bau-gr.freu{animation:freu .35s ease-out;transform-origin:50% 100%;}
+  @keyframes freu{50%{transform:scale(1.08)}}
+  .bblk{position:absolute;width:var(--bs);height:var(--bs);background-size:100% 100%;image-rendering:pixelated;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
+  .bblk.neu{animation:bauen .25s ease-out;}
+  @keyframes bauen{from{transform:translateY(calc(var(--bs)*-1)) scale(.6);opacity:0}to{transform:none;opacity:1}}
+  .bground{height:calc(var(--bs)*.7);background-image:linear-gradient(#5fae35 0 40%,transparent 40%),var(--dirt);background-size:100% 100%,var(--bs) var(--bs);image-rendering:pixelated;}
+  .hausbild{--bs:16px;display:flex;justify-content:center;margin:4px auto 14px;}
   #craft{position:absolute;left:0;right:0;top:4px;height:var(--cs);display:flex;justify-content:center;align-items:center;gap:6px;}
   .cslot{position:relative;width:var(--cs);height:var(--cs);box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;
          display:flex;align-items:center;justify-content:center;font-size:calc(var(--cs)*.58);font-weight:bold;line-height:1;color:rgba(0,0,0,.3);
@@ -456,6 +467,16 @@ const keyOf = name => 'typecraft-user-' + name.toLowerCase();
   ])));
   r.setProperty('--stone', px(tex(8, 8, '#8a8a8a', [
     [1,1,2,2,'#7a7a7a'],[5,2,2,2,'#9c9c9c'],[3,5,3,2,'#7a7a7a'],[0,6,2,2,'#9c9c9c'],[6,6,2,2,'#7a7a7a']
+  ])));
+  // Bauplatz der Satz-Werkbänke: Dach, Glas und Tür
+  r.setProperty('--roof', px(tex(8, 8, '#a0402e', [
+    [0,0,8,1,'#7e3023'],[0,4,8,1,'#7e3023'],[3,1,1,3,'#7e3023'],[7,5,1,3,'#7e3023'],[1,2,2,1,'#b85a45']
+  ])));
+  r.setProperty('--glass', px(tex(8, 8, '#a9dcf0', [
+    [0,0,8,1,'#6fb0cf'],[0,7,8,1,'#6fb0cf'],[0,0,1,8,'#6fb0cf'],[7,0,1,8,'#6fb0cf'],[2,2,2,1,'#e6f7ff'],[2,3,1,1,'#e6f7ff']
+  ])));
+  r.setProperty('--door', px(tex(8, 8, '#6b4423', [
+    [0,0,1,8,'#4a2d14'],[7,0,1,8,'#4a2d14'],[3,0,2,8,'#7d5230'],[5,4,1,1,'#d9b44a']
   ])));
   r.setProperty('--iron', px(tex(8, 8, '#8a8a8a', [
     [0,3,1,2,'#7a7a7a'],[4,0,2,1,'#9c9c9c'],
@@ -1210,6 +1231,21 @@ function bellRing(){
   } catch(e){}
 }
 
+// Leiser Klick für jeden Buchstaben bei Sätzen: tief und kurz, damit schnelles Tippen nicht klingelt
+function klick(){
+  try {
+    const c = getCtx(), t = c.currentTime;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(260 * (0.92 + Math.random() * 0.16), t);
+    o.frequency.exponentialRampToValueAtTime(120, t + 0.04);
+    g.gain.setValueAtTime(0.05, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + 0.06);
+  } catch(e){}
+}
+
 function beep(freq){
   try {
     const c = getCtx();
@@ -1529,8 +1565,55 @@ function chestSeq(L){
     return {w, item};
   });
 }
+// ---------- Bauplatz (Satz-Werkbänke): jeder Buchstabe setzt einen Block, pro Werkbank entsteht ein Bauwerk ----------
+// W = Wand (Material je Werkbank), R = Dach, G = Glas, D = Tür; gebaut wird von unten nach oben
+const BAU_ART = {
+  haus: ['....R....', '...RRR...', '..RRRRR..', '.RRRRRRR.', 'RRRRRRRRR', '.WWWWWWW.', '.WGWDWGW.', '.WWWDWWW.'],
+  turm: ['W.W.W.W', 'WWWWWWW', '.WWWWW.', '.WGWGW.', '.WWWWW.', '.WWGWW.', '.WWWWW.', '.WWDWW.', '.WWDWW.'],
+  burg: ['W.W.W.W.W.W', 'WWWWWWWWWWW', 'WGWWWWWWWGW', 'WWWWWWWWWWW', 'WGWWWDWWWGW', 'WWWWWDWWWWW']
+};
+const BAU_TEX = {R:'roof', G:'glass', D:'door'};
+const BAU_LEVEL = [['haus', 'wood'], ['haus', 'stone'], ['turm', 'stone'], ['burg', 'stone'], ['haus', 'copper'], ['turm', 'iron'], ['burg', 'gold'], ['burg', 'diamond']];
+function bauPlan(){
+  const [art, wall] = BAU_LEVEL[LEVELS.slice(0, cur).filter(l => l.sentences).length] || BAU_LEVEL[0];
+  const rows = BAU_ART[art], plan = [];
+  for (let r = rows.length - 1; r >= 0; r--) [...rows[r]].forEach((ch, c) => { if (ch !== '.') plan.push({r, c, tex: ch === 'W' ? wall : BAU_TEX[ch]}); });
+  return {plan, cols: rows[0].length, rows: rows.length};
+}
+const bauBlock = (b, neu) => `<i class="bblk${neu ? ' neu' : ''}" style="left:calc(var(--bs)*${b.c});top:calc(var(--bs)*${b.r});background-image:var(--${b.tex})"></i>`;
+function bauHTML(bau, n){
+  return `<div class="bau-w" style="width:calc(var(--bs)*${bau.cols + 2})"><div class="bau-gr" style="width:calc(var(--bs)*${bau.cols});height:calc(var(--bs)*${bau.rows})">${bau.plan.slice(0, n).map(b => bauBlock(b)).join('')}</div><div class="bground"></div></div>`;
+}
+function bauStart(){
+  const lanes = document.getElementById('lanes');
+  if (!lanes) return;
+  run.bau = bauPlan(); run.built = 0;
+  const el = document.createElement('div');
+  el.id = 'bau';
+  el.innerHTML = bauHTML(run.bau, 0);
+  lanes.appendChild(el);
+  const chest = document.getElementById('cchest');
+  if (chest) chest.style.display = 'none';
+}
+// So viele Blöcke stehen, wie der Anteil der getippten Buchstaben es verlangt
+function bauSet(){
+  const gr = document.querySelector('#bau .bau-gr');
+  if (!gr || !run.bau) return;
+  const total = run.bau.plan.length;
+  const n = run.correct >= run.target ? total : Math.floor(run.correct / run.target * total);
+  while (run.built < n) gr.insertAdjacentHTML('beforeend', bauBlock(run.bau.plan[run.built++], true));
+}
+// Satz fertig: ein einziges helles Bling und das Bauwerk hüpft kurz
+function satzFertig(){
+  craftNow(-1);
+  run.crafted++;
+  setTimeout(xpPing, 80);
+  const gr = document.querySelector('#bau .bau-gr');
+  if (gr) { gr.classList.remove('freu'); void gr.offsetWidth; gr.classList.add('freu'); }
+}
 function chestStart(L){
   run.seq = chestSeq(L); run.wi = 0; run.ci = 0; run.got = {}; run.list = []; run.newIds = []; run.crafted = 0;
+  if (L.sentences) bauStart();
   renderChest();
   chestNext();
 }
@@ -1542,8 +1625,8 @@ function renderChest(){
 function craftBuild(w){
   const el = document.getElementById('craft');
   if (!el) return;
-  if (LEVELS[cur].sentences) {      // Satz: der ganze Satz als Text, getippte Zeichen werden hell
-    el.innerHTML = `<div class="csent">${w.split(/(?<= )/).map(wd => `<span class="sw">${[...wd].map(ch => `<span class="sch">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('')}</span>`).join('')}</div><div class="carrow">→</div><div class="cslot cres"></div>`;
+  if (LEVELS[cur].sentences) {      // Satz: der ganze Satz als Text, getippte Zeichen werden hell; gebaut wird auf dem Bauplatz
+    el.innerHTML = `<div class="csent">${w.split(/(?<= )/).map(wd => `<span class="sw">${[...wd].map(ch => `<span class="sch">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('')}</span>`).join('')}</div>`;
     return;
   }
   el.classList.add('words');
@@ -1697,18 +1780,20 @@ function chestKey(e, k){
     st.emeralds++;
     save(); topBar();
     pressKey(k);
+    if (L.sentences) klick();      // Sätze: nur ein leiser Klick pro Buchstabe, das Bling gibt es erst am Satzende
     mineBlock(b);
     bounce();
     updateGoal();
     const {w, item} = run.seq[run.wi];
     craftLetter(b, run.ci);
+    if (L.sentences) bauSet();
     run.ci++;
     const wordDone = run.ci >= w.length;
-    if (wordDone) craftDone(item);
+    if (wordDone) { if (L.sentences) satzFertig(); else craftDone(item); }
     if (run.correct >= run.target) { setExpected(null); finish(); return; }
     setExpected(null);
-    let delay = 450;
-    if (wordDone) { run.wi++; run.ci = 0; delay = 2900; }   // nach einem fertigen Wort: Gegenstand entsteht und wandert in die Truhe
+    let delay = L.sentences ? 50 : 450;   // Sätze: kaum Pause, damit schnelles Tippen nicht verschluckt wird
+    if (wordDone) { run.wi++; run.ci = 0; delay = L.sentences ? 700 : 2900; }   // nach einem fertigen Wort: Gegenstand entsteht und wandert in die Truhe
     pendingTimer = setTimeout(chestNext, delay);
   } else {
     const before = starsFor(run.wrong, run.target, maxHearts(LEVELS[cur]));
@@ -1843,7 +1928,7 @@ const CRUMB_COLORS = {wood:['#a8793a','#8a5f2c','#c9985a'], dirt:['#7a5230','#5e
 // Abbau wie in Minecraft: Risse wachsen, der Block wackelt, Krümel springen ab, dann zerplatzt er
 function mineBlock(b){
   const el = b.el, lanes = document.getElementById('lanes') || el.parentNode;
-  if (el.classList.contains('sch')) { setTimeout(() => { xpPing(); burst(b, lanes); }, 150); return; }   // Satz: Krümel am Buchstaben
+  if (el.classList.contains('sch')) { setTimeout(() => burst(b, lanes), 150); return; }   // Satz: Krümel am Buchstaben, ohne Bling
   const word = el.classList.contains('cb');
   const crack = document.createElement('div');
   crack.className = 'crack';
@@ -2063,7 +2148,7 @@ function finish(){
     ? `<div class="reward rcard"><div class="cimg" style="width:64px;margin:0 auto;">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="rw-title">${LEVELS[newBench].name} freigeschaltet!</div><div class="benchbtn"></div></div>` : '';
   const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '') + `<div class="rcards">${benchCard}${nextCard}</div>`;
   const slots = Array.from({length: 9}, (_, i) => `<div class="lootslot">${run.list && run.list[i] ? itemSVG(run.list[i]).replace('<svg ', `<svg style="animation-delay:${.12 * i}s" `) : ''}</div>`).join('');
-  const chestImg = L.chest ? `<div class="lootgrid">${slots}</div>` : '';
+  const chestImg = L.sentences && run.bau ? `<div class="hausbild">${bauHTML(run.bau, run.bau.plan.length)}</div>` : L.chest ? `<div class="lootgrid">${slots}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn quiet'; retry.textContent = 'Nochmal';
