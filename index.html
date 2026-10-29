@@ -1753,9 +1753,11 @@ function finish(){
   const L = LEVELS[cur];
   const bud = starBudget(run.target);
   const stars = L.intro ? 3 : starsFor(run.wrong, run.target);
+  const wasOpen = LEVELS.map((_, i) => unlocked(i));
   st.stars[cur] = Math.max(st.stars[cur] || 0, stars);
   if (stars > 0) st.emeralds += 3;
   save();
+  const newBench = LEVELS.findIndex((B, i) => B.chest && B.ready && !wasOpen[i] && unlocked(i));
 
   const box = document.getElementById('overlayBox');
   box.className = 'box';
@@ -1767,7 +1769,8 @@ function finish(){
   const msg = stars > 0
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
-  const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
+  const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '')
+    + (newBench >= 0 ? `<div class="reward"><div class="cimg" style="width:64px;margin:0 auto;">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="rw-title">${LEVELS[newBench].name} freigeschaltet!</div></div>` : '');
   const slots = Array.from({length: 9}, (_, i) => `<div class="lootslot">${run.list && run.list[i] ? itemSVG(run.list[i]).replace('<svg ', `<svg style="animation-delay:${.12 * i}s" `) : ''}</div>`).join('');
   const chestImg = L.chest ? `<div class="lootgrid">${slots}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
@@ -1777,6 +1780,11 @@ function finish(){
   const menu = document.createElement('button'); menu.className = 'btn'; menu.textContent = 'Menü';
   menu.onclick = () => { hideOverlay(); renderMenu(); };
   btns.appendChild(retry); btns.appendChild(menu);
+  if (newBench >= 0) {
+    const bb = document.createElement('button'); bb.className = 'btn green'; bb.textContent = 'Werkbank öffnen';
+    bb.onclick = () => { hideOverlay(); start(newBench); };
+    btns.appendChild(bb);
+  }
   if (next) {
     const nb = document.createElement('button'); nb.className = 'btn green'; nb.textContent = 'Weiter';
     nb.onclick = () => { hideOverlay(); start(cur + 1); };
