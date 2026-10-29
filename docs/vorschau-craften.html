@@ -1,61 +1,51 @@
 <!DOCTYPE html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Typecraft – Vorschau Craften (Block-Leiste)</title>
+<title>Typecraft – Vorschau Craften (Wort links, Werkbank rechts)</title>
 <style>
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#1d1d1d;color:#fff;}
-#app{padding:12px 16px;max-width:1100px;margin:0 auto;}
+#app{padding:12px 16px;max-width:1200px;margin:0 auto;}
 .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
 .bar span{opacity:.8;font-size:14px;}
 .btn{background:#5a5a5a;color:#fff;border:3px solid #000;border-radius:4px;padding:8px 12px;font-size:15px;font-weight:bold;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35);}
-.btn.on{background:#4caf50;}
-#frame{position:relative;height:660px;border:4px solid #000;border-radius:4px;overflow:hidden;background:linear-gradient(#7ec8ff 0%,#a8e6a1 62%,#3c7d2e 100%);}
-/* Schwarzer Kopfbereich wie im Spiel */
-#top{position:absolute;left:0;right:0;top:0;height:230px;background:#111;border-bottom:4px solid #000;}
-#title{position:absolute;top:10px;left:0;right:0;text-align:center;font-size:15px;letter-spacing:.5px;color:#cfcfcf;text-shadow:2px 2px 0 #000;}
+#frame{position:relative;height:520px;border:4px solid #000;border-radius:4px;overflow:hidden;background:linear-gradient(#7ec8ff 0%,#a8e6a1 62%,#3c7d2e 100%);}
+#top{position:absolute;left:0;right:0;top:0;height:300px;background:#111;border-bottom:4px solid #000;display:grid;grid-template-columns:1fr 1px 360px;align-items:center;}
+#title{position:absolute;top:10px;left:0;right:0;text-align:center;font-size:15px;color:#cfcfcf;text-shadow:2px 2px 0 #000;}
 #title b{color:#ffd166;}
+#div{height:200px;background:#333;}
 
-/* ===== Block-Leiste ===== */
-#band{--s:76px;position:absolute;left:0;right:0;top:48px;height:150px;display:flex;justify-content:center;align-items:center;gap:10px;}
+/* ===== links: das Wort ===== */
+#band{--s:70px;display:flex;justify-content:center;align-items:center;gap:12px;padding-top:30px;}
 .cb{position:relative;width:var(--s);height:var(--s);box-sizing:border-box;border:3px solid #000;display:flex;align-items:center;justify-content:center;
-    font-weight:bold;font-size:34px;color:#fff;text-shadow:2px 2px 0 #000;transition:transform .25s,opacity .25s,filter .25s;
+    font-weight:bold;font-size:32px;color:#fff;text-shadow:2px 2px 0 #000;transition:transform .25s,filter .25s,opacity .25s;background-color:#a87a3c;
     box-shadow:inset -5px -5px 0 rgba(0,0,0,.3),inset 5px 5px 0 rgba(255,255,255,.18);
     background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.12) 0 4px,transparent 4px 12px),repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0 4px,transparent 4px 16px);}
-.mat-holz .cb{background-color:#a87a3c;} .mat-stein .cb{background-color:#7d7d7d;} .mat-eisen .cb{background-color:#c9b8a8;}
-/* kommende Blöcke: ruhig, etwas kleiner */
-.cb.next{transform:scale(.88);filter:brightness(.8);}
-/* aktueller Block: größer, gelber Rahmen, schwebender Pfeil, Fingername */
-.cb.now{transform:scale(1.22);z-index:2;outline:4px solid #ffd166;box-shadow:inset -5px -5px 0 rgba(0,0,0,.3),inset 5px 5px 0 rgba(255,255,255,.25),0 0 22px 4px rgba(255,209,102,.6);}
-.cb.now::before{content:"";position:absolute;top:-30px;left:50%;margin-left:-9px;border:9px solid transparent;border-top:12px solid #ffd166;animation:bob 1s ease-in-out infinite;}
-.cb.now::after{content:attr(data-finger);position:absolute;bottom:-34px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:13px;color:#ffd166;background:#000;padding:2px 8px;border-radius:3px;text-shadow:none;}
-@keyframes bob{50%{transform:translateY(5px);}}
-/* erledigte Blöcke: bleiben an ihrem Platz, werden zum leeren Slot mit Haken */
-.cb.done{background-image:none;background-color:#8b8b8b;border-color:#373737 #fff #fff #373737;box-shadow:none;transform:scale(.8);color:#4caf50;font-size:30px;}
-.cb.done::before{content:"\2713";}
-.cb.done span{display:none;}
+.cb.next{filter:brightness(.8);}
+.cb.now{transform:scale(1.2);z-index:2;outline:4px solid #ffd166;box-shadow:inset -5px -5px 0 rgba(0,0,0,.3),inset 5px 5px 0 rgba(255,255,255,.25),0 0 22px 4px rgba(255,209,102,.55);}
+.cb.now::before{content:"";position:absolute;top:-32px;left:50%;margin-left:-10px;border:10px solid transparent;border-top:13px solid #ffd166;animation:bob 1s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(6px);}}
+/* Block ist in die Werkbank gewandert: Platz bleibt als leere Mulde */
+.cb.gone{background:rgba(255,255,255,.06);background-image:none;border:3px dashed #444;box-shadow:none;color:transparent;text-shadow:none;transform:scale(.85);}
 
-/* ===== Ansicht „Erledigt“ (Werkbank) ===== */
-#bench{position:absolute;left:50%;margin-left:-125px;top:250px;width:230px;display:none;background:#c6c6c6;border:4px solid #000;border-radius:4px;padding:10px;color:#3f3f3f;
-       box-shadow:inset 3px 3px 0 #fff,inset -3px -3px 0 #8b8b8b;z-index:5;}
-#bench.open{display:block;animation:pop .25s ease-out;}
-@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
-#bench h4{margin:0 0 8px;font-size:14px;text-shadow:none;}
-.bg{display:grid;grid-template-columns:repeat(3,44px);gap:3px;}
-.sl{width:44px;height:44px;box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;color:#fff;text-shadow:2px 2px 0 #000;}
-.sl.full{border-color:#000;box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),inset 3px 3px 0 rgba(255,255,255,.2);}
-.mat-holz .sl.full{background:#a87a3c;} .mat-stein .sl.full{background:#7d7d7d;} .mat-eisen .sl.full{background:#c9b8a8;}
-.brow{display:flex;align-items:center;gap:10px;}
-.arrow{font-size:28px;color:#555;}
-.res{width:56px;height:56px;box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;display:flex;align-items:center;justify-content:center;font-size:30px;}
-.res.ok{animation:pop .4s ease-out;background:#9ee37d;}
-#bench p{margin:8px 0 0;font-size:12px;}
+/* ===== rechts: Werkbank 3x3 ===== */
+#table{justify-self:center;background:#c6c6c6;border:4px solid #000;border-radius:4px;padding:12px 14px;margin-top:24px;color:#3f3f3f;
+       box-shadow:inset 3px 3px 0 #fff,inset -3px -3px 0 #8b8b8b;}
+#table h4{margin:0 0 8px;font-size:14px;}
+.brow{display:flex;align-items:center;gap:12px;}
+.bg{display:grid;grid-template-columns:repeat(3,52px);gap:3px;}
+.sl{width:52px;height:52px;box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;display:flex;align-items:center;justify-content:center;}
+.sl i{width:100%;height:100%;box-sizing:border-box;border:3px solid #000;background:#a87a3c;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:bold;font-size:22px;color:#fff;text-shadow:2px 2px 0 #000;
+      box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),inset 3px 3px 0 rgba(255,255,255,.2);animation:drop .25s ease-out;}
+@keyframes drop{from{transform:scale(1.4)}to{transform:scale(1)}}
+.arrow{font-size:30px;color:#555;}
+.res{width:64px;height:64px;box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.res.ok{background:#9ee37d;animation:big .5s ease-out;}
+@keyframes big{0%{transform:scale(.3)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+#name{margin-top:8px;text-align:center;font-weight:bold;font-size:14px;min-height:18px;}
 
-/* Hinweis unten */
+.fly{position:fixed;z-index:20;pointer-events:none;transition:transform .45s cubic-bezier(.4,0,.2,1),width .45s,height .45s;}
 #note{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(0,0,0,.65);font-size:14px;line-height:1.4;}
-kbd{background:#5a5a5a;border:2px solid #000;border-radius:3px;padding:0 6px;}
 </style></head><body><div id="app">
 <div class="bar">
-  <button class="btn" id="b1">Ansicht A: Haken im Band</button>
-  <button class="btn" id="b2">Ansicht B: Werkbank „Erledigt“</button>
   <button class="btn" id="bnext">Nächster Buchstabe →</button>
   <button class="btn" id="breset">Neu</button>
   <span>Du kannst auch direkt die Buchstaben tippen.</span>
@@ -63,36 +53,42 @@ kbd{background:#5a5a5a;border:2px solid #000;border-radius:3px;padding:0 6px;}
 <div id="frame">
   <div id="top">
     <div id="title">Werkbank 1 · Wort 3 von 9 · <b>Schwert</b></div>
-    <div id="band" class="mat-holz"></div>
+    <div id="band"></div>
+    <div id="div"></div>
+    <div id="table">
+      <h4>Werkbank</h4>
+      <div class="brow"><div class="bg" id="bg"></div><div class="arrow">➜</div><div class="res" id="res"></div></div>
+      <div id="name"></div>
+    </div>
   </div>
-  <div id="bench" class="mat-holz">
-    <h4>Erledigt: deine Blöcke</h4>
-    <div class="brow"><div class="bg" id="bg"></div><div class="arrow">➜</div><div class="res" id="res"></div></div>
-    <p>Jeder abgebaute Block landet im Gitter. Ist das Wort fertig, erscheint der Gegenstand.</p>
-  </div>
-  <div id="note"></div>
+  <div id="note"><b>Links</b> das Wort: der aktuelle Block hat den gelben Rahmen mit dem hüpfenden Dreieck, die späteren stehen ruhig daneben. Ist ein Buchstabe getippt, fliegt sein Block in die <b>Werkbank rechts</b> (3×3-Gitter). Sind alle drin, erscheint der Gegenstand im Ergebnisfeld. In der Mulde im Wort bleibt der Platz frei, damit nichts verrutscht.</div>
 </div>
 </div>
 <script>
-const WORD='SCHWERT', FING={S:'Ringfinger links',C:'Mittelfinger links',H:'Zeigefinger rechts',W:'Ringfinger links',E:'Mittelfinger links',R:'Zeigefinger links',T:'Zeigefinger links'};
-let i=0, mode='A';
+const WORD='SCHWERT';
+let i=0,busy=false;
 const $=id=>document.getElementById(id);
 function render(){
-  $('band').innerHTML=[...WORD].map((c,k)=>`<div class="cb ${k<i?'done':k===i?'now':'next'}" ${k===i?`data-finger="${FING[c]}"`:''}><span>${c}</span></div>`).join('');
-  $('bg').innerHTML=[...Array(9)].map((_,k)=>`<div class="sl ${k<i?'full':''}">${k<i?WORD[k]:''}</div>`).join('');
-  const r=$('res'); r.className='res'+(i>=WORD.length?' ok':''); r.textContent=i>=WORD.length?'🗡️':'';
-  $('bench').classList.toggle('open',mode==='B');
-  $('b1').classList.toggle('on',mode==='A'); $('b2').classList.toggle('on',mode==='B');
-  $('note').innerHTML = mode==='A'
-   ? '<b>A – alles im Band:</b> Alle Blöcke des Wortes stehen mittig nebeneinander. <b>Aktuell</b> = größer, gelber Rahmen, Pfeil und Fingername. <b>Kommend</b> = etwas kleiner und dunkler. <b>Erledigt</b> = leerer Slot mit grünem Haken, bleibt an seinem Platz (so sieht das Kind den Fortschritt, nichts springt).'
-   : '<b>B – Ansicht „Erledigt“:</b> Das Band bleibt wie in A. Zusätzlich zeigt eine Werkbank (3×3-Gitter + Ergebnis) unter dem Band, was schon gesammelt ist. Sie lässt sich ein- und ausblenden (Taste <kbd>Tab</kbd> oder Klick) und bleibt für das Tippen unwichtig.';
+  $('band').innerHTML=[...WORD].map((c,k)=>`<div class="cb ${k<i?'gone':k===i?'now':'next'}">${c}</div>`).join('');
+  $('bg').innerHTML=[...Array(9)].map((_,k)=>`<div class="sl">${k<i?`<i>${WORD[k]}</i>`:''}</div>`).join('');
+  const done=i>=WORD.length;
+  $('res').className='res'+(done?' ok':''); $('res').textContent=done?'🗡️':''; $('name').textContent=done?'Schwert':'';
 }
-function step(){ if(i<WORD.length){i++;render();} }
-$('b1').onclick=()=>{mode='A';render();}; $('b2').onclick=()=>{mode='B';render();};
-$('bnext').onclick=step; $('breset').onclick=()=>{i=0;render();};
-addEventListener('keydown',e=>{
-  if(e.key==='Tab'){e.preventDefault();mode=mode==='A'?'B':'A';render();return;}
-  if(i<WORD.length && e.key.toUpperCase()===WORD[i]) step();
-});
+function step(){
+  if(busy||i>=WORD.length)return;
+  busy=true;
+  const src=$('band').children[i].getBoundingClientRect();
+  const dst=$('bg').children[i].getBoundingClientRect();
+  const f=document.createElement('div'); f.className='cb fly'; f.textContent=WORD[i];
+  Object.assign(f.style,{left:src.left+'px',top:src.top+'px',width:src.width+'px',height:src.height+'px',transform:'none'});
+  document.body.appendChild(f);
+  $('band').children[i].style.visibility='hidden';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    f.style.transform=`translate(${dst.left-src.left+3}px,${dst.top-src.top+3}px)`; f.style.width=(dst.width-6)+'px'; f.style.height=(dst.height-6)+'px'; f.style.fontSize='22px';
+  }));
+  setTimeout(()=>{f.remove();i++;render();busy=false;},470);
+}
+$('bnext').onclick=step; $('breset').onclick=()=>{i=0;busy=false;render();};
+addEventListener('keydown',e=>{ if(i<WORD.length && e.key.toUpperCase()===WORD[i]) step(); });
 render();
 </script></body></html>
