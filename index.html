@@ -236,11 +236,15 @@
   .emsvg{vertical-align:middle;}
 
   /* Oben rechts: Smaragd-Zähler und Schnellzugriffsleiste mit 4 Slots für die Spitzhacken */
-  .userrow{display:inline-flex;align-items:center;}
-  .userdel{background:none;border:none;color:#c33;font:inherit;font-size:20px;cursor:pointer;padding:0 6px 0 0;margin-right:8px;}
+  .userrow{display:flex;align-items:center;background:#444;border:3px solid;border-color:#373737 #fff #fff #373737;margin:4px 0;}
+  .userpick{flex:1;display:flex;align-items:center;gap:14px;background:none;border:none;color:#fff;font:inherit;font-size:26px;text-align:left;padding:8px 12px;cursor:pointer;}
+  .userpick:hover{background:#5b5f9c;}
+  .userpick svg{width:40px;height:40px;border:2px solid #000;flex:none;}
+  .userdel{background:none;border:none;color:#c33;font:inherit;font-size:22px;cursor:pointer;padding:0 12px;align-self:stretch;}
   .userdel:hover{color:#f55;}
-  .userlist{display:flex;flex-wrap:wrap;justify-content:center;}
+  .userlist{display:flex;flex-direction:column;margin-bottom:8px;max-height:300px;overflow:auto;}
   #btnUser{cursor:pointer;font-size:20px;}
+  #userLabel{display:flex;align-items:center;gap:8px;}
   .hud{display:flex;align-items:center;gap:14px;}
   .counter{display:flex;align-items:center;gap:8px;font-size:26px;font-weight:bold;color:#fff;text-shadow:2px 2px 0 #3f3f3f;
            background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:4px 14px 4px 8px;}
@@ -614,7 +618,7 @@ function openUsers(){
   const box = document.getElementById('overlayBox');
   box.className = 'box';
   const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const names = userList().map(n => `<span class="userrow"><button class="btn userpick" data-n="${esc(n)}">${esc(n)}</button><button class="userdel" data-n="${esc(n)}" title="Spieler löschen">✕</button></span>`).join('');
+  const names = userList().map(n => `<div class="userrow"><button class="userpick" data-n="${esc(n)}">${headSVG(n, 40)}<span>${esc(n)}</span></button><button class="userdel" data-n="${esc(n)}" title="Spieler löschen">✕</button></div>`).join('');
   box.innerHTML = `${user ? '<button class="mclose" title="Schließen">✕</button>' : ''}<div class="mtitle">Wer spielt?</div>
     <div class="minner">${names ? `<div class="userlist">${names}</div>` : ''}
     <input id="spielerInput" type="text" name="spielerwahl" maxlength="12" placeholder="Neuer Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" style="font:inherit;font-size:24px;padding:6px 10px;border:3px solid #000;width:80%;margin:8px 0;">
@@ -686,6 +690,25 @@ function heartSVG(size, full){
 }
 
 // Smaragd als eigene 16x16-Pixelgrafik, angelehnt an das Vorbild (ovaler Edelstein mit Facetten)
+// Spieler-Kopf aus 8 x 8 Pixeln (eigene Grafik); Aussehen ergibt sich aus dem Namen
+function headSVG(name, size){
+  let h = 7;
+  for (const ch of name.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const pick = (list, shift) => list[(h >> shift) % list.length];
+  const skin = pick([['#c98e63','#a8714a'], ['#f1c9a5','#d9a47c'], ['#8d5a3b','#6e4129'], ['#fbe0c8','#e4b99a']], 0);
+  const hair = pick(['#3b2a1a','#8a5a2b','#e0b94a','#1c1c1c','#b5472a','#e8e8e8'], 3);
+  const eye = pick(['#3a5ca8','#3b7a3b','#4a3020'], 6);
+  const style = pick(['kurz','franse','lang'], 8);
+  const map = {
+    kurz:  ['HHHHHHHH','HHHHHHHH','HSSSSSSH','SWESSEWS','SSSSSSSS','SSSSSSSS','SSSMMSSS','SSSSSSSS'],
+    franse:['HHHHHHHH','HHHHHHHH','HHSSSSHH','SWESSEWS','SSSSSSSS','SSSSSSSS','SSSMMSSS','SSSSSSSS'],
+    lang:  ['HHHHHHHH','HHHHHHHH','HHSSSSHH','HWESSEWH','HSSSSSSH','HSSSSSSH','HSSMMSSH','HSSSSSSH']
+  }[style];
+  const col = {H:hair, S:skin[0], M:skin[1], W:'#fff', E:eye};
+  let rects = '';
+  map.forEach((row, y) => [...row].forEach((c, x) => { rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${col[c]}"/>`; }));
+  return `<svg viewBox="0 0 8 8" width="${size}" height="${size}" shape-rendering="crispEdges" style="image-rendering:pixelated;display:block">${rects}</svg>`;
+}
 function emeraldSVG(size){
   const rows = {1:[5,10], 2:[4,11], 3:[3,12], 4:[3,12], 5:[2,13], 6:[2,13], 7:[2,13], 8:[2,13],
                 9:[3,12], 10:[3,12], 11:[3,12], 12:[4,11], 13:[5,10], 14:[6,9]};
@@ -751,7 +774,7 @@ function renderHotbar(){
 }
 
 function topBar(){
-  document.getElementById('userLabel').textContent = '👤 ' + (user || '');
+  document.getElementById('userLabel').innerHTML = user ? `${headSVG(user, 30)}<span>${user.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</span>` : '';
   document.getElementById('emeralds').textContent = st.emeralds;
   document.getElementById('invCount').textContent = Object.values(st.items).reduce((a, n) => a + n, 0);
   renderHotbar();
