@@ -1658,7 +1658,7 @@ function start(i){
   hideToast();
   if (document.activeElement) document.activeElement.blur();   // kein Button mit Fokus, den die Leertaste auslösen könnte
   cur = i;
-  document.getElementById('lvName').textContent = LEVELS[i].chest ? LEVELS[i].name : 'Level ' + i;
+  document.getElementById('lvName').textContent = LEVELS[i].chest ? LEVELS[i].name : 'Level ' + (i + 1);
   show('game');
   setBiome();
   const field = document.getElementById('field');
@@ -1814,7 +1814,7 @@ function onKey(e){
     if (e.key === 'Escape' && user && document.getElementById('menu') && !document.getElementById('menu').classList.contains('hidden')) hideOverlay();
     if (e.key === 'Enter') {
       e.preventDefault();
-      const btn = (document.getElementById('userGo') || (document.getElementById('userSel') && !document.getElementById('userSel').hidden ? document.getElementById('userSel') : null)) || document.querySelector('#overlayBox .mclose') || document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn');
+      const btn = (document.getElementById('userGo') || (document.getElementById('userSel') && !document.getElementById('userSel').hidden ? document.getElementById('userSel') : null)) || document.querySelector('#overlayBox .mclose') || document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn.next') || document.querySelector('#overlayBox .btn');
       if (btn) btn.click();
     }
     return;
@@ -1983,7 +1983,7 @@ function finish(){
     box.querySelector('.benchbtn').appendChild(bb);
   }
   if (next) {
-    const nb = document.createElement('button'); nb.className = 'btn green'; nb.textContent = 'Weiter';
+    const nb = document.createElement('button'); nb.className = 'btn next'; nb.textContent = 'Nächstes Level';
     nb.onclick = () => { hideOverlay(); start(cur + 1); };
     btns.appendChild(nb);
   }
