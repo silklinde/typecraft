@@ -1995,7 +1995,7 @@ function finish(){
     box.querySelector('.benchbtn').appendChild(bb);
   }
   if (next) {
-    const nb = document.createElement('button'); nb.className = 'btn next'; nb.textContent = 'Nächstes Level';
+    const nb = document.createElement('button'); nb.className = 'btn green next'; nb.textContent = 'Nächstes Level';
     nb.onclick = () => { hideOverlay(); start(cur + 1); };
     box.querySelector('.nextbtn').appendChild(nb);
   }
