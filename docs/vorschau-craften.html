@@ -34,7 +34,7 @@ body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;backgrou
 .cb.done span{display:none;}
 
 /* ===== Ansicht „Erledigt“ (Werkbank) ===== */
-#bench{position:absolute;right:16px;top:56px;width:230px;display:none;background:#c6c6c6;border:4px solid #000;border-radius:4px;padding:10px;color:#3f3f3f;
+#bench{position:absolute;left:50%;margin-left:-125px;top:250px;width:230px;display:none;background:#c6c6c6;border:4px solid #000;border-radius:4px;padding:10px;color:#3f3f3f;
        box-shadow:inset 3px 3px 0 #fff,inset -3px -3px 0 #8b8b8b;z-index:5;}
 #bench.open{display:block;animation:pop .25s ease-out;}
 @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
@@ -62,7 +62,7 @@ kbd{background:#5a5a5a;border:2px solid #000;border-radius:3px;padding:0 6px;}
 </div>
 <div id="frame">
   <div id="top">
-    <div id="title">Werkbank 1 · Wort 3 von 9 · <b>Holzschwert</b></div>
+    <div id="title">Werkbank 1 · Wort 3 von 9 · <b>Schwert</b></div>
     <div id="band" class="mat-holz"></div>
   </div>
   <div id="bench" class="mat-holz">
@@ -85,7 +85,7 @@ function render(){
   $('b1').classList.toggle('on',mode==='A'); $('b2').classList.toggle('on',mode==='B');
   $('note').innerHTML = mode==='A'
    ? '<b>A – alles im Band:</b> Alle Blöcke des Wortes stehen mittig nebeneinander. <b>Aktuell</b> = größer, gelber Rahmen, Pfeil und Fingername. <b>Kommend</b> = etwas kleiner und dunkler. <b>Erledigt</b> = leerer Slot mit grünem Haken, bleibt an seinem Platz (so sieht das Kind den Fortschritt, nichts springt).'
-   : '<b>B – Ansicht „Erledigt“:</b> Das Band bleibt wie in A. Zusätzlich zeigt eine Werkbank (3×3-Gitter + Ergebnis) rechts, was schon gesammelt ist. Sie lässt sich ein- und ausblenden (Taste <kbd>Tab</kbd> oder Klick) und bleibt für das Tippen unwichtig.';
+   : '<b>B – Ansicht „Erledigt“:</b> Das Band bleibt wie in A. Zusätzlich zeigt eine Werkbank (3×3-Gitter + Ergebnis) unter dem Band, was schon gesammelt ist. Sie lässt sich ein- und ausblenden (Taste <kbd>Tab</kbd> oder Klick) und bleibt für das Tippen unwichtig.';
 }
 function step(){ if(i<WORD.length){i++;render();} }
 $('b1').onclick=()=>{mode='A';render();}; $('b2').onclick=()=>{mode='B';render();};
