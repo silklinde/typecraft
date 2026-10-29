@@ -1169,11 +1169,16 @@ function bounce(){
 }
 
 let audioCtx = null;
+// Ein einziger Audio-Kontext für alle Töne; wird bei Bedarf geweckt (Browser pausieren ihn gern)
+function getCtx(){
+  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state !== 'running') audioCtx.resume();
+  return audioCtx;
+}
 // Erfolgston: ganz helle, kleine Glocke (reine Töne mit glockentypischen Obertönen, kein Gleiten, kurzer Ausklang)
 function xpPing(){
   try {
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const c = audioCtx, t = c.currentTime;
+    const c = getCtx(), t = c.currentTime;
     const base = 2200 * (0.97 + Math.random() * 0.06);
     [[1, 0.05, 0.14], [2.76, 0.028, 0.08], [5.4, 0.014, 0.04]].forEach(([m, vol, len]) => {
       const o = c.createOscillator(), g = c.createGain();
@@ -1191,8 +1196,7 @@ function xpPing(){
 // Glocke für das Abschluss-Fenster (wie der Glockenblock in Minecraft): tiefer, voller, lang nachklingend
 function bellRing(){
   try {
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const c = audioCtx, t = c.currentTime;
+    const c = getCtx(), t = c.currentTime;
     [[1, 0.16, 0.45], [2.0, 0.09, 0.3], [2.76, 0.07, 0.22], [4.1, 0.04, 0.14], [5.4, 0.025, 0.09]].forEach(([m, vol, len]) => {
       const o = c.createOscillator(), g = c.createGain();
       o.type = 'sine';
@@ -1208,7 +1212,7 @@ function bellRing(){
 
 function beep(freq){
   try {
-    const c = new (window.AudioContext || window.webkitAudioContext)();
+    const c = getCtx();
     const o = c.createOscillator(), g = c.createGain();
     o.frequency.value = freq; o.connect(g); g.connect(c.destination);
     g.gain.value = 0.05; o.start(); o.stop(c.currentTime + 0.12);
