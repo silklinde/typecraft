@@ -1064,7 +1064,7 @@ function openInventory(){
 }
 
 function openShop(){
-  const box = openMenuModal('Shop', `<div class="sign"><b>Bald geöffnet!</b>Der Shop eröffnet bald.<br>Dann kannst du hier deine Smaragde ausgeben.</div><div class="signpost"></div><div class="mrow" id="shopEm"></div>`, false);
+  const box = openMenuModal('Shop', `<div class="sign"><b>Neueröffnung!</b>Bald eröffnet unser Shop. Sammle schon einmal fleißig Smaragde, die kannst du hier dann für neues Spielzeug ausgeben.</div><div class="signpost"></div><div class="mrow" id="shopEm"></div>`, false);
   document.getElementById('shopEm').innerHTML = `<span class="mem">${st.emeralds} ${emeraldSVG(32)}</span>`;
 }
 
