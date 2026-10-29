@@ -615,17 +615,17 @@ function openUsers(){
   const names = userList().map(n => `<span class="userrow"><button class="btn userpick" data-n="${esc(n)}">${esc(n)}</button><button class="userdel" data-n="${esc(n)}" title="Spieler löschen">✕</button></span>`).join('');
   box.innerHTML = `${user ? '<button class="mclose" title="Schließen">✕</button>' : ''}<div class="mtitle">Wer spielt?</div>
     <div class="minner">${names ? `<div class="userlist">${names}</div>` : ''}
-    <input id="userName" maxlength="12" placeholder="Neuer Name" autocomplete="off" style="font:inherit;font-size:24px;padding:6px 10px;border:3px solid #000;width:80%;margin:8px 0;">
+    <input id="spielerInput" type="text" name="spielerwahl" maxlength="12" placeholder="Neuer Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" style="font:inherit;font-size:24px;padding:6px 10px;border:3px solid #000;width:80%;margin:8px 0;">
     <div><button class="btn green" id="userGo">Los</button></div></div>`;
   if (user) box.querySelector('.mclose').onclick = hideOverlay;
   box.querySelectorAll('.userpick').forEach(b => b.onclick = () => pickUser(b.dataset.n));
   box.querySelectorAll('.userdel').forEach(b => b.onclick = () => deleteUser(b.dataset.n));
-  const inp = box.querySelector('#userName'), go = box.querySelector('#userGo');
+  const inp = box.querySelector('#spielerInput'), go = box.querySelector('#userGo');
   const sync = () => { go.disabled = !inp.value.trim(); };
   inp.oninput = sync; sync();
   go.onclick = () => { if (!go.disabled) pickUser(inp.value); };
   document.getElementById('overlay').style.display = 'flex';
-  box.querySelector('#userName').focus();
+  box.querySelector('#spielerInput').focus();
 }
 function unlocked(i){
   const L = LEVELS[i];
