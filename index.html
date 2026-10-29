@@ -316,7 +316,16 @@
   .csent .sch.done{color:#9be06f;}
   .csent .sch.now{border-bottom-color:#ffd166;color:#ffd166;}
   /* Bauplatz: jeder getippte Buchstabe setzt einen Block, am Ende steht ein Haus (Satz-Werkbänke) */
-  #bau{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--cs) + 8px);--bs:calc(var(--cs)*.3);pointer-events:none;}
+  /* Bauplatz: eigener Bereich unter dem Spielfeld über die ganze Breite; das Bauwerk steht als durchsichtiger Umriss da und füllt sich mit jedem Buchstaben */
+  #game.bausatz{--bauh:clamp(160px,25vh,270px);}
+  #game.bausatz #biome{height:clamp(520px,calc(100vh - 140px - var(--bauh)),1000px);margin-bottom:0;}
+  #bau{position:relative;height:var(--bauh);margin:12px 0;border:4px solid #000;border-radius:4px;overflow:hidden;box-sizing:border-box;pointer-events:none;
+       background:linear-gradient(#7ec8ff 0%,#cfeeff 100%);}
+  #bau .bau-ti{position:absolute;left:14px;top:8px;font-weight:bold;font-size:15px;color:#fff;text-shadow:2px 2px 0 #000;}
+  #bau .bau-w{position:absolute;left:50%;transform:translateX(-50%);bottom:var(--gh);}
+  #bau .bau-boden{position:absolute;left:0;right:0;bottom:0;height:var(--gh);background-image:linear-gradient(#5fae35 0 40%,transparent 40%),var(--dirt);background-size:100% 100%,var(--bg) var(--bg);image-rendering:pixelated;}
+  #bau{--gh:26px;--bg:26px;}
+  .bblk.ghost{opacity:.28;box-shadow:none;filter:grayscale(.4);}
   .bau-w{position:relative;}
   .bau-gr{position:relative;margin:0 auto;}
   .bau-gr.freu{animation:freu .35s ease-out;transform-origin:50% 100%;}
@@ -954,6 +963,7 @@ function topBar(){
 function show(id){
   document.getElementById('menu').classList.toggle('hidden', id !== 'menu');
   document.getElementById('game').classList.toggle('hidden', id !== 'game');
+  if (id !== 'game') bauWeg();
 }
 
 // ---------- Truhen (eigene Pixelgrafik, 16 Pixel breit) ----------
@@ -1580,20 +1590,32 @@ function bauPlan(){
   for (let r = rows.length - 1; r >= 0; r--) [...rows[r]].forEach((ch, c) => { if (ch !== '.') plan.push({r, c, tex: ch === 'W' ? wall : BAU_TEX[ch]}); });
   return {plan, cols: rows[0].length, rows: rows.length};
 }
-const bauBlock = (b, neu) => `<i class="bblk${neu ? ' neu' : ''}" style="left:calc(var(--bs)*${b.c});top:calc(var(--bs)*${b.r});background-image:var(--${b.tex})"></i>`;
+const bauBlock = (b, neu, ghost) => `<i class="bblk${neu ? ' neu' : ''}${ghost ? ' ghost' : ''}" style="left:calc(var(--bs)*${b.c});top:calc(var(--bs)*${b.r});background-image:var(--${b.tex})"></i>`;
 function bauHTML(bau, n){
   return `<div class="bau-w" style="width:calc(var(--bs)*${bau.cols + 2})"><div class="bau-gr" style="width:calc(var(--bs)*${bau.cols});height:calc(var(--bs)*${bau.rows})">${bau.plan.slice(0, n).map(b => bauBlock(b)).join('')}</div><div class="bground"></div></div>`;
 }
 function bauStart(){
-  const lanes = document.getElementById('lanes');
-  if (!lanes) return;
+  const game = document.getElementById('game');
+  const biome = document.getElementById('biome');
+  if (!game || !biome) return;
   run.bau = bauPlan(); run.built = 0;
+  const bau = run.bau;
   const el = document.createElement('div');
   el.id = 'bau';
-  el.innerHTML = bauHTML(run.bau, 0);
-  lanes.appendChild(el);
+  el.innerHTML = `<div class="bau-ti">Bauplatz</div>
+    <div class="bau-w" style="--bs:min(28px,calc((var(--bauh) - var(--gh) - 24px)/${bau.rows}));width:calc(var(--bs)*${bau.cols})">
+      <div class="bau-gr" style="width:calc(var(--bs)*${bau.cols});height:calc(var(--bs)*${bau.rows})">${bau.plan.map(b => bauBlock(b, false, true)).join('')}</div>
+    </div><div class="bau-boden"></div>`;
+  game.classList.add('bausatz');
+  biome.after(el);
   const chest = document.getElementById('cchest');
   if (chest) chest.style.display = 'none';
+}
+function bauWeg(){
+  const el = document.getElementById('bau');
+  if (el) el.remove();
+  const game = document.getElementById('game');
+  if (game) game.classList.remove('bausatz');
 }
 // So viele Blöcke stehen, wie der Anteil der getippten Buchstaben es verlangt
 function bauSet(){
@@ -1811,6 +1833,7 @@ function chestKey(e, k){
 function start(i){
   clearTimeout(pendingTimer);
   hideToast();
+  bauWeg();
   if (document.activeElement) document.activeElement.blur();   // kein Button mit Fokus, den die Leertaste auslösen könnte
   cur = i;
   document.getElementById('lvName').textContent = LEVELS[i].chest ? LEVELS[i].name : 'Level ' + (i + 1);
