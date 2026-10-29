@@ -243,6 +243,10 @@
   .spielerraster .chest.spieler.neu .cimg svg{border:none;}
   .spielerraster .chest.spieler .cname{max-width:100%;overflow:hidden;text-overflow:ellipsis;}
   .spielerraster .chest.spieler.sel{outline:4px solid #9be06f;outline-offset:-4px;}
+  .kopfwahl{display:grid;grid-template-columns:repeat(3,64px);gap:6px;justify-content:center;margin-bottom:6px;}
+  .kopf{padding:2px;background:#444;border:3px solid;border-color:#373737 #fff #fff #373737;cursor:pointer;line-height:0;}
+  .kopf:hover{background:#5b5f9c;}
+  .kopf.sel{outline:4px solid #9be06f;outline-offset:-1px;}
   .spieleraktion{min-height:62px;margin-top:10px;}
   .spieleraktion .btn[hidden]{display:none;}
   #btnUser{cursor:pointer;font-size:20px;}
@@ -360,6 +364,7 @@
 <script>
 const KEY_OLD = 'typecraft-v1';        // Spielstand aus der Zeit vor den Nutzernamen
 const KEY_USERS = 'typecraft-users';   // Liste der Namen
+const KEY_AVATARS = 'typecraft-avatars'; // Name -> Nummer des Kopfes
 const KEY_CUR = 'typecraft-current';   // zuletzt gewählter Name
 const lsGet = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch(e){} };
@@ -586,7 +591,7 @@ function fresh(){ return {v:3, emeralds:0, stars:{}, owned:{wald:true}, biome:'w
 function save(){ if (user) lsSet(keyOf(user), JSON.stringify(st)); }
 
 // Nutzer anlegen oder wählen. Der alte Spielstand (typecraft-v1) geht an den ersten Namen, der angelegt wird.
-function pickUser(name){
+function pickUser(name, head){
   name = name.trim().slice(0, 12);
   if (!name) return false;
   const list = userList();
@@ -595,6 +600,7 @@ function pickUser(name){
   else {
     if (!list.length && lsGet(KEY_OLD) && !lsGet(keyOf(name))) lsSet(keyOf(name), lsGet(KEY_OLD));
     list.push(name); lsSet(KEY_USERS, JSON.stringify(list));
+    if (head !== undefined) { const av = avatars(); av[name] = head; lsSet(KEY_AVATARS, JSON.stringify(av)); }
   }
   user = name; lsSet(KEY_CUR, name);
   st = load(); hotbarSeen = null;
@@ -612,6 +618,7 @@ function deleteUser(name){
   box.querySelector('#delYes').onclick = () => {
     try { localStorage.removeItem(keyOf(name)); } catch(e){}
     lsSet(KEY_USERS, JSON.stringify(userList().filter(n => n !== name)));
+    const av = avatars(); delete av[name]; lsSet(KEY_AVATARS, JSON.stringify(av));
     if (name === user) { user = null; try { localStorage.removeItem(KEY_CUR); } catch(e){} st = fresh(); renderMenu(); }
     openUsers();
   };
@@ -655,13 +662,20 @@ function openNewUser(canGoBack){
   box.className = 'box';
   box.innerHTML = `${user ? '<button class="mclose" title="Schließen">✕</button>' : ''}<div class="mtitle">Neuer Spieler</div>
     <div class="minner">
+    <div class="kopfwahl">${HEADS.map((h, i) => `<button class="kopf${i === 0 ? ' sel' : ''}" data-i="${i}" title="Kopf wählen">${headArt(i, 56)}</button>`).join('')}</div>
     <input id="spielerInput" type="text" name="spielerwahl" maxlength="12" placeholder="Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" style="font:inherit;font-size:24px;padding:6px 10px;border:3px solid #000;width:80%;margin:8px 0;">
     <div>${canGoBack ? '<button class="btn" id="userBack">Zurück</button>' : ''}<button class="btn green" id="userGo">Los</button></div></div>`;
   if (user) box.querySelector('.mclose').onclick = hideOverlay;
   const inp = box.querySelector('#spielerInput'), go = box.querySelector('#userGo');
   const sync = () => { go.disabled = !inp.value.trim(); };
   inp.oninput = sync; sync();
-  go.onclick = () => { if (!go.disabled) pickUser(inp.value); };
+  let head = 0;
+  box.querySelectorAll('.kopf').forEach(k => k.onclick = () => {
+    head = +k.dataset.i;
+    box.querySelectorAll('.kopf').forEach(o => o.classList.toggle('sel', o === k));
+    inp.focus();
+  });
+  go.onclick = () => { if (!go.disabled) pickUser(inp.value, head); };
   if (canGoBack) box.querySelector('#userBack').onclick = openUsers;
   document.getElementById('overlay').style.display = 'flex';
   inp.focus();
@@ -723,24 +737,30 @@ function heartSVG(size, full){
 }
 
 // Smaragd als eigene 16x16-Pixelgrafik, angelehnt an das Vorbild (ovaler Edelstein mit Facetten)
-// Spieler-Kopf aus 8 x 8 Pixeln (eigene Grafik); Aussehen ergibt sich aus dem Namen
-function headSVG(name, size){
-  let h = 7;
-  for (const ch of name.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  const pick = (list, shift) => list[(h >> shift) % list.length];
-  const skin = pick([['#c98e63','#a8714a'], ['#f1c9a5','#d9a47c'], ['#8d5a3b','#6e4129'], ['#fbe0c8','#e4b99a']], 0);
-  const hair = pick(['#3b2a1a','#8a5a2b','#e0b94a','#1c1c1c','#b5472a','#e8e8e8'], 3);
-  const eye = pick(['#3a5ca8','#3b7a3b','#4a3020'], 6);
-  const style = pick(['kurz','franse','lang'], 8);
-  const map = {
-    kurz:  ['HHHHHHHH','HHHHHHHH','HSSSSSSH','SWESSEWS','SSSSSSSS','SSSSSSSS','SSSMMSSS','SSSSSSSS'],
-    franse:['HHHHHHHH','HHHHHHHH','HHSSSSHH','SWESSEWS','SSSSSSSS','SSSSSSSS','SSSMMSSS','SSSSSSSS'],
-    lang:  ['HHHHHHHH','HHHHHHHH','HHSSSSHH','HWESSEWH','HSSSSSSH','HSSSSSSH','HSSMMSSH','HSSSSSSH']
-  }[style];
-  const col = {H:hair, S:skin[0], M:skin[1], W:'#fff', E:eye};
+// Spieler-Köpfe aus 8 x 8 Pixeln (eigene Grafik): 9 zur Auswahl, [Haut, Haar, Augen, Frisur]
+const SKINS = [['#c98e63','#a8714a'], ['#f1c9a5','#d9a47c'], ['#8d5a3b','#6e4129'], ['#fbe0c8','#e4b99a']];
+const HEADS = [
+  [0,'#3b2a1a','#3b7a3b','kurz'],  [1,'#8a5a2b','#3a5ca8','franse'], [3,'#e0b94a','#3a5ca8','lang'],
+  [2,'#1c1c1c','#4a3020','kurz'],  [1,'#b5472a','#3b7a3b','lang'],   [0,'#1c1c1c','#4a3020','franse'],
+  [3,'#e8e8e8','#3a5ca8','kurz'],  [2,'#3b2a1a','#4a3020','lang'],   [1,'#3b2a1a','#3a5ca8','franse']
+];
+const HEADMAP = {
+  kurz:  ['HHHHHHHH','HHHHHHHH','HSSSSSSH','SWESSEWS','SSSSSSSS','SSSSSSSS','SSSMMSSS','SSSSSSSS'],
+  franse:['HHHHHHHH','HHHHHHHH','HHSSSSHH','SWESSEWS','SSSSSSSS','SSSSSSSS','SSSMMSSS','SSSSSSSS'],
+  lang:  ['HHHHHHHH','HHHHHHHH','HHSSSSHH','HWESSEWH','HSSSSSSH','HSSSSSSH','HSSMMSSH','HSSSSSSH']
+};
+function headArt(idx, size){
+  const [sk, hair, eye, style] = HEADS[idx];
+  const col = {H:hair, S:SKINS[sk][0], M:SKINS[sk][1], W:'#fff', E:eye};
   let rects = '';
-  map.forEach((row, y) => [...row].forEach((c, x) => { rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${col[c]}"/>`; }));
+  HEADMAP[style].forEach((row, y) => [...row].forEach((c, x) => { rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${col[c]}"/>`; }));
   return `<svg viewBox="0 0 8 8" width="${size}" height="${size}" shape-rendering="crispEdges" style="image-rendering:pixelated;display:block">${rects}</svg>`;
+}
+const avatars = () => { try { return JSON.parse(lsGet(KEY_AVATARS)) || {}; } catch(e){ return {}; } };
+function headSVG(name, size){
+  let idx = avatars()[name];
+  if (idx === undefined) { idx = 7; for (const ch of name.toLowerCase()) idx = (idx * 31 + ch.charCodeAt(0)) >>> 0; idx %= HEADS.length; }
+  return headArt(idx, size);
 }
 function emeraldSVG(size){
   const rows = {1:[5,10], 2:[4,11], 3:[3,12], 4:[3,12], 5:[2,13], 6:[2,13], 7:[2,13], 8:[2,13],
