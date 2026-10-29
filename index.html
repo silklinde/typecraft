@@ -1415,6 +1415,7 @@ function bigBlock(k, kind){
   return {x, blk:{key:k, el, kind}};
 }
 function askKey(){
+  finishMining();
   const k = HAENDE_SEQ[hz.idx];
   expect(k);
   const {x, blk} = bigBlock(k, 'dirt');
@@ -1427,6 +1428,7 @@ function askKey(){
 }
 // Grundhaltung: ein Holzblock über F, J oder der Leertaste, wird mit Animation abgebaut
 function grundAsk(){
+  finishMining();
   const k = GRUND_SEQ[run.correct];
   run.cur = bigBlock(k, 'wood').blk;
   run.busy = false;
@@ -1613,6 +1615,7 @@ function craftDone(item){
 }
 // Die Buchstaben stehen nur in der Werkbank-Leiste oben (Wort-Blöcke bzw. Satztext); die Taste zeigt die Tastatur
 function chestNext(){
+  finishMining();
   const lanes = document.getElementById('lanes');
   if (!lanes || !run) return;
   const {w, item} = run.seq[run.wi], ch = w[run.ci];
@@ -1628,6 +1631,7 @@ function chestNext(){
 }
 // Umschalt-Einführung, Schritt 2: ein kleiner Block verwandelt sich in einen Großbuchstaben, solange Umschalt gehalten wird
 function csNext(){
+  finishMining();
   const hrow = document.getElementById('hrow');
   if (!hrow || !cs) return;
   const k = cs.letters[cs.idx];
@@ -1781,6 +1785,7 @@ LEVELS.forEach(L => L.neu.forEach(k => { ORE_OF[k] = L.ore || 'coal'; }));
 
 // Zeigt genau einen Block über seiner Taste (neue Tasten doppelt gewichtet, nie zweimal dieselbe Taste hintereinander)
 function showBlock(){
+  finishMining();
   const L = LEVELS[cur];
   const lanes = document.getElementById('lanes');
   if (!lanes || !run) return;
@@ -1844,18 +1849,26 @@ function mineBlock(b){
   crack.className = 'crack';
   el.appendChild(crack);
   el.classList.add('mining');
-  let n = 0;
+  let n = 0, fin = false;
+  const done = () => {
+    if (fin) return;
+    fin = true;
+    clearInterval(iv);
+    MINING.delete(done);
+    xpPing();   // Bling erst, wenn der Block wirklich abgebaut ist
+    burst(b, lanes);
+    if (word) { crack.remove(); el.classList.remove('mining'); el.classList.add('gone'); }   // Wortblock bleibt als Mulde
+    else el.remove();
+  };
   const iv = setInterval(() => {
     crack.style.backgroundImage = `url(${crackStage(n)})`;
-    if (++n >= 10) {
-      clearInterval(iv);
-      xpPing();   // Bling erst, wenn der Block wirklich abgebaut ist
-      burst(b, lanes);
-      if (word) { crack.remove(); el.classList.remove('mining'); el.classList.add('gone'); }   // Wortblock bleibt als Mulde
-      else el.remove();
-    }
+    if (++n >= 10) done();
   }, 35);
+  MINING.add(done);
 }
+// Läuft noch ein Abbau (z. B. weil der Browser ruckelt), wird er beendet, bevor der nächste Block erscheint
+const MINING = new Set();
+function finishMining(){ [...MINING].forEach(f => f()); }
 
 function burst(b, lanes){
   const r = b.el.getBoundingClientRect(), lr = lanes.getBoundingClientRect();
