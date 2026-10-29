@@ -265,17 +265,11 @@
   .citem.lock{background:#2a2a2a;box-shadow:inset 0 0 0 3px #3a3a3a;opacity:.6;}
   .citem.lock svg{filter:grayscale(1) brightness(.4);}
   .citem.lock .t{color:#aaa;font-size:16px;}
-  /* Modal am Ende einer Werkbank: offene Truhe, die Gegenstände ragen hinten heraus, die Vorderwand liegt davor */
-  .lootchest{position:relative;width:300px;margin:0 auto 4px;}
-  .lootchest svg.ch{width:100%;height:auto;display:block;image-rendering:pixelated;}
-  .lootchest .front{position:absolute;left:0;top:0;clip-path:inset(60% 0 0 0);}
-  .lootchest .stuff{position:absolute;left:9%;right:9%;bottom:40%;display:flex;justify-content:center;align-items:flex-end;}
-  .lootchest .stuff .li{position:relative;width:40px;height:40px;flex:none;margin:0;animation:lootup .5s ease-out backwards;}
-  .lootchest .stuff .li svg{width:40px;height:40px;image-rendering:pixelated;display:block;}
-  .lootchest .stuff .li i{position:absolute;right:-2px;bottom:-4px;font-style:normal;font-size:22px;line-height:1;color:#fff;text-shadow:2px 2px 0 #000;}
-  @keyframes lootup{from{translate:0 40px;opacity:0}to{translate:0 0;opacity:1}}
-  .lootrow{display:flex;justify-content:center;gap:4px 18px;flex-wrap:wrap;margin:6px 0 10px;font-size:22px;line-height:1.1;}
-  .lootrow b{font-weight:normal;color:#ffd166;font-size:18px;margin-left:4px;}
+  /* Modal am Ende einer Werkbank: Truhen-Fenster mit 3 x 3 Slots, ein Gegenstand pro Wort */
+  .lootgrid{display:grid;grid-template-columns:repeat(3,72px);width:fit-content;margin:0 auto 12px;padding:10px 12px;background:#444;}
+  .lootslot{width:72px;height:72px;box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;display:flex;align-items:center;justify-content:center;}
+  .lootslot svg{width:48px;height:48px;image-rendering:pixelated;display:block;animation:lootup .4s ease-out backwards;}
+  @keyframes lootup{from{translate:0 -16px;opacity:0;scale:.5}to{translate:0 0;opacity:1;scale:1}}
   .ikey.shift{box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);}
   .ikey.nudge{animation:nudge .3s;}
   @keyframes nudge{0%,100%{translate:0 0}25%{translate:-5px 0}75%{translate:5px 0}}
@@ -439,9 +433,9 @@ const HAENDE_SEQ = ['f', 'j', 'd', 's', 'a', 'k', 'l', 'ö', ' '];
 // Kurze Fingernamen für Hände auflegen (die Seite sieht man an der Hand)
 const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeigefinger',
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
-const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Fass'];
-const CHEST2_WORDS = ['Ja','Öl','Fall','Kalk','Lass','Salsa'];
-const CHEST3_WORDS = ['Glas','Hals','Saga','Jagd','Kahl'];
+const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Fass','As','Dada','Fa'];
+const CHEST2_WORDS = ['Ja','Öl','Fall','Falls','Kalk','Lass','Salsa','Kajak','Alaska'];
+const CHEST3_WORDS = ['Glas','Hals','Hass','Saga','Jagd','Kahl','Gala','Gaga','Hall'];
 const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
 const LEVELS = [
@@ -1212,7 +1206,7 @@ function chestSeq(L){
   });
 }
 function chestStart(L){
-  run.seq = chestSeq(L); run.wi = 0; run.ci = 0; run.got = {}; run.newIds = []; run.crafted = 0;
+  run.seq = chestSeq(L); run.wi = 0; run.ci = 0; run.got = {}; run.list = []; run.newIds = []; run.crafted = 0;
   renderChest();
   chestNext();
 }
@@ -1262,6 +1256,7 @@ function craftDone(item){
   st.items[item.id] = (st.items[item.id] || 0) + 1;
   save();
   run.got[item.id] = (run.got[item.id] || 0) + 1;
+  run.list.push(item);
   if (first) run.newIds.push(item.id);
   run.crafted++;
   setTimeout(() => {
@@ -1707,10 +1702,8 @@ function finish(){
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
-  const got = L.chest ? CRAFT.filter(it => run.got[it.id]) : [];
-  const names = got.map(it => `<span>${it.name} × ${run.got[it.id]}${run.newIds.includes(it.id) ? '<b>neu!</b>' : ''}</span>`).join('');
-  const stuff = got.map((it, i) => `<div class="li" style="animation-delay:${.15 * i}s">${itemSVG(it)}${run.got[it.id] > 1 ? `<i>${run.got[it.id]}</i>` : ''}</div>`).join('');
-  const chestImg = L.chest ? `<div class="lootchest">${chestSVG('open')}<div class="stuff">${stuff}</div>${chestSVG('open').replace('class="ch"', 'class="ch front"')}</div><div class="lootrow">${names || 'Die Truhe ist noch leer.'}</div>` : '';
+  const slots = Array.from({length: 9}, (_, i) => `<div class="lootslot">${run.list && run.list[i] ? itemSVG(run.list[i]).replace('<svg ', `<svg style="animation-delay:${.12 * i}s" `) : ''}</div>`).join('');
+  const chestImg = L.chest ? `<div class="lootgrid">${slots}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
