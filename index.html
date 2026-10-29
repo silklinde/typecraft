@@ -418,7 +418,9 @@ const shiftFor = k => LEFTHAND.includes(k) ? 'shift' : 'shiftl';   // Großbuchs
 const KEYPOS = {};
 KEYROWS.forEach((row, r) => row.forEach((k, i) => { KEYPOS[k] = {r, c: ROWSTART[r] + i * 4}; }));
 // ß liegt in der Zahlenreihe (Reihe -1), die es sonst noch nicht gibt: dort steht nur ß, Spalte wie auf der echten Tastatur
-KEYPOS['ß'] = {r: -1, c: 39};
+// Zahlenreihe: 1 steht über Q, 0 über P, ß rechts daneben (die ganze Reihe liegt eine halbe Taste weiter rechts als auf der echten Tastatur, damit sie ins Raster passt)
+const NUMROW = ['1','2','3','4','5','6','7','8','9','0','ß'];
+NUMROW.forEach((k, i) => { KEYPOS[k] = {r: -1, c: 1 + i * 4}; });
 // Beschriftung: ß hat keinen Großbuchstaben (toUpperCase würde SS daraus machen)
 const KLBL = k => k === 'ß' ? 'ß' : k.toUpperCase();
 // Mitte der Taste als Anteil der Tastaturbreite (für fallende Blöcke und neue Tasten)
@@ -426,7 +428,7 @@ const cxOf = k => (KEYPOS[k].c + 1) / NCOL;
 const HOME10 = ['a','s','d','f','g','h','j','k','l','ö'];
 
 // Jeder Finger und die Tasten, die er bedient (die Grundtaste steht vorn)
-const FINGERS = {a:'ayq', s:'sxw', d:'dce', f:'fgrtvb', j:'jhzumn', k:'ki,', l:'lo.', 'ö':'öpü-äß'};
+const FINGERS = {a:'ayq1', s:'sxw2', d:'dce3', f:'fgrtvb45', j:'jhzumn67', k:'ki,8', l:'lo.9', 'ö':'öpü-äß0'};
 const FNAME = {a:'linker kleiner Finger', s:'linker Ringfinger', d:'linker Mittelfinger', f:'linker Zeigefinger',
                j:'rechter Zeigefinger', k:'rechter Mittelfinger', l:'rechter Ringfinger', 'ö':'rechter kleiner Finger'};
 const FCOL = {a:'#4a2f18', s:'#6b4423', d:'#8a5a2b', f:'#b07a3c', j:'#b07a3c', k:'#8a5a2b', l:'#6b4423', 'ö':'#4a2f18'};
@@ -434,7 +436,7 @@ function fingerOf(k){ if (k === 'shift') return 'ö'; if (k === 'shiftl') return
 const FINGER = {shift:'rechter kleiner Finger (Umschalt gedrückt halten)', shiftl:'linker kleiner Finger (Umschalt gedrückt halten)'}, COLOR = {};
 Object.keys(KEYPOS).forEach(k => {
   const h = fingerOf(k), r = KEYPOS[k].r;
-  const side = 'gh'.includes(k) || 'tzbn'.includes(k);
+  const side = 'gh'.includes(k) || 'tzbn'.includes(k) || '56'.includes(k);
   const how = [r === -1 ? 'zwei Reihen nach oben' : r === 0 ? 'eine Reihe nach oben' : r === 2 ? 'eine Reihe nach unten' : '', side ? 'zur Seite strecken' : ''].filter(Boolean).join(', ');
   FINGER[k] = FNAME[h] + (how ? ` (${how})` : '');
   COLOR[k] = FCOL[h];
@@ -498,6 +500,8 @@ const LEVELS = [
    hint:'Übung: Die ganze Tastatur. Erze sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
   {name:'Level 18: + Ä ß', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß']), neu:['ä','ß'], ore:'redstone',
    hint:'Neu: Ä (rechts neben Ö) und ß (ganz rechts in der obersten Reihe). Beide tippt der rechte kleine Finger.', target:16},
+  {name:'Level 19: Zahlen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß','1','2','3','4','5','6','7','8','9','0']), neu:['1','2','3','4','5','6','7','8','9','0'], ore:'obsidian',
+   hint:'Neu: Die Zahlen 1 bis 0 in der obersten Reihe. Jeder Finger geht zwei Reihen nach oben und danach zurück auf seine Grundtaste.', target:30},
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
@@ -537,11 +541,17 @@ function load(){
         if (n[1]) n[0] = 3;
         s.stars = n; s.v = 2;
       }
+      // v3: Level 19 (Zahlen) steht vor den Werkbänken, deren Herzen rücken um eins nach hinten
+      if (s.v < 3) {
+        const n = {};
+        Object.keys(s.stars || {}).forEach(i => { n[+i >= 19 ? +i + 1 : +i] = s.stars[i]; });
+        s.stars = n; s.v = 3;
+      }
       if (!s.items) s.items = {};
       return s;
     }
   } catch(e){}
-  return {v:2, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}};
+  return {v:3, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}};
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
 function unlocked(i){
@@ -955,7 +965,7 @@ function buildBoard(field, L, mode){
     : `<div class="lanes" id="lanes">${L.chest ? '<div id="craft"></div><div id="cchest"></div>' : ''}</div>`;
 
   const num = !haende && L.keys.includes('ß');
-  const rows = num ? [['ß']].concat(KEYROWS) : KEYROWS;
+  const rows = num ? [L.keys.includes('1') ? NUMROW : ['ß']].concat(KEYROWS) : KEYROWS;
   const keysHtml = rows.map((row, r) => row.map(k => {
     const pos = `grid-row:${r + 1};grid-column:${KEYPOS[k].c} / span 4`;
     const off = !(haende ? HAENDE_SEQ : L.keys).includes(k);

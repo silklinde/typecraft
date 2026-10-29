@@ -23,8 +23,9 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 | 16 | + Y - | Y - | Gold | 16 | |
 | 17 | Alle Reihen | – | Erze der Tasten der unteren Reihe (je Taste wie oben) | 48 | Diamantspitzhacke |
 | 18 | + Ä ß | Ä ß | Redstone | 16 | |
+| 19 | Zahlen | 1 2 3 4 5 6 7 8 9 0 | Obsidian | 30 | |
 
-**Ä** ist ab Level 18 dabei. **ß** liegt in einer zusätzlichen Reihe über Q–Ü (Zahlenreihe nur mit ß, `KEYPOS['ß']` = Reihe −1, Spalte 39). Diese Reihe erscheint nur in Levels, deren `keys` ß enthalten; dann bekommt `.kb` die Klasse `num` und alles darunter rutscht per `--o` eine Reihe nach unten. Beide tippt der rechte kleine Finger.
+**Ä** ist ab Level 18 dabei. **ß** liegt in einer zusätzlichen Reihe über Q–Ü (Zahlenreihe, `KEYPOS` = Reihe −1; in Level 18 steht dort nur ß, ab Level 19 alle Zahlen `NUMROW`: 1 beginnt in Spalte 1 über Q, ß in Spalte 41; die Reihe liegt eine halbe Taste weiter rechts als auf echten Tastaturen, damit sie ins Raster passt). Diese Reihe erscheint nur in Levels, deren `keys` ß enthalten; dann bekommt `.kb` die Klasse `num` und alles darunter rutscht per `--o` eine Reihe nach unten. Beide tippt der rechte kleine Finger. Level 19 führt die Zahlen ein (`FINGERS`: 1 kleiner Finger links, 2 Ring, 3 Mitte, 4 und 5 Zeigefinger links, 6 und 7 Zeigefinger rechts, 8 Mitte, 9 Ring, 0 kleiner Finger rechts). Der Spielstand ist `v:3`: die Werkbänke stehen jetzt bei Index 20–25.
 
 ## Level-Felder
 ```js
@@ -65,7 +66,7 @@ Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Ver
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
 
 ## Werkbänke (Wörter-Level, früher „Truhen“)
-Menü-Bereiche: „Minen“ (die Level), „Craften“ (6 Werkbänke mit Wörtern), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird ein Truhen-Fenster mit 3 × 3 Slots gezeigt: 9 Wörter = 9 Gegenstände, je einer pro Slot (`run.list`), keine Auflistung darunter. Im Menü steht unter der Werkbank nur ein freier Platz für die Herzen, keine Buchstaben. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–24, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
+Menü-Bereiche: „Minen“ (die Level), „Craften“ (6 Werkbänke mit Wörtern), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird ein Truhen-Fenster mit 3 × 3 Slots gezeigt: 9 Wörter = 9 Gegenstände, je einer pro Slot (`run.list`), keine Auflistung darunter. Im Menü steht unter der Werkbank nur ein freier Platz für die Herzen, keine Buchstaben. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 20–25, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
 
 | Werkbank | Tasten | Freigeschaltet durch | Stand |
 |-------|--------|----------------------|-------|
