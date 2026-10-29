@@ -66,14 +66,19 @@ Pro Nutzer ein Eintrag: `localStorage['typecraft-user-<name klein>']` (Namenslis
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
 
 ## Werkbänke (Wörter-Level, früher „Truhen“)
-Menü-Bereiche: „Minen“ (die Level), „Craften“ (6 Werkbänke mit Wörtern), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird ein Truhen-Fenster mit 3 × 3 Slots gezeigt: 9 Wörter = 9 Gegenstände, je einer pro Slot (`run.list`), keine Auflistung darunter. Im Menü steht unter der Werkbank nur ein freier Platz für die Herzen, keine Buchstaben. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 20–25, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
+Menü-Bereiche: „Minen“ (die Level), „Craften“ (14 Werkbänke mit Wörtern und Sätzen), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird ein Truhen-Fenster mit 3 × 3 Slots gezeigt: 9 Wörter = 9 Gegenstände, je einer pro Slot (`run.list`), keine Auflistung darunter. Im Menü steht unter der Werkbank nur ein freier Platz für die Herzen, keine Buchstaben. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 20–25, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
 
 | Werkbank | Tasten | Freigeschaltet durch | Stand |
 |-------|--------|----------------------|-------|
 | 1 | A S D F + Umschalt | Level 2 | spielbar |
 | 2 | A S D F J K L Ö + linke Umschalt | Level 3 | spielbar (9 Wörter einmal) |
 | 3 | + G H | Level 4 | spielbar (9 Wörter einmal) |
-| 4–6 | offen | – | noch gesperrt |
+| 4 | Grundreihe (`CHEST4_WORDS`) | Level 6 | spielbar |
+| 5 | + obere Reihe (`CHEST5_WORDS`) | Level 12 | spielbar |
+| 6 | alle Reihen (`CHEST6_WORDS`) | Level 18 | spielbar |
+| 7–14 | Sätze mit 3 bis 10 Wörtern (`SENT_WORDS`), ganze Tastatur mit Ä, ß und Leertaste | Level 19 | spielbar |
+
+Satz-Werkbänke (`sentences:true`): Der Satz steht als Text in der Werkbank-Leiste (getippte Zeichen werden grün), pro Satz entsteht ein Gegenstand. Die Leertaste kommt als breiter Block (`.block.big.space`) über der Leertaste, beide Daumen leuchten. Satzzeichen nur Komma, Punkt und Bindestrich; weitere Zeichen und Enter stehen als Tickets in Notion.
 
 Truhe 1: Beginn mit Einführung der Umschalt-Taste (Block „⇧“, Fenster „Neue Taste freigeschaltet“). Danach 9 Wörter (`CHEST1_WORDS`, je einmal, zufällig), Herzen und Smaragde wie bei Leveln. Alle Anfangsbuchstaben sind groß: Kohleblock = Großbuchstabe (Umschalt gedrückt halten), Steinblock = Kleinbuchstabe. Oben steht das Wort, der aktuelle Buchstabe ist gelb. Umschalt steht rechts neben dem rechten Arm (Zeile der Leertaste) und wird vom rechten kleinen Finger bedient.
 
