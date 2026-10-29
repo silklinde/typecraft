@@ -81,6 +81,11 @@
   #overlay .box .reward .rw-name{font-size:28px;font-weight:normal;}
   #overlay .box .reward .rw-text{font-size:20px;}
   #overlay .box .reward .rw-title{font-size:26px;font-weight:normal;}
+  #overlay .box .rcards{display:flex;gap:12px;justify-content:center;align-items:stretch;}
+  #overlay .box .rcards .reward{flex:1;margin-top:14px;display:flex;flex-direction:column;justify-content:space-between;}
+  #overlay .box .rcards .reward .btn{font-size:22px;padding:8px 12px;}
+  #overlay .box .btn.quiet{font-size:20px;padding:4px 12px;background:transparent;color:#aaa;border-color:#555;box-shadow:none;}
+  #overlay .box .btn.quiet:hover{background:#333;color:#fff;box-shadow:none;}
   #overlay .box .reward{background:#1a1a1a;border:3px solid;border-color:#373737 #fff #fff #373737;border-radius:0;}
   @keyframes grow{0%{transform:scale(.05);opacity:0}100%{transform:scale(1);opacity:1}}
   .hidden{display:none !important;}
@@ -989,6 +994,9 @@ function itemSVG(it){ return pixSVG(ITEM_ART[it.art], 'it', it.pal); }
 // Die beste Spitzhacke bestimmt, welche Materialien (und Gegenstände) vorkommen
 function pickTier(){ return Math.max(0, HOTBAR.indexOf(currentPick())); }
 
+// Spitzhacke, mit der das Level gespielt wird
+function levelPick(i){ return i <= 5 ? 'holz' : i <= 11 ? 'stein' : i <= 17 ? 'eisen' : 'diamant'; }
+
 function renderMenu(){
   cur = -1; active = false; cancelAnimationFrame(raf); clearTimeout(pendingTimer); hideToast();
   document.getElementById('lvName').textContent = '';
@@ -1002,7 +1010,7 @@ function renderMenu(){
     b.className = 'chest lvl';
     b.disabled = !open;
     b.title = open ? '' : `Schließe zuerst Level ${i} ab`;
-    const pick = i <= 5 ? 'holz' : i <= 11 ? 'stein' : i <= 17 ? 'eisen' : 'diamant';   // Spitzhacke, mit der das Level gespielt wird
+    const pick = levelPick(i);
     const sub = s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : '';
     b.innerHTML = `<div class="cimg">${pickaxeSVG(pick, 64)}</div><div class="cname">Level ${i + 1}</div><div class="csub">${sub}</div>`;
     b.onclick = () => start(i);
@@ -1966,15 +1974,19 @@ function finish(){
   const msg = stars > 0
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
-  const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '')
-    + (newBench >= 0 ? `<div class="reward"><div class="cimg" style="width:64px;margin:0 auto;">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="rw-title">${LEVELS[newBench].name} freigeschaltet!</div><div class="benchbtn"></div></div>` : '');
+  const nextL = next ? LEVELS[cur + 1] : null;
+  const nextCard = nextL
+    ? `<div class="reward rcard"><div class="cimg" style="width:64px;margin:0 auto;">${nextL.chest ? pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL) : pickaxeSVG(levelPick(cur + 1), 64)}</div><div class="rw-title">${nextL.chest ? nextL.name : 'Level ' + (cur + 2)}</div><div class="nextbtn"></div></div>` : '';
+  const benchCard = newBench >= 0
+    ? `<div class="reward rcard"><div class="cimg" style="width:64px;margin:0 auto;">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="rw-title">${LEVELS[newBench].name} freigeschaltet!</div><div class="benchbtn"></div></div>` : '';
+  const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '') + `<div class="rcards">${benchCard}${nextCard}</div>`;
   const slots = Array.from({length: 9}, (_, i) => `<div class="lootslot">${run.list && run.list[i] ? itemSVG(run.list[i]).replace('<svg ', `<svg style="animation-delay:${.12 * i}s" `) : ''}</div>`).join('');
   const chestImg = L.chest ? `<div class="lootgrid">${slots}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
-  const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
+  const retry = document.createElement('button'); retry.className = 'btn quiet'; retry.textContent = 'Nochmal';
   retry.onclick = () => { hideOverlay(); start(cur); };
-  const menu = document.createElement('button'); menu.className = 'btn'; menu.textContent = 'Menü';
+  const menu = document.createElement('button'); menu.className = 'btn quiet'; menu.textContent = 'Menü';
   menu.onclick = () => { hideOverlay(); renderMenu(); };
   btns.appendChild(retry); btns.appendChild(menu);
   if (newBench >= 0) {
@@ -1985,7 +1997,7 @@ function finish(){
   if (next) {
     const nb = document.createElement('button'); nb.className = 'btn next'; nb.textContent = 'Nächstes Level';
     nb.onclick = () => { hideOverlay(); start(cur + 1); };
-    btns.appendChild(nb);
+    box.querySelector('.nextbtn').appendChild(nb);
   }
   // 1 Sekunde Pause: Der letzte Anschlag ist sichtbar gezählt, Eingaben werden jetzt nicht mehr gewertet.
   // Danach wächst das Fenster aus der Mitte (Animation am Fenster selbst).
