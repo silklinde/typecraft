@@ -236,13 +236,15 @@
   .emsvg{vertical-align:middle;}
 
   /* Oben rechts: Smaragd-Zähler und Schnellzugriffsleiste mit 4 Slots für die Spitzhacken */
-  .userrow{display:flex;align-items:center;background:#444;border:3px solid;border-color:#373737 #fff #fff #373737;margin:4px 0;}
-  .userpick{flex:1;display:flex;align-items:center;gap:14px;background:none;border:none;color:#fff;font:inherit;font-size:26px;text-align:left;padding:8px 12px;cursor:pointer;}
-  .userpick:hover{background:#5b5f9c;}
-  .userpick svg{width:40px;height:40px;border:2px solid #000;flex:none;}
-  .userdel{background:none;border:none;color:#c33;font:inherit;font-size:22px;cursor:pointer;padding:0 12px;align-self:stretch;}
-  .userdel:hover{color:#f55;}
-  .userlist{display:flex;flex-direction:column;margin-bottom:8px;max-height:300px;overflow:auto;}
+  .spielerraster{grid-template-columns:repeat(4,minmax(0,1fr));max-height:50vh;overflow:auto;padding:4px;}
+  .spielerraster .chest.spieler{padding:10px 4px 8px;}
+  .spielerraster .chest.spieler svg{width:64px;height:64px;}
+  .spielerraster .chest.spieler .cimg svg:not(.ch){border:2px solid #000;}
+  .spielerraster .chest.spieler.neu .cimg svg{border:none;}
+  .spielerraster .chest.spieler .cname{max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+  .spielerraster .chest.spieler.sel{outline:4px solid #9be06f;outline-offset:-4px;}
+  .spieleraktion{min-height:62px;margin-top:10px;}
+  .spieleraktion .btn[hidden]{display:none;}
   #btnUser{cursor:pointer;font-size:20px;}
   #userLabel{display:flex;align-items:center;gap:8px;}
   .hud{display:flex;align-items:center;gap:14px;}
@@ -614,24 +616,55 @@ function deleteUser(name){
     openUsers();
   };
 }
+function plusSVG(size){
+  let r = '';
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const arm = (x >= 6 && x <= 9) || (y >= 6 && y <= 9);
+    const edge = (x >= 6 && x <= 9 && (y === 1 || y === 14)) || (y >= 6 && y <= 9 && (x === 1 || x === 14));
+    if (arm && x >= 1 && x <= 14 && y >= 1 && y <= 14 && !(x < 6 && y < 6) && !(x > 9 && y < 6) && !(x < 6 && y > 9) && !(x > 9 && y > 9))
+      r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${edge || x === 6 || y === 6 ? '#9be06f' : (x === 9 || y === 9 ? '#2d5c18' : '#5d9e3a')}"/>`;
+  }
+  return `<svg viewBox="0 0 16 16" width="${size}" height="${size}" shape-rendering="crispEdges" style="image-rendering:pixelated;display:block">${r}</svg>`;
+}
+const escHtml = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// Spielerauswahl: Karten wie bei Level und Werkbänken; Karte antippen, dann Auswählen oder Löschen
 function openUsers(){
+  const names = userList();
+  if (!names.length) return openNewUser(false);
+  const box = document.getElementById('overlayBox');
+  box.className = 'box wide';
+  const cards = names.map(n => `<button class="chest spieler" data-n="${escHtml(n)}"><div class="cimg">${headSVG(n, 64)}</div><div class="cname">${escHtml(n)}</div></button>`).join('');
+  box.innerHTML = `${user ? '<button class="mclose" title="Schließen">✕</button>' : ''}<div class="mtitle">Wer spielt?</div>
+    <div class="minner"><div class="g5 spielerraster">${cards}<button class="chest spieler neu" title="Neuen Spieler anlegen"><div class="cimg">${plusSVG(64)}</div><div class="cname">Neu</div></button></div>
+    <div class="spieleraktion"><button class="btn green" id="userSel" hidden>Auswählen</button><button class="btn" id="userDel" hidden>Löschen</button></div></div>`;
+  if (user) box.querySelector('.mclose').onclick = hideOverlay;
+  let sel = null;
+  const selBtn = box.querySelector('#userSel'), delBtn = box.querySelector('#userDel');
+  box.querySelectorAll('.spieler').forEach(c => c.onclick = () => {
+    if (c.classList.contains('neu')) return openNewUser(true);
+    box.querySelectorAll('.spieler').forEach(o => o.classList.toggle('sel', o === c));
+    sel = c.dataset.n; selBtn.hidden = delBtn.hidden = false;
+  });
+  selBtn.onclick = () => { if (sel) pickUser(sel); };
+  delBtn.onclick = () => { if (sel) deleteUser(sel); };
+  document.getElementById('overlay').style.display = 'flex';
+}
+function openNewUser(canGoBack){
   const box = document.getElementById('overlayBox');
   box.className = 'box';
-  const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const names = userList().map(n => `<div class="userrow"><button class="userpick" data-n="${esc(n)}">${headSVG(n, 40)}<span>${esc(n)}</span></button><button class="userdel" data-n="${esc(n)}" title="Spieler löschen">✕</button></div>`).join('');
-  box.innerHTML = `${user ? '<button class="mclose" title="Schließen">✕</button>' : ''}<div class="mtitle">Wer spielt?</div>
-    <div class="minner">${names ? `<div class="userlist">${names}</div>` : ''}
-    <input id="spielerInput" type="text" name="spielerwahl" maxlength="12" placeholder="Neuer Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" style="font:inherit;font-size:24px;padding:6px 10px;border:3px solid #000;width:80%;margin:8px 0;">
-    <div><button class="btn green" id="userGo">Los</button></div></div>`;
+  box.innerHTML = `${user ? '<button class="mclose" title="Schließen">✕</button>' : ''}<div class="mtitle">Neuer Spieler</div>
+    <div class="minner">
+    <input id="spielerInput" type="text" name="spielerwahl" maxlength="12" placeholder="Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" style="font:inherit;font-size:24px;padding:6px 10px;border:3px solid #000;width:80%;margin:8px 0;">
+    <div>${canGoBack ? '<button class="btn" id="userBack">Zurück</button>' : ''}<button class="btn green" id="userGo">Los</button></div></div>`;
   if (user) box.querySelector('.mclose').onclick = hideOverlay;
-  box.querySelectorAll('.userpick').forEach(b => b.onclick = () => pickUser(b.dataset.n));
-  box.querySelectorAll('.userdel').forEach(b => b.onclick = () => deleteUser(b.dataset.n));
   const inp = box.querySelector('#spielerInput'), go = box.querySelector('#userGo');
   const sync = () => { go.disabled = !inp.value.trim(); };
   inp.oninput = sync; sync();
   go.onclick = () => { if (!go.disabled) pickUser(inp.value); };
+  if (canGoBack) box.querySelector('#userBack').onclick = openUsers;
   document.getElementById('overlay').style.display = 'flex';
-  box.querySelector('#spielerInput').focus();
+  inp.focus();
 }
 function unlocked(i){
   const L = LEVELS[i];
@@ -1707,7 +1740,7 @@ function onKey(e){
     if (e.key === 'Escape' && user && document.getElementById('menu') && !document.getElementById('menu').classList.contains('hidden')) hideOverlay();
     if (e.key === 'Enter') {
       e.preventDefault();
-      const btn = (document.getElementById('userGo')) || document.querySelector('#overlayBox .mclose') || document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn');
+      const btn = (document.getElementById('userGo') || (document.getElementById('userSel') && !document.getElementById('userSel').hidden ? document.getElementById('userSel') : null)) || document.querySelector('#overlayBox .mclose') || document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn');
       if (btn) btn.click();
     }
     return;
