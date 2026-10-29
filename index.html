@@ -594,11 +594,19 @@ function pickUser(name){
   return true;
 }
 function deleteUser(name){
-  if (!confirm(`Spieler „${name}“ und den ganzen Spielstand wirklich löschen?`)) return;
-  try { localStorage.removeItem(keyOf(name)); } catch(e){}
-  lsSet(KEY_USERS, JSON.stringify(userList().filter(n => n !== name)));
-  if (name === user) { user = null; try { localStorage.removeItem(KEY_CUR); } catch(e){} st = fresh(); renderMenu(); }
-  openUsers();
+  const box = document.getElementById('overlayBox');
+  box.className = 'box';
+  box.innerHTML = `<button class="mclose" title="Abbrechen">✕</button><div class="mtitle">Spieler löschen?</div>
+    <div class="minner"><p style="font-size:24px;margin:8px 0 16px;"></p>
+    <button class="btn green" id="delNo">Abbrechen</button><button class="btn" id="delYes">Löschen</button></div>`;
+  box.querySelector('p').textContent = `„${name}“ und der ganze Spielstand gehen verloren.`;
+  box.querySelector('.mclose').onclick = box.querySelector('#delNo').onclick = openUsers;
+  box.querySelector('#delYes').onclick = () => {
+    try { localStorage.removeItem(keyOf(name)); } catch(e){}
+    lsSet(KEY_USERS, JSON.stringify(userList().filter(n => n !== name)));
+    if (name === user) { user = null; try { localStorage.removeItem(KEY_CUR); } catch(e){} st = fresh(); renderMenu(); }
+    openUsers();
+  };
 }
 function openUsers(){
   const box = document.getElementById('overlayBox');
