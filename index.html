@@ -24,11 +24,11 @@
   .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
   h2{margin:4px 0 8px;font-size:18px;}
   /* Menü-Raster: links Minen (5x5), rechts oben Craften (2x5), rechts unten Inventar (3x5), unten der Shop über die ganze Breite */
-  #menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:stretch;}
+  #menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:stretch;grid-template-rows:auto 1fr;min-height:calc(100vh - 124px);}
   #menu .panel{margin:6px 0;}
   #pMinen{grid-column:1;grid-row:1;}
   #pCraften{grid-column:2;grid-row:1;}
-  #dock{grid-column:1 / -1;grid-row:2;display:flex;gap:16px;margin:6px 0;}
+  #dock{grid-column:1 / -1;grid-row:2;display:flex;gap:16px;margin:6px 0;align-self:end;align-items:flex-end;}
   #dock .chest{width:160px;padding:4px;background:none;border:none;box-shadow:none;gap:8px;}
   #dock .chest .cname{font-size:30px;}
   #dock .chest .cimg{width:128px;height:100px;align-items:center;}
