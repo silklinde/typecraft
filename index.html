@@ -291,6 +291,13 @@
   #intro.cplay{--cs:clamp(40px,6.2vh,64px);}
   #intro.cplay .block.big{top:calc(var(--cs) + 30px);}
   /* Werkbank-Leiste: ein Slot pro Buchstabe, Pfeil, Ergebnis; rechts die kleine Truhe */
+  .block.big.space{width:calc(var(--bw)*2.6);font-size:calc(var(--bw)*.3);}
+  /* Satz-Werkbank: der Satz steht als Text in der Leiste, getippte Zeichen leuchten */
+  .csent{max-width:62%;text-align:center;font-size:calc(var(--cs)*.42);line-height:1.15;font-weight:bold;color:rgba(255,255,255,.4);text-shadow:2px 2px 0 #000;}
+  .csent .sw{white-space:nowrap;}
+  .csent .sch{display:inline-block;min-width:.3em;border-bottom:3px solid transparent;}
+  .csent .sch.done{color:#fff;}
+  .csent .sch.now{border-bottom-color:#ffd166;color:#ffd166;}
   #craft{position:absolute;left:0;right:0;top:4px;height:var(--cs);display:flex;justify-content:center;align-items:center;gap:6px;}
   .cslot{position:relative;width:var(--cs);height:var(--cs);box-sizing:border-box;background:#8b8b8b;border:3px solid;border-color:#373737 #fff #fff #373737;
          display:flex;align-items:center;justify-content:center;font-size:calc(var(--cs)*.58);font-weight:bold;line-height:1;color:rgba(0,0,0,.3);
@@ -494,8 +501,24 @@ const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeige
 const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Fass','As','Dada','Fa'];
 const CHEST2_WORDS = ['Ja','Öl','Fall','Falls','Kalk','Lass','Salsa','Kajak','Alaska'];
 const CHEST3_WORDS = ['Glas','Hals','Hass','Saga','Jagd','Kahl','Gala','Gaga','Hall'];
+// Werkbänke 4–6: Wörter mit der ganzen Grundreihe, der oberen Reihe und allen Reihen
+const CHEST4_WORDS = ['Gas','Lag','Flak','Kaff','Haha','Saal','Aal','Gag','Kajaks'];
+const CHEST5_WORDS = ['Wasser','Teller','Haus','Eis','Hut','Rose','Wolke','Quark','Pute','Kuh','Tür','Zeit'];
+const CHEST6_WORDS = ['Banane','Computer','Zebra','Mond','Vogel','Yacht','Boxen','Gabel','Vase','Mama','Katze','Nacht'];
+// Werkbänke 7–14: Sätze mit 3 bis 10 Wörtern (ein Satz = ein Gegenstand)
+const SENT_WORDS = {
+  3: ['Der Hund bellt.','Mama kocht Suppe.','Die Sonne scheint.','Wir spielen Fußball.','Tom malt Bilder.','Die Katze schläft.'],
+  4: ['Der Hund läuft schnell.','Mia liest ein Buch.','Wir essen heute Pizza.','Die Vögel singen laut.','Papa fährt zur Arbeit.','Ich mag grüne Äpfel.'],
+  5: ['Am Morgen scheint die Sonne.','Meine Schwester spielt gern Klavier.','Der Bus kommt gleich an.','Im Garten blühen viele Blumen.','Wir gehen heute ins Kino.'],
+  6: ['Nach der Schule spielen wir Fußball.','Mein Bruder baut ein großes Haus.','Im Winter fällt oft weißer Schnee.','Die Kinder lachen und spielen draußen.','Am Sonntag besuchen wir unsere Oma.'],
+  7: ['Der kleine Hund spielt im grünen Garten.','Heute Abend essen wir zusammen bei Oma.','Meine Katze schläft gern auf dem Sofa.','Im Sommer fahren wir ans blaue Meer.'],
+  8: ['Am Wochenende fahren wir mit dem Zug weg.','Der Lehrer erklärt den Kindern die neue Aufgabe.','Mein Bruder und ich bauen eine große Burg.','Nach dem Essen gehen wir noch kurz spazieren.'],
+  9: ['Im Herbst fallen die bunten Blätter von den Bäumen.','Meine Freundin hat ein neues Fahrrad zum Geburtstag bekommen.','Wenn es regnet, bleiben wir zu Hause und lesen.'],
+  10: ['Auf dem Bauernhof leben Kühe, Schweine, Hühner und ein Pferd.','Am Abend sitzen wir alle zusammen am Tisch und lachen.','Im Sommer fahren wir mit dem Rad zum See baden.']
+};
 const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
+const SENT_KEYS = UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß',' ']);
 const LEVELS = [
   {name:'Level 1: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9},
   {name:'Level 2: Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, target:6, reward:'holz'},
@@ -548,9 +571,29 @@ const LEVELS = [
    words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
   {chest:true, name:'Werkbank 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
-  {chest:true, name:'Werkbank 4', label:'', keys:[], neu:[], shift:true, need:5},
-  {chest:true, name:'Werkbank 5', label:'', keys:[], neu:[], shift:true, need:11},
-  {chest:true, name:'Werkbank 6', label:'', keys:[], neu:[], shift:true, need:17},
+  {chest:true, name:'Werkbank 4', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:5, ready:true,
+   words:CHEST4_WORDS, rounds:1, target:wordsLen(CHEST4_WORDS, 1)},
+  {chest:true, name:'Werkbank 5', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:11, ready:true,
+   words:CHEST5_WORDS, rounds:1, target:wordsLen(CHEST5_WORDS, 1)},
+  {chest:true, name:'Werkbank 6', label:'Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], shift:true, shiftl:true, need:17, ready:true,
+   words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
+  // Satz-Werkbänke: Sätze mit 3 bis 10 Wörtern, brauchen Ä und ß (Level 19). Die Leertaste gehört zu den Tasten.
+  {chest:true, sentences:true, name:'Werkbank 7', label:'3 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[3], rounds:1, target:wordsLen(SENT_WORDS[3], 1)},
+  {chest:true, sentences:true, name:'Werkbank 8', label:'4 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[4], rounds:1, target:wordsLen(SENT_WORDS[4], 1)},
+  {chest:true, sentences:true, name:'Werkbank 9', label:'5 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[5], rounds:1, target:wordsLen(SENT_WORDS[5], 1)},
+  {chest:true, sentences:true, name:'Werkbank 10', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[6], rounds:1, target:wordsLen(SENT_WORDS[6], 1)},
+  {chest:true, sentences:true, name:'Werkbank 11', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[7], rounds:1, target:wordsLen(SENT_WORDS[7], 1)},
+  {chest:true, sentences:true, name:'Werkbank 12', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[8], rounds:1, target:wordsLen(SENT_WORDS[8], 1)},
+  {chest:true, sentences:true, name:'Werkbank 13', label:'9 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[9], rounds:1, target:wordsLen(SENT_WORDS[9], 1)},
+  {chest:true, sentences:true, name:'Werkbank 14', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+   words:SENT_WORDS[10], rounds:1, target:wordsLen(SENT_WORDS[10], 1)},
 ];
 const SHOP = [
   {id:'wolf',  label:'🐺 Wolf',        cost:5,  type:'pet'},
@@ -1429,12 +1472,17 @@ function renderChest(){
 function craftBuild(w){
   const el = document.getElementById('craft');
   if (!el) return;
+  if (LEVELS[cur].sentences) {      // Satz: der ganze Satz als Text, getippte Zeichen werden hell
+    el.innerHTML = `<div class="csent">${w.split(/(?<= )/).map(wd => `<span class="sw">${[...wd].map(ch => `<span class="sch">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('')}</span>`).join('')}</div><div class="carrow">→</div><div class="cslot cres"></div>`;
+    return;
+  }
   el.innerHTML = [...w].map(ch => `<div class="cslot">${ch}</div>`).join('') + `<div class="carrow">→</div><div class="cslot cres"></div>`;
 }
 function craftNow(i){
-  document.querySelectorAll('#craft .cslot').forEach((e, j) => e.classList.toggle('now', j === i && !e.classList.contains('cres')));
+  document.querySelectorAll(craftSel()).forEach((e, j) => e.classList.toggle('now', j === i && !e.classList.contains('cres')));
 }
-function craftSlot(i){ return document.querySelectorAll('#craft .cslot')[i]; }
+const craftSel = () => LEVELS[cur].sentences ? '#craft .sch' : '#craft .cslot';
+function craftSlot(i){ return document.querySelectorAll(craftSel())[i]; }
 // Ein kleines Stück fliegt vom Start-Rechteck zum Ziel-Element (Slot oder Truhe)
 function flyTo(rect, dst, fill, delay, dur, done){
   setTimeout(() => {
@@ -1454,6 +1502,7 @@ function flyTo(rect, dst, fill, delay, dur, done){
 function craftLetter(b, i){
   const slot = craftSlot(i);
   if (!slot) return;
+  if (LEVELS[cur].sentences) { slot.classList.add('done'); return; }
   const rect = b.el.getBoundingClientRect();
   flyTo(rect, slot, f => { f.style.cssText += `background-image:var(--${b.kind});border:3px solid #000;`; f.textContent = b.ch; }, 250, 400, () => {
     slot.classList.add('full', 'pop');
@@ -1499,15 +1548,17 @@ function chestNext(){
   const key = ch.toLowerCase(), cap = ch !== key;
   const el = document.createElement('div');
   const kind = item.ore;
-  el.className = 'block big ' + kind;
-  el.textContent = ch;
-  el.style.left = (cxOf(key) * 100).toFixed(3) + '%';
+  const space = ch === ' ';
+  el.className = 'block big ' + kind + (space ? ' space' : '');
+  el.textContent = space ? 'Leertaste' : ch;
+  el.style.left = ((space ? 21 / NCOL : cxOf(key)) * 100).toFixed(3) + '%';
   lanes.appendChild(el);
   run.cur = {key, el, kind, cap, ch};
   run.busy = false;
   if (run.ci === 0) craftBuild(w);
   craftNow(run.ci);
   setExpected(key, cap && shiftFor(key));
+  if (space) { const tl = document.querySelector('#intro .thumb.l'); if (tl) tl.classList.add('hover'); }   // beide Daumen
 }
 // Umschalt-Einführung, Schritt 2: ein kleiner Block verwandelt sich in einen Großbuchstaben, solange Umschalt gehalten wird
 function csNext(){
@@ -1916,7 +1967,7 @@ function finish(){
     ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
   const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '')
-    + (newBench >= 0 ? `<div class="reward"><div class="cimg" style="width:64px;margin:0 auto;">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="rw-title">${LEVELS[newBench].name} freigeschaltet!</div></div>` : '');
+    + (newBench >= 0 ? `<div class="reward"><div class="cimg" style="width:64px;margin:0 auto;">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="rw-title">${LEVELS[newBench].name} freigeschaltet!</div><div class="benchbtn"></div></div>` : '');
   const slots = Array.from({length: 9}, (_, i) => `<div class="lootslot">${run.list && run.list[i] ? itemSVG(run.list[i]).replace('<svg ', `<svg style="animation-delay:${.12 * i}s" `) : ''}</div>`).join('');
   const chestImg = L.chest ? `<div class="lootgrid">${slots}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
@@ -1929,7 +1980,7 @@ function finish(){
   if (newBench >= 0) {
     const bb = document.createElement('button'); bb.className = 'btn green'; bb.textContent = 'Werkbank öffnen';
     bb.onclick = () => { hideOverlay(); start(newBench); };
-    btns.appendChild(bb);
+    box.querySelector('.benchbtn').appendChild(bb);
   }
   if (next) {
     const nb = document.createElement('button'); nb.className = 'btn green'; nb.textContent = 'Weiter';
