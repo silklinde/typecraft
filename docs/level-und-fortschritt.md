@@ -83,13 +83,13 @@ Umschalt: Großbuchstaben tippt man mit der Umschalt der **anderen** Hand. Recht
 ## Crafting an den Werkbänken und Inventar
 Oben in der Mitte steht eine Werkbank-Leiste (`#craft`): ein Slot pro Buchstabe, Pfeil, Ergebnis-Slot; rechts eine kleine Truhe mit Zähler. Jeder abgebaute Block fliegt als kleiner Block in seinen Slot. Ist das Wort fertig, entsteht im Ergebnis-Slot ein Gegenstand (mit Namen) und wandert in die Truhe. Jedes Wort hat einen Gegenstand, seine Blöcke bestehen aus dem passenden Material (`CRAFT`, `chestSeq`). Welche Gegenstände vorkommen, hängt an der besten Spitzhacke (`pickTier()`); bessere Gegenstände sind häufiger (Gewicht 1 + 2 × Stufe).
 
-Gecraftet wird nur Einrichtung und Funktionsblöcke (Minecraft-Inventar, Kategorie mit dem Bett). Lapislazuli und Redstone werden abgebaut, nicht gecraftet, und kommen deshalb nicht vor.
+Gecraftet werden nur Gegenstände der Kategorie Dekoration (https://de.minecraft.wiki/w/Handwerk/Dekoration). Lapislazuli und Redstone werden abgebaut, nicht gecraftet, und kommen deshalb nicht vor.
 
 | Spitzhacke | Material → Gegenstand |
 |---|---|
 | Holz | Holz → Werkbank, Truhe, Bett; Stein → Ofen; Kohle → Fackel |
-| Stein | Eisen → Laterne, Kessel; Kupfer → Blitzableiter |
-| Eisen | Gold → Uhr; Diamant → Zaubertisch |
-| Diamant | Obsidian → Netherportal |
+| Stein | Eisen → Laterne, Kessel, Amboss |
+| Eisen | Diamant → Zaubertisch, Plattenspieler |
+| Diamant | Obsidian → Endertruhe |
 
 Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Inventar“ gecraftete Gegenstände mit Namen und Anzahl; alles, was noch nicht gecraftet wurde, ist nur ein leerer grauer Inventar-Slot (ohne Namen). Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.
