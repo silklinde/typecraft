@@ -620,7 +620,10 @@ function openUsers(){
   if (user) box.querySelector('.mclose').onclick = hideOverlay;
   box.querySelectorAll('.userpick').forEach(b => b.onclick = () => pickUser(b.dataset.n));
   box.querySelectorAll('.userdel').forEach(b => b.onclick = () => deleteUser(b.dataset.n));
-  box.querySelector('#userGo').onclick = () => { const inp = box.querySelector('#userName'); if (!pickUser(inp.value)) inp.focus(); };
+  const inp = box.querySelector('#userName'), go = box.querySelector('#userGo');
+  const sync = () => { go.disabled = !inp.value.trim(); };
+  inp.oninput = sync; sync();
+  go.onclick = () => { if (!go.disabled) pickUser(inp.value); };
   document.getElementById('overlay').style.display = 'flex';
   box.querySelector('#userName').focus();
 }
