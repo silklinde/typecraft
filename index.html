@@ -1879,6 +1879,7 @@ function onKey(e){
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   const k = e.key.toLowerCase();
   if (k === ' ') e.preventDefault();   // die Leertaste soll weder scrollen noch einen Button auslösen
+  if (e.repeat && k !== 'shift') return;   // Taste gehalten: Wiederholungen zählen nicht als Fehler
   const L = LEVELS[cur];
 
   if (L.chest) {
