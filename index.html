@@ -1842,7 +1842,7 @@ const CRUMB_COLORS = {wood:['#a8793a','#8a5f2c','#c9985a'], dirt:['#7a5230','#5e
 
 // Abbau wie in Minecraft: Risse wachsen, der Block wackelt, Krümel springen ab, dann zerplatzt er
 function mineBlock(b){
-  const el = b.el, lanes = document.getElementById('lanes');
+  const el = b.el, lanes = document.getElementById('lanes') || el.parentNode;
   if (el.classList.contains('sch')) { setTimeout(() => { xpPing(); burst(b, lanes); }, 150); return; }   // Satz: Krümel am Buchstaben
   const word = el.classList.contains('cb');
   const crack = document.createElement('div');
@@ -1856,9 +1856,10 @@ function mineBlock(b){
     clearInterval(iv);
     MINING.delete(done);
     xpPing();   // Bling erst, wenn der Block wirklich abgebaut ist
-    burst(b, lanes);
-    if (word) { crack.remove(); el.classList.remove('mining'); el.classList.add('gone'); }   // Wortblock bleibt als Mulde
-    else el.remove();
+    try { burst(b, lanes); } finally {
+      if (word) { crack.remove(); el.classList.remove('mining'); el.classList.add('gone'); }   // Wortblock bleibt als Mulde
+      else el.remove();
+    }
   };
   const iv = setInterval(() => {
     crack.style.backgroundImage = `url(${crackStage(n)})`;
