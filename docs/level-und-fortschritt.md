@@ -39,6 +39,7 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 
 ## Herzen und Smaragde
 - Die Herzen hängen an der Zahl der Fehler (`starBudget(target)`, `starsFor()`), nicht an einer sichtbaren Prozentzahl. Intern gilt weiter: Genauigkeit ≥ 95 % → 3 Herzen, ≥ 85 % → 2, ≥ 70 % → 1, sonst 0 (nochmal, ohne Druck). Die Grundhaltung und alle Einführungen geben immer 3 Herzen.
+- **Werkbänke:** Wort-Werkbänke haben 5 Herzen, Satz-Werkbänke 10 Herzen (`maxHearts(L)`). Die Genauigkeit für k Herzen steigt gleichmäßig von 70 % (1 Herz) bis 95 % (alle Herzen), siehe `heartAcc()`. Die Herz-Größe passt sich an (`heartSize()`). Ältere Spielstände mit 3 Herzen bleiben gültig.
 
   | Level-Länge | ❤❤❤ | ❤❤ | ❤ |
   |---|---|---|---|

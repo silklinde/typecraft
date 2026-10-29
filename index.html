@@ -1066,12 +1066,12 @@ function renderMenu(){
   const ch = document.getElementById('chests'); ch.innerHTML = '';
   LEVELS.forEach((L, i) => {
     if (!L.chest) return;
-    const open = unlocked(i), s = st.stars[i] || 0;
+    const open = unlocked(i), s = st.stars[i] || 0, hs = heartSize(maxHearts(L), 16);
     const b = document.createElement('button');
     b.className = 'chest bench';
     b.disabled = !open;
     b.title = open ? '' : (L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald');
-    const sub = open ? (s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : '') : '';
+    const sub = open ? (s ? Array.from({length: s}, () => heartSVG(hs, true)).join('') : '') : '';
     b.innerHTML = `<div class="cimg">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="cname">${L.name}</div><div class="csub">${sub}</div>`;
     b.onclick = () => start(i);
     ch.appendChild(b);
@@ -1445,19 +1445,29 @@ function learnSteps(L){
 }
 
 // Fehler-Budget je Stern: so viele Fehler darf das Kind bei `target` Blöcken machen (95 / 85 / 70 % Genauigkeit)
-function starBudget(target){ return [0.95, 0.85, 0.70].map(p => Math.floor(target * (1 / p - 1) + 1e-9)); }
-function starsFor(wrong, target){
-  const b = starBudget(target);
-  return wrong <= b[0] ? 3 : wrong <= b[1] ? 2 : wrong <= b[2] ? 1 : 0;
+// Herzen je Level: 3 normal, 5 bei Wort-Werkbänken, 10 bei Satz-Werkbänken
+function maxHearts(L){ return L.sentences ? 10 : L.chest ? 5 : 3; }
+// Größe eines Herzens, damit alle Herzen in dieselbe Zeile passen (base = Größe bei 3 Herzen)
+function heartSize(n, base){ return n > 5 ? Math.round(base * .65) : n > 3 ? Math.round(base * .8) : base; }
+const heartRow = (n, full, base) => Array.from({length: n}, (_, i) => heartSVG(heartSize(n, base), i < full)).join('');
+// Genauigkeit für k Herzen: bei 3 Herzen 70 / 85 / 95 %, sonst gleichmäßig von 70 bis 95 %
+const heartAcc = (k, n) => n === 3 ? [0.70, 0.85, 0.95][k - 1] : 0.70 + 0.25 * (k - 1) / (n - 1);
+// Fehler-Budget: bud[k-1] = so viele Fehler darf das Kind für k Herzen machen
+function starBudget(target, n = 3){ return Array.from({length: n}, (_, i) => Math.floor(target * (1 / heartAcc(i + 1, n) - 1) + 1e-9)); }
+function starsFor(wrong, target, n = 3){
+  const b = starBudget(target, n);
+  let k = 0;
+  while (k < n && wrong <= b[k]) k++;
+  return k;
 }
 
 // Live-Leiste: Fortschritt und Herzen; jeder Fehler über dem Budget lässt ein Herz erlöschen
 function updateGoal(lost){
   const el = document.getElementById('goal');
   if (phase !== 'play' || !run || LEVELS[cur].intro) { el.classList.add('hidden'); return; }
-  const b = starBudget(run.target), stars = starsFor(run.wrong, run.target);
+  const n = maxHearts(LEVELS[cur]), stars = starsFor(run.wrong, run.target, n);
   const note = `Fehler: ${run.wrong}`;
-  const hearts = [0,1,2].map(i => heartSVG(34, i < stars)).join('');
+  const hearts = heartRow(n, stars, 34);
   el.innerHTML = `<div class="top"><span class="hearts${lost ? ' lost' : ''}">${hearts}</span><span class="cnt">${run.correct}</span><span class="note">${note}</span></div>
     <div class="bar" style="--n:${run.target}"><i style="width:${Math.min(100, run.correct / run.target * 100)}%"></i><u></u></div>`;
   el.classList.remove('hidden');
@@ -1697,9 +1707,9 @@ function chestKey(e, k){
     if (wordDone) { run.wi++; run.ci = 0; delay = 2900; }   // nach einem fertigen Wort: Gegenstand entsteht und wandert in die Truhe
     pendingTimer = setTimeout(chestNext, delay);
   } else {
-    const before = starsFor(run.wrong, run.target);
+    const before = starsFor(run.wrong, run.target, maxHearts(LEVELS[cur]));
     run.wrong++;
-    updateGoal(starsFor(run.wrong, run.target) < before);
+    updateGoal(starsFor(run.wrong, run.target, maxHearts(LEVELS[cur])) < before);
     beep(200);
     b.el.classList.remove('shake'); void b.el.offsetWidth; b.el.classList.add('shake');
     if (b.key === k && b.cap) {     // richtige Taste, aber Umschalt vergessen: Umschalt wackelt
@@ -1994,9 +2004,9 @@ function onKey(e){
     setExpected(null);
     pendingTimer = setTimeout(showBlock, 450);
   } else {
-    const before = starsFor(run.wrong, run.target);
+    const before = starsFor(run.wrong, run.target, maxHearts(LEVELS[cur]));
     run.wrong++;
-    updateGoal(starsFor(run.wrong, run.target) < before);
+    updateGoal(starsFor(run.wrong, run.target, maxHearts(LEVELS[cur])) < before);
     beep(200);
     b.el.classList.remove('shake');
     void b.el.offsetWidth;
@@ -2009,8 +2019,9 @@ function finish(){
   active = false;
   cancelAnimationFrame(raf);
   const L = LEVELS[cur];
-  const bud = starBudget(run.target);
-  const stars = L.intro ? 3 : starsFor(run.wrong, run.target);
+  const maxH = maxHearts(L);
+  const bud = starBudget(run.target, maxH);
+  const stars = L.intro ? 3 : starsFor(run.wrong, run.target, maxH);
   const wasOpen = LEVELS.map((_, i) => unlocked(i));
   st.stars[cur] = Math.max(st.stars[cur] || 0, stars);
   if (stars > 0) st.emeralds += 3;
@@ -2022,10 +2033,10 @@ function finish(){
   const next = cur < LEVELS.length - 1 && stars > 0 && !L.chest;
   const fehler = n => n === 1 ? '1 Fehler' : `${n} Fehler`;
   const detail = L.intro ? '' : `${run.correct} ${L.chest ? 'Buchstaben' : 'Blöcke'}, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
-  const ziel = (L.intro || stars === 3) ? ''
-    : `<div style="margin-top:6px;color:#ddd;">${`Für ${stars + 1} ${stars === 0 ? 'Herz' : 'Herzen'} höchstens ${fehler(bud[2 - stars])}`}.</div>`;
+  const ziel = (L.intro || stars === maxH) ? ''
+    : `<div style="margin-top:6px;color:#ddd;">${`Für ${stars + 1} ${stars === 0 ? 'Herz' : 'Herzen'} höchstens ${fehler(bud[stars])}`}.</div>`;
   const msg = stars > 0
-    ? `Geschafft!<div class="mrow"><span class="hearts">${[0,1,2].map(i => heartSVG(40, i < stars)).join('')}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
+    ? `Geschafft!<div class="mrow"><span class="hearts">${heartRow(maxH, stars, 40)}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
     : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
   const nextL = next ? LEVELS[cur + 1] : null;
   const nextCard = nextL
