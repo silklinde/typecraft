@@ -24,19 +24,30 @@
   .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
   h2{margin:4px 0 8px;font-size:18px;}
   /* Menü-Raster: links Minen (5x5), rechts oben Craften (2x5), rechts unten Inventar (3x5), unten der Shop über die ganze Breite */
-  #menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:start;}
+  #menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:stretch;}
   #menu .panel{margin:6px 0;}
-  #pMinen{grid-column:1;grid-row:1 / span 2;}
+  #pMinen{grid-column:1;grid-row:1;}
   #pCraften{grid-column:2;grid-row:1;}
-  #pInventar{grid-column:2;grid-row:2;}
-  #pShop{grid-column:1 / -1;grid-row:3;}
+  #dock{grid-column:1 / -1;grid-row:2;display:flex;gap:16px;margin:6px 0;}
+  #dock .chest{width:200px;padding:14px 8px 12px;}
+  #dock .chest .cimg{width:128px;height:100px;align-items:center;}
+  #dock .chest .cimg svg.ch{width:128px;}
+  #dock .chest .cimg svg.emsvg{width:88px;height:88px;}
+  #overlay .box.wide{width:min(760px,94vw);}
+  #overlay .box.wide .minner{max-height:68vh;overflow:auto;}
+  #overlay .box .g5{gap:8px;}
+  #overlay .box .g5 .citem,#overlay .box .g5 .cempty{width:auto;aspect-ratio:1;box-sizing:border-box;justify-content:center;}
+  #overlay .box .shoplist{display:flex;flex-direction:column;align-items:stretch;gap:2px;}
+  #overlay .box .shoplist .btn{display:flex;align-items:center;justify-content:center;gap:8px;}
   #menu.hidden{display:none;}
   .g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch;}
   .g5 .chest,.g5 .chest:disabled,.g5 .citem,.g5 .cempty{width:auto;min-width:0;margin:0;}
   .g5 .chest .cimg,.g5 .chest:disabled .cimg{width:100%;}
   .g5 .chest .cimg svg.ch{width:min(104px,100%);}
   .g5 .chest:disabled .cimg svg.ch{width:min(80px,100%);}
-  .g5 .chest .cname,.g5 .chest:disabled .cname{font-size:22px;}
+  .g5{align-content:start;}
+  .g5 .chest .cname,.g5 .chest:disabled .cname{font-size:clamp(15px,1.6vw,22px);white-space:nowrap;}
+  .g5 .chest{padding-left:2px;padding-right:2px;}
   .g5 .chest.lvl .cimg svg,.g5 .chest.lvl:disabled .cimg svg{width:min(64px,100%);height:auto;aspect-ratio:1;}
   .g5 .chest .csub{min-height:18px;}
   .g5 .cempty{height:auto;aspect-ratio:1;}
@@ -314,13 +325,9 @@
       <h2>Craften</h2>
       <div class="g5" id="chests"></div>
     </div>
-    <div class="panel" id="pInventar">
-      <h2>Inventar</h2>
-      <div class="g5" id="collection"></div>
-    </div>
-    <div class="panel" id="pShop">
-      <h2>Shop</h2>
-      <div id="shop"></div>
+    <div id="dock">
+      <button class="chest" id="btnInv"><div class="cimg"></div><div class="cname">Inventar</div><div class="csub"></div></button>
+      <button class="chest" id="btnShop"><div class="cimg"></div><div class="cname">Shop</div><div class="csub"></div></button>
     </div>
   </div>
 
@@ -824,20 +831,42 @@ function renderMenu(){
     ch.appendChild(b);
   });
 
-  const co = document.getElementById('collection'); co.innerHTML = '';
-  CRAFT.forEach(it => {
-    const n = st.items[it.id] || 0;
-    const d = document.createElement('div');
-    if (n) {
-      d.className = 'citem';
-      d.innerHTML = itemSVG(it) + `<div>${it.name}</div><div class="n">× ${n}</div>`;
-    } else {
-      d.className = 'cempty';     // noch nicht gecraftet: nur ein leerer Inventar-Slot
-    }
-    co.appendChild(d);
-  });
+  document.querySelector('#btnInv .cimg').innerHTML = chestSVG('closed');
+  document.querySelector('#btnShop .cimg').innerHTML = emeraldSVG(88);
+  const owned = CRAFT.filter(it => st.items[it.id]).length;
+  document.querySelector('#btnInv .csub').textContent = `${owned} / ${CRAFT.length}`;
+  document.getElementById('btnInv').onclick = openInventory;
+  document.getElementById('btnShop').onclick = openShop;
+}
 
+// Inventar und Shop öffnen als Fenster über dem Menü (gleiches Fenster wie das Abschluss-Fenster)
+function openMenuModal(title, bodyHtml, wide){
+  const box = document.getElementById('overlayBox');
+  box.className = 'box' + (wide ? ' wide' : '');
+  box.innerHTML = `<div class="mtitle">${title}</div><div class="minner">${bodyHtml}<div class="btns" style="margin-top:14px;"></div></div>`;
+  const close = document.createElement('button'); close.className = 'btn green'; close.textContent = 'Schließen';
+  close.onclick = hideOverlay;
+  box.querySelector('.btns').appendChild(close);
+  document.getElementById('overlay').style.display = 'flex';
+  return box;
+}
+
+function openInventory(){
+  const cells = CRAFT.map(it => {
+    const n = st.items[it.id] || 0;
+    return n ? `<div class="citem">${itemSVG(it)}<div>${it.name}</div><div class="n">× ${n}</div></div>` : '<div class="cempty"></div>';
+  }).join('');
+  openMenuModal('Inventar', `<div class="g5">${cells}</div>`, true);
+}
+
+function openShop(){
+  const box = openMenuModal('Shop', `<div class="shoplist" id="shop"></div><div class="mrow" id="shopEm"></div>`, false);
+  renderShop();
+}
+
+function renderShop(){
   const sh = document.getElementById('shop'); sh.innerHTML = '';
+  document.getElementById('shopEm').innerHTML = `<span class="mem">${st.emeralds} ${emeraldSVG(32)}</span>`;
   SHOP.forEach(item => {
     const owned = !!st.owned[item.id];
     const locked = item.need !== undefined && (st.stars[item.need] || 0) < 1;
@@ -846,7 +875,7 @@ function renderMenu(){
     if (owned) {
       if (item.type === 'biome') {
         b.textContent = `${item.label} ${st.biome === item.id ? '(aktiv)' : '– wählen'}`;
-        b.onclick = () => { st.biome = item.id; save(); renderMenu(); };
+        b.onclick = () => { st.biome = item.id; save(); renderShop(); };
       } else {
         b.textContent = `${item.label} ✓ (dabei)`;
         b.disabled = true;
@@ -858,7 +887,7 @@ function renderMenu(){
         st.emeralds -= item.cost;
         st.owned[item.id] = true;
         if (item.type === 'biome') st.biome = item.id;
-        save(); renderMenu();
+        save(); topBar(); renderShop();
       };
     }
     sh.appendChild(b);
@@ -1580,6 +1609,7 @@ function tick(t){
 
 function onKey(e){
   if (document.getElementById('overlay').style.display === 'flex') {
+    if (e.key === 'Escape' && document.getElementById('menu') && !document.getElementById('menu').classList.contains('hidden')) hideOverlay();
     if (e.key === 'Enter') {
       e.preventDefault();
       const btn = document.querySelector('#overlayBox .btn.green') || document.querySelector('#overlayBox .btn');
@@ -1725,6 +1755,7 @@ function finish(){
   save();
 
   const box = document.getElementById('overlayBox');
+  box.className = 'box';
   const next = cur < LEVELS.length - 1 && stars > 0 && !L.chest;
   const fehler = n => n === 1 ? '1 Fehler' : `${n} Fehler`;
   const detail = L.intro ? '' : `${run.correct} ${L.chest ? 'Buchstaben' : 'Blöcke'}, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
