@@ -1790,7 +1790,11 @@ function showBlock(){
   const el = document.createElement('div');
   // Neue Tasten des Levels sind Erz, die Wiederholung ist Stein. In Übungslevels ist das Erz die Reihe der Stufe
   // (Level 4: zufällig etwa jeder dritte Block).
-  const isOre = L.neu.length ? L.neu.includes(key)
+  // Sind alle Tasten des Levels neu (Level 2 und 3), wechseln sich Erz und Stein ab.
+  const allNeu = L.neu.length && L.keys.every(k => L.neu.includes(k));
+  if (allNeu) run.erzDran = !run.erzDran;
+  const isOre = allNeu ? run.erzDran
+              : L.neu.length ? L.neu.includes(key)
               : (L.oreRow !== undefined ? KEYPOS[key].r === L.oreRow : Math.random() < 0.3);
   const kind = isOre ? (L.neu.length ? (L.ore || 'coal') : (ORE_OF[key] || L.ore || 'coal')) : 'stone';
   el.className = 'block big ' + kind;
