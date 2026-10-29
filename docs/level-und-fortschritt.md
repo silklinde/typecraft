@@ -4,26 +4,25 @@ Alle Daten stehen im Array `LEVELS` in `index.html`. Index = Level-Nummer.
 
 | Nr | Name | Neue Tasten | Erz | Treffer | Belohnung |
 |----|------|-------------|-----|---------|-----------|
-| 0 | Hände auflegen | alle 8 Finger + Daumen | Erde | 9 (F J D S A K L Ö ␣) | – |
-| 1 | Grundhaltung | F J + Leertaste | Holz | 6 (F J Leertaste, zweimal) | Holzspitzhacke |
-| 2 | A S D | A S D | Kohle | 16 | nur linke Hand (A S D F) |
-| 3 | K L Ö | K L Ö | Kohle | 16 | nur rechte Hand (J K L Ö) |
-| 4 | + G H | G H | Kohle | 16 | |
-| 5 | Ganze Reihe | – | Kohle (zufällig ca. jeder dritte Block) | 32 | Steinspitzhacke |
-| 6 | + E I | E I | Eisen | 16 | |
-| 7 | + R U | R U | Kupfer | 16 | |
-| 8 | + T Z | T Z | Lapislazuli | 16 | |
-| 9 | + W O | W O | Eisen | 16 | |
-| 10 | + Q P Ü | Q P Ü | Kupfer | 16 | |
-| 11 | Obere Reihe | – | Erze der Tasten der oberen Reihe (je Taste wie oben) | 32 | Eisenspitzhacke |
-| 12 | + C , | C , | Diamant | 16 | |
-| 13 | + V M | V M | Gold | 16 | |
-| 14 | + B N | B N | Redstone | 16 | |
-| 15 | + X . | X . | Diamant | 16 | |
-| 16 | + Y - | Y - | Gold | 16 | |
-| 17 | Alle Reihen | – | Erze der Tasten der unteren Reihe (je Taste wie oben) | 48 | Diamantspitzhacke |
-| 18 | + Ä ß | Ä ß | Redstone | 16 | |
-| 19 | Zahlen | 1 2 3 4 5 6 7 8 9 0 (nur die Zahlen, sonst keine Taste aktiv) | Obsidian | 30 | |
+| 0 | Hände auflegen | alle 8 Finger + Daumen | Erde | 9 (F J D S A K L Ö ␣) | Holzspitzhacke |
+| 1 | A S D F | A S D F | Kohle | 16 | nur linke Hand |
+| 2 | J K L Ö | J K L Ö | Kohle | 16 | nur rechte Hand |
+| 3 | + G H | G H | Kohle | 16 | |
+| 4 | Ganze Reihe | – | Kohle (zufällig ca. jeder dritte Block) | 32 | Steinspitzhacke |
+| 5 | + E I | E I | Eisen | 16 | |
+| 6 | + R U | R U | Kupfer | 16 | |
+| 7 | + T Z | T Z | Lapislazuli | 16 | |
+| 8 | + W O | W O | Eisen | 16 | |
+| 9 | + Q P Ü | Q P Ü | Kupfer | 16 | |
+| 10 | Obere Reihe | – | Erze der Tasten der oberen Reihe (je Taste wie oben) | 32 | Eisenspitzhacke |
+| 11 | + C , | C , | Diamant | 16 | |
+| 12 | + V M | V M | Gold | 16 | |
+| 13 | + B N | B N | Redstone | 16 | |
+| 14 | + X . | X . | Diamant | 16 | |
+| 15 | + Y - | Y - | Gold | 16 | |
+| 16 | Alle Reihen | – | Erze der Tasten der unteren Reihe (je Taste wie oben) | 48 | Diamantspitzhacke |
+| 17 | + Ä ß | Ä ß | Redstone | 16 | |
+| 18 | Zahlen | 1 2 3 4 5 6 7 8 9 0 (nur die Zahlen, sonst keine Taste aktiv) | Obsidian | 30 | |
 
 **Ä** ist ab Level 18 dabei. **ß** liegt in einer zusätzlichen Reihe über Q–Ü (Zahlenreihe, `KEYPOS` = Reihe −1; in Level 18 steht dort nur ß, ab Level 19 alle Zahlen `NUMROW`: 1 beginnt in Spalte 1 über Q, ß in Spalte 41; die Reihe liegt eine halbe Taste weiter rechts als auf echten Tastaturen, damit sie ins Raster passt). Diese Reihe erscheint nur in Levels, deren `keys` ß enthalten; dann bekommt `.kb` die Klasse `num` und alles darunter rutscht per `--o` eine Reihe nach unten. Beide tippt der rechte kleine Finger. Level 19 führt die Zahlen ein (`FINGERS`: 1 kleiner Finger links, 2 Ring, 3 Mitte, 4 und 5 Zeigefinger links, 6 und 7 Zeigefinger rechts, 8 Mitte, 9 Ring, 0 kleiner Finger rechts). Der Spielstand ist `v:3`: die Werkbänke stehen jetzt bei Index 20–25.
 
@@ -99,3 +98,6 @@ Gecraftet werden nur Gegenstände der Kategorie Dekoration (https://de.minecraft
 | Diamant | Obsidian → Endertruhe |
 
 Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Inventar“ gecraftete Gegenstände mit Namen und Anzahl; alles, was noch nicht gecraftet wurde, ist nur ein leerer grauer Inventar-Slot (ohne Namen). Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.
+
+
+**Stand v4 des Spielstands:** Die frühere Grundhaltung (F J + Leertaste, Holzblöcke) entfällt; die Holzspitzhacke gibt Level 0 „Hände auflegen“. F steht jetzt in Level 1 (linke Hand), J in Level 2 (rechte Hand). Alle Indizes ab dem alten Level 2 sind um eins nach vorn gerückt (Migration in `load()`). Der Code für die Grundhaltung (`grundAsk`, `GRUND_SEQ`) ist noch da, wird aber nicht mehr benutzt.

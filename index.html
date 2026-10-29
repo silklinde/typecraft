@@ -535,79 +535,78 @@ const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
 const SENT_KEYS = UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß',' ']);
 const LEVELS = [
-  {name:'Level 1: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9},
-  {name:'Level 2: Grundhaltung', keys:['f','j'], neu:['f','j'], intro:true, target:6, reward:'holz'},
-  {name:'Level 3: A S D', keys:['a','s','d','f'], neu:['a','s','d'],
-   hint:'Neu: A, S und D (nur linke Hand, die rechte ruht). Die Kohleblöcke zeigen dir die neuen Tasten. Tippe die Taste, um den Block abzubauen.', target:16},
-  {name:'Level 4: K L Ö', keys:['j','k','l','ö'], neu:['k','l','ö'],
-   hint:'Neu: K, L und Ö (nur rechte Hand, die linke ruht). Die Kohleblöcke zeigen dir die neuen Tasten.', target:16},
-  {name:'Level 5: + G H', keys:HOME10, neu:['g','h'],
+  {name:'Level 1: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9, reward:'holz'},
+  {name:'Level 2: A S D F', keys:['a','s','d','f'], neu:['a','s','d','f'],
+   hint:'Neu: A, S, D und F (nur linke Hand, die rechte ruht). Die Kohleblöcke zeigen dir die neuen Tasten. Tippe die Taste, um den Block abzubauen.', target:16},
+  {name:'Level 3: J K L Ö', keys:['j','k','l','ö'], neu:['j','k','l','ö'],
+   hint:'Neu: J, K, L und Ö (nur rechte Hand, die linke ruht). Die Kohleblöcke zeigen dir die neuen Tasten.', target:16},
+  {name:'Level 4: + G H', keys:HOME10, neu:['g','h'],
    hint:'Neu: G und H (Kohle). Dafür streckt sich der Zeigefinger zur Seite und geht danach zurück auf F bzw. J.', target:16},
-  {name:'Level 6: Ganze Reihe', keys:HOME10, neu:[],
+  {name:'Level 5: Ganze Reihe', keys:HOME10, neu:[],
    hint:'Übung: Alle Tasten der Grundreihe, Stein und Kohle. Lass die Hände ruhig liegen und bewege nur die Finger.', target:32, reward:'stein'},
 
   // Obere Reihe: Eisen, Kupfer, Lapislazuli (mit der Steinspitzhacke abbaubar). Die Finger greifen eine Reihe nach oben und gehen zurück auf die Grundtaste.
-  {name:'Level 7: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
+  {name:'Level 6: + E I', keys:UPPER(['e','i']), neu:['e','i'], ore:'iron',
    hint:'Neu: E und I (Eisenerz, beide Mittelfinger). Greife eine Reihe nach oben und gehe danach zurück auf D bzw. K.', target:16},
-  {name:'Level 8: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'copper',
+  {name:'Level 7: + R U', keys:UPPER(['e','i','r','u']), neu:['r','u'], ore:'copper',
    hint:'Neu: R (Kupfererz, linker Zeigefinger) und U (rechter Zeigefinger). Nach dem Tippen geht der Finger zurück auf F bzw. J.', target:16},
-  {name:'Level 9: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'lapis',
+  {name:'Level 8: + T Z', keys:UPPER(['e','i','r','u','t','z']), neu:['t','z'], ore:'lapis',
    hint:'Neu: T und Z (Lapislazuli). Die Zeigefinger strecken sich nach oben und zur Seite. Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 10: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
+  {name:'Level 9: + W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:['w','o'], ore:'iron',
    hint:'Neu: W (linker Ringfinger) und O (rechter Ringfinger).', target:16},
-  {name:'Level 11: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'copper',
+  {name:'Level 10: + Q P Ü', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:['q','p','ü'], ore:'copper',
    hint:'Neu: Q (Kupfererz, linker kleiner Finger), P und Ü (rechter kleiner Finger).', target:16},
-  {name:'Level 12: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
+  {name:'Level 11: Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], ore:'iron', oreRow:0,
    hint:'Übung: Grundreihe und obere Reihe. Erze sind die Tasten der oberen Reihe.', target:32, reward:'eisen'},
 
   // Untere Reihe: Diamant, Gold, Redstone (mit der Eisenspitzhacke abbaubar)
-  {name:'Level 13: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
+  {name:'Level 12: + C ,', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:['c',','], ore:'diamond',
    hint:'Neu: C (linker Mittelfinger) und Komma (rechter Mittelfinger). Greife eine Reihe nach unten und gehe zurück auf D bzw. K.', target:16},
-  {name:'Level 14: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'gold',
+  {name:'Level 13: + V M', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m']), neu:['v','m'], ore:'gold',
    hint:'Neu: V (Golderz, linker Zeigefinger) und M (rechter Zeigefinger). Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 15: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'redstone',
+  {name:'Level 14: + B N', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n']), neu:['b','n'], ore:'redstone',
    hint:'Neu: B und N (Redstone). Die Zeigefinger strecken sich nach unten und zur Seite. Danach zurück auf F bzw. J.', target:16},
-  {name:'Level 16: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
+  {name:'Level 15: + X .', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.']), neu:['x','.'], ore:'diamond',
    hint:'Neu: X (linker Ringfinger) und Punkt (rechter Ringfinger).', target:16},
-  {name:'Level 17: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'gold',
+  {name:'Level 16: + Y -', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:['y','-'], ore:'gold',
    hint:'Neu: Y (Golderz, linker kleiner Finger) und Bindestrich (rechter kleiner Finger).', target:16},
-  {name:'Level 18: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
+  {name:'Level 17: Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], ore:'diamond', oreRow:2,
    hint:'Übung: Die ganze Tastatur. Erze sind die Tasten der unteren Reihe. Die Hände bleiben ruhig liegen.', target:48, reward:'diamant'},
-  {name:'Level 19: + Ä ß', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß']), neu:['ä','ß'], ore:'redstone',
+  {name:'Level 18: + Ä ß', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß']), neu:['ä','ß'], ore:'redstone',
    hint:'Neu: Ä (rechts neben Ö) und ß (ganz rechts in der obersten Reihe). Beide tippt der rechte kleine Finger.', target:16},
-  {name:'Level 20: Zahlen', keys:['1','2','3','4','5','6','7','8','9','0'], neu:['1','2','3','4','5','6','7','8','9','0'], ore:'obsidian',
+  {name:'Level 19: Zahlen', keys:['1','2','3','4','5','6','7','8','9','0'], neu:['1','2','3','4','5','6','7','8','9','0'], ore:'obsidian',
    hint:'Neu: Die Zahlen 1 bis 0 in der obersten Reihe. Jeder Finger geht zwei Reihen nach oben und danach zurück auf seine Grundtaste.', target:30},
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
-  {chest:true, name:'Werkbank 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:2, ready:true,
+  {chest:true, name:'Werkbank 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:1, ready:true,
    words:CHEST1_WORDS, rounds:1, target:wordsLen(CHEST1_WORDS, 1)},
-  {chest:true, name:'Werkbank 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:3, ready:true,
+  {chest:true, name:'Werkbank 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:2, ready:true,
    words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
-  {chest:true, name:'Werkbank 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
+  {chest:true, name:'Werkbank 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:3, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
-  {chest:true, name:'Werkbank 4', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:5, ready:true,
+  {chest:true, name:'Werkbank 4', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
    words:CHEST4_WORDS, rounds:1, target:wordsLen(CHEST4_WORDS, 1)},
-  {chest:true, name:'Werkbank 5', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:11, ready:true,
+  {chest:true, name:'Werkbank 5', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:10, ready:true,
    words:CHEST5_WORDS, rounds:1, target:wordsLen(CHEST5_WORDS, 1)},
-  {chest:true, name:'Werkbank 6', label:'Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], shift:true, shiftl:true, need:17, ready:true,
+  {chest:true, name:'Werkbank 6', label:'Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], shift:true, shiftl:true, need:16, ready:true,
    words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
-  // Satz-Werkbänke: Sätze mit 3 bis 10 Wörtern, brauchen Ä und ß (Level 19). Die Leertaste gehört zu den Tasten.
-  {chest:true, sentences:true, name:'Werkbank 7', label:'3 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  // Satz-Werkbänke: Sätze mit 3 bis 10 Wörtern, brauchen Ä und ß (Level 18). Die Leertaste gehört zu den Tasten.
+  {chest:true, sentences:true, name:'Werkbank 7', label:'3 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[3], rounds:1, target:wordsLen(SENT_WORDS[3], 1)},
-  {chest:true, sentences:true, name:'Werkbank 8', label:'4 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Werkbank 8', label:'4 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[4], rounds:1, target:wordsLen(SENT_WORDS[4], 1)},
-  {chest:true, sentences:true, name:'Werkbank 9', label:'5 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Werkbank 9', label:'5 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[5], rounds:1, target:wordsLen(SENT_WORDS[5], 1)},
-  {chest:true, sentences:true, name:'Werkbank 10', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Werkbank 10', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[6], rounds:1, target:wordsLen(SENT_WORDS[6], 1)},
-  {chest:true, sentences:true, name:'Werkbank 11', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Werkbank 11', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[7], rounds:1, target:wordsLen(SENT_WORDS[7], 1)},
-  {chest:true, sentences:true, name:'Werkbank 12', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Werkbank 12', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[8], rounds:1, target:wordsLen(SENT_WORDS[8], 1)},
-  {chest:true, sentences:true, name:'Werkbank 13', label:'9 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Werkbank 13', label:'9 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[9], rounds:1, target:wordsLen(SENT_WORDS[9], 1)},
-  {chest:true, sentences:true, name:'Werkbank 14', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Werkbank 14', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:SENT_WORDS[10], rounds:1, target:wordsLen(SENT_WORDS[10], 1)},
 ];
 const SHOP = [
@@ -642,13 +641,20 @@ function load(){
         Object.keys(s.stars || {}).forEach(i => { n[+i >= 19 ? +i + 1 : +i] = s.stars[i]; });
         s.stars = n; s.v = 3;
       }
+      // v4: Die Grundhaltung entfällt (die Holzspitzhacke gehört zu Level 1), alle Level ab Index 2 rücken nach vorn
+      if (s.v < 4) {
+        const n = {};
+        Object.keys(s.stars || {}).forEach(i => { if (+i === 1) return; n[+i >= 2 ? +i - 1 : +i] = s.stars[i]; });
+        if ((s.stars || {})[1]) n[0] = 3;
+        s.stars = n; s.v = 4;
+      }
       if (!s.items) s.items = {};
       return s;
     }
   } catch(e){}
   return fresh();
 }
-function fresh(){ return {v:3, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}}; }
+function fresh(){ return {v:4, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}}; }
 function save(){ if (user) lsSet(keyOf(user), JSON.stringify(st)); }
 
 // Nutzer anlegen oder wählen. Der alte Spielstand (typecraft-v1) geht an den ersten Namen, der angelegt wird.
@@ -750,7 +756,7 @@ function unlocked(i){
 // ---------- Spitzhacken (eigene Pixelgrafik) ----------
 const PICKS = {
   holz:  {name:'Holzspitzhacke',  b:'#a8793a', l:'#c9985a', d:'#6e4a22',
-          text:'Du hast die Holzblöcke mit bloßer Hand abgebaut und daraus eine Holzspitzhacke gebaut.'},
+          text:'Du hast deine Hände aufgelegt und daraus eine Holzspitzhacke gebaut.'},
   stein: {name:'Steinspitzhacke', b:'#9a9a9a', l:'#c4c4c4', d:'#666666',
           text:'Aus Stein und Holz gebaut. Damit kannst du als Nächstes härtere Erze abbauen.'},
   eisen: {name:'Eisenspitzhacke', b:'#d8d8d8', l:'#f4f4f4', d:'#9a9a9a',
@@ -1005,7 +1011,7 @@ function itemSVG(it){ return pixSVG(ITEM_ART[it.art], 'it', it.pal); }
 function pickTier(){ return Math.max(0, HOTBAR.indexOf(currentPick())); }
 
 // Spitzhacke, mit der das Level gespielt wird
-function levelPick(i){ return i <= 5 ? 'holz' : i <= 11 ? 'stein' : i <= 17 ? 'eisen' : 'diamant'; }
+function levelPick(i){ return i <= 4 ? 'holz' : i <= 10 ? 'stein' : i <= 16 ? 'eisen' : 'diamant'; }
 
 function renderMenu(){
   cur = -1; active = false; cancelAnimationFrame(raf); clearTimeout(pendingTimer); hideToast();
@@ -1741,7 +1747,7 @@ function showBlock(){
   const key = weighted[Math.floor(Math.random() * weighted.length)];
   const el = document.createElement('div');
   // Neue Tasten des Levels sind Erz, die Wiederholung ist Stein. In Übungslevels ist das Erz die Reihe der Stufe
-  // (Level 5: zufällig etwa jeder dritte Block).
+  // (Level 4: zufällig etwa jeder dritte Block).
   const isOre = L.neu.length ? L.neu.includes(key)
               : (L.oreRow !== undefined ? KEYPOS[key].r === L.oreRow : Math.random() < 0.3);
   const kind = isOre ? (L.neu.length ? (L.ore || 'coal') : (ORE_OF[key] || L.ore || 'coal')) : 'stone';
