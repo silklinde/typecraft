@@ -1276,7 +1276,7 @@ function buildBoard(field, L, mode){
       })()
     : mode === 'learn'
     ? `<div class="newrow">
-         ${L.neu.map(k => `<div id="big-${k}" class="nk ${ore}" style="left:${(cxOf(k) * 100).toFixed(3)}%">${KLBL(k)}</div>`).join('')}
+         ${L.neu.map(k => `<div id="big-${k}" class="nk ${ore}" style="left:${((cxOf(k) + (L.neu.includes('ß') && L.neu.includes('ä') ? (k === 'ß' ? -3.5 : 0) / NCOL : 0)) * 100).toFixed(3)}%">${KLBL(k)}</div>`).join('')}
        </div>`
     : `<div class="lanes" id="lanes">${L.chest ? '<div id="craft"></div><div id="cchest"></div>' : ''}</div>`;
 
