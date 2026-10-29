@@ -64,10 +64,10 @@ Haustiere stehen zwischen den Armen und hüpfen bei Treffern. Biome sind CSS-Ver
 
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
 
-## Truhen (Wörter-Level)
-Eigener Bereich „Truhen“ im Menü, 6 Truhen. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–24, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
+## Werkbänke (Wörter-Level, früher „Truhen“)
+Menü-Bereiche: „Minen“ (die Level), „Craften“ (6 Werkbänke mit Wörtern), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird eine Truhe mit den erhaltenen Gegenständen gezeigt. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–24, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
 
-| Truhe | Tasten | Freigeschaltet durch | Stand |
+| Werkbank | Tasten | Freigeschaltet durch | Stand |
 |-------|--------|----------------------|-------|
 | 1 | A S D F + Umschalt | Level 2 | spielbar |
 | 2 | A S D F J K L Ö + linke Umschalt | Level 3 | spielbar (10 Wörter einmal, 42 Buchstaben) |
@@ -80,7 +80,7 @@ Umschalt: Großbuchstaben tippt man mit der Umschalt der **anderen** Hand. Recht
 
 **Umschalt-Einführung** (Phase `cshift`, Zustand `cs`, `introKeys` je Truhe: D F A bzw. J K L): 1. Umschalt-Block ⇧ mit Fingername „Kleiner Finger“, das Kind drückt Umschalt. 2. Danach steht ein kleiner Steinblock („d“) mit „⇧ halten“ über der Taste. Solange Umschalt gehalten wird, verwandelt er sich in einen Kohleblock „D“ (`csMorph`, loslassen = wieder klein). 3. Nur mit gehaltener Umschalt zählt der Anschlag, sonst wackeln Block und Umschalt-Taste, ohne Fehler. Nach drei Buchstaben beginnen die Wörter.
 
-## Crafting in den Truhen und Sammlung
+## Crafting an den Werkbänken und Inventar
 Oben in der Mitte steht eine Werkbank-Leiste (`#craft`): ein Slot pro Buchstabe, Pfeil, Ergebnis-Slot; rechts eine kleine Truhe mit Zähler. Jeder abgebaute Block fliegt als kleiner Block in seinen Slot. Ist das Wort fertig, entsteht im Ergebnis-Slot ein Gegenstand (mit Namen) und wandert in die Truhe. Jedes Wort hat einen Gegenstand, seine Blöcke bestehen aus dem passenden Material (`CRAFT`, `chestSeq`). Welche Gegenstände vorkommen, hängt an der besten Spitzhacke (`pickTier()`); bessere Gegenstände sind häufiger (Gewicht 1 + 2 × Stufe).
 
 Gecraftet wird nur Einrichtung und Funktionsblöcke (Minecraft-Inventar, Kategorie mit dem Bett). Lapislazuli und Redstone werden abgebaut, nicht gecraftet, und kommen deshalb nicht vor.
@@ -92,4 +92,4 @@ Gecraftet wird nur Einrichtung und Funktionsblöcke (Minecraft-Inventar, Kategor
 | Eisen | Gold → Uhr; Diamant → Zaubertisch |
 | Diamant | Obsidian → Netherportal |
 
-Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Sammlung“ gecraftete Gegenstände mit Namen und Anzahl; alles, was noch nicht gecraftet wurde, ist nur ein leerer grauer Inventar-Slot (ohne Namen). Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.
+Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Inventar“ gecraftete Gegenstände mit Namen und Anzahl; alles, was noch nicht gecraftet wurde, ist nur ein leerer grauer Inventar-Slot (ohne Namen). Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.

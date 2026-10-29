@@ -287,15 +287,15 @@
 
   <div id="menu">
     <div class="panel">
-      <h2>Level</h2>
+      <h2>Minen</h2>
       <div id="levels"></div>
     </div>
     <div class="panel">
-      <h2>Truhen</h2>
+      <h2>Craften</h2>
       <div class="chests" id="chests"></div>
     </div>
     <div class="panel">
-      <h2>Sammlung</h2>
+      <h2>Inventar</h2>
       <div class="loot" id="collection"></div>
     </div>
     <div class="panel">
@@ -481,15 +481,15 @@ const LEVELS = [
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
-  {chest:true, name:'Truhe 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:2, ready:true,
+  {chest:true, name:'Werkbank 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:2, ready:true,
    words:CHEST1_WORDS, rounds:2, target:wordsLen(CHEST1_WORDS, 2)},
-  {chest:true, name:'Truhe 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:3, ready:true,
+  {chest:true, name:'Werkbank 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:3, ready:true,
    words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
-  {chest:true, name:'Truhe 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
+  {chest:true, name:'Werkbank 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
-  {chest:true, name:'Truhe 4', label:'', keys:[], neu:[], shift:true, need:5},
-  {chest:true, name:'Truhe 5', label:'', keys:[], neu:[], shift:true, need:11},
-  {chest:true, name:'Truhe 6', label:'', keys:[], neu:[], shift:true, need:17},
+  {chest:true, name:'Werkbank 4', label:'', keys:[], neu:[], shift:true, need:5},
+  {chest:true, name:'Werkbank 5', label:'', keys:[], neu:[], shift:true, need:11},
+  {chest:true, name:'Werkbank 6', label:'', keys:[], neu:[], shift:true, need:17},
 ];
 const SHOP = [
   {id:'wolf',  label:'🐺 Wolf',        cost:5,  type:'pet'},
@@ -701,9 +701,10 @@ const ITEM_ART = {
 };
 const METAL = (d, l, m) => ({d, l, m});
 // Gegenstand je Material: `tier` = ab welcher Spitzhacke (0 Holz, 1 Stein, 2 Eisen, 3 Diamant) das Material abbaubar ist
+const BENCH_PAL = {d:'#2a170a', l:'#c08a4a', b:'#9a6a30', m:'#6f4a20', g:'#d8d8d8'};
 const CRAFT = [
   // Einrichtung und Funktionsblöcke: Holzspitzhacke (Holz, Stein, Kohle)
-  {id:'werkbank', name:'Werkbank',     ore:'wood',     tier:0, art:'bench',   pal:{d:'#2a170a', l:'#c08a4a', b:'#9a6a30', m:'#6f4a20', g:'#d8d8d8'}},
+  {id:'werkbank', name:'Werkbank',     ore:'wood',     tier:0, art:'bench',   pal:BENCH_PAL},
   {id:'truhe',    name:'Truhe',        ore:'wood',     tier:0, art:'chest',   pal:CHEST_PAL},
   {id:'bett',     name:'Bett',         ore:'wood',     tier:0, art:'bed',     pal:{d:'#2a170a', w:'#f2f2f2', r:'#c62828', R:'#e04848', b:'#9a6a30'}},
   {id:'ofen',     name:'Ofen',         ore:'stone',    tier:0, art:'furnace', pal:{t:'#a8a8a8', s:'#8a8a8a', u:'#6e6e6e', d:'#3a3a3a', k:'#1a1a1a', f:'#f08a1c'}},
@@ -749,7 +750,7 @@ function renderMenu(){
     b.disabled = !open;
     b.title = open ? '' : (L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald');
     const sub = open ? (s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : L.label) : '';
-    b.innerHTML = `<div class="cimg">${chestSVG('closed')}${open ? '' : padlockSVG()}</div><div class="cname">${L.name}</div><div class="csub">${sub}</div>`;
+    b.innerHTML = `<div class="cimg">${pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}${open ? '' : padlockSVG()}</div><div class="cname">${L.name}</div><div class="csub">${sub}</div>`;
     b.onclick = () => start(i);
     ch.appendChild(b);
   });
@@ -1664,7 +1665,7 @@ function finish(){
   const rw = (L.reward && stars > 0) ? rewardHtml(L.reward) : '';
   const loot = L.chest ? CRAFT.filter(it => run.got[it.id]).map(it =>
     `<div class="lootitem">${itemSVG(it)}<span>${it.name} × ${run.got[it.id]}</span>${run.newIds.includes(it.id) ? '<b>neu!</b>' : ''}</div>`).join('') : '';
-  const chestImg = L.chest ? `<div style="width:120px;margin:0 auto 6px;">${chestSVG(stars > 0 ? 'open' : 'closed')}</div><div class="lootrow">${loot}</div>` : '';
+  const chestImg = L.chest ? `<div style="width:120px;margin:0 auto 6px;">${chestSVG(stars > 0 ? 'open' : 'closed')}</div><div class="lootrow">${loot || 'Die Truhe ist noch leer.'}</div>` : '';
   box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn'; retry.textContent = 'Nochmal';
