@@ -93,7 +93,7 @@ Gecraftet werden nur Gegenstände der Kategorie Dekoration (https://de.minecraft
 
 | Spitzhacke | Material → Gegenstand |
 |---|---|
-| Holz | Holz → Bett, Holztür, Leiter, Zaun; Stein → Ofen, Bruchsteinmauer, Hebel; Kohle → Fackel |
+| Holz | Holz → Bett, Holztür, Leiter, Zaun; Stein → Ofen, Mauer, Hebel; Kohle → Fackel |
 | Stein | Eisen → Laterne, Kessel, Amboss, Eisentür, Eisengitter, Trichter; Kupfer → Kupfergitter, Kupferlaterne, Kupfertruhe, Kupferfackel |
 | Eisen | Gold → Feinwägeplatte; Redstone → Redstone-Fackel; Diamant → Zaubertisch, Plattenspieler |
 | Diamant | Obsidian → Endertruhe |
