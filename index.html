@@ -285,6 +285,11 @@
            background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:4px 14px 4px 8px;}
   .counter #emIcon{display:inline-flex;}
   .counter#btnShop,.counter#btnInv{cursor:pointer;}
+  .infobtn{display:block;grid-column:1/-1;justify-self:end;margin:6px 0 14px auto;width:40px;height:40px;padding:0;font-family:Georgia,serif;font-style:italic;font-weight:bold;font-size:26px;line-height:1;color:#fff;background:#8b8b8b;border:3px solid #000;border-radius:50%;cursor:pointer;box-shadow:inset 3px 3px 0 #c6c6c6,inset -3px -3px 0 #555;}
+  .infobtn:hover{background:#5a8fd6;}
+  .infotext{font-size:22px;text-align:left;}
+  .infotext a{color:#7fc4ff;}
+  .infotext p{margin:0 0 12px;}
   .counter #invIcon{display:inline-flex;}
   .counter #invIcon svg{width:34px;height:auto;image-rendering:pixelated;display:block;}
   .hotbar{display:flex;gap:4px;background:#c6c6c6;border:3px solid #000;padding:4px;border-radius:2px;
@@ -431,6 +436,7 @@
       <h2>Craften</h2>
       <div class="g5" id="chests"></div>
     </div>
+    <button class="infobtn" id="btnInfo" title="Info und Lizenz" aria-label="Info und Lizenz">i</button>
   </div>
 
   <div id="game" class="hidden">
@@ -591,14 +597,14 @@ const CHEST5_WORDS = ['Wasser','Teller','Haus','Eis','Hut','Rose','Wolke','Quark
 const CHEST6_WORDS = ['Banane','Computer','Zebra','Mond','Vogel','Yacht','Boxen','Gabel','Vase','Mama','Katze','Nacht'];
 // Werkbänke 7–14: Sätze mit 3 bis 10 Wörtern (ein Satz = ein Gegenstand)
 const SENT_WORDS = {
-  3: ['Der Creeper zischt.','Steve baut Häuser.','Ich suche Diamanten.','Wir bauen Burgen.','Der Zombie stöhnt.','Alex fällt Bäume.'],
-  4: ['Steve findet einen Diamanten.','Der Wolf bewacht mich.','Ich esse gebratenes Fleisch.','Alex baut ein Haus.','Die Zombies kommen nachts.','Ich zähme einen Wolf.'],
-  5: ['Am Abend kommen die Zombies.','Im Wald wachsen viele Bäume.','Mit Eisen baut man Werkzeuge.','Meine Katze verjagt den Creeper.','Wir bauen ein großes Schloss.'],
-  6: ['Nach dem Bauen suchen wir Diamanten.','Steve baut ein Haus aus Holz.','In der Höhle liegt viel Kohle.','Der Creeper schleicht sich leise an.','Die Bewohner im Dorf handeln gern.'],
-  7: ['Mein Wolf folgt mir durch die Höhle.','Im Nether ist es heiß und gefährlich.','Ich pflanze Weizen und füttere die Kühe.','Mit Redstone kann man Türen automatisch öffnen.'],
-  8: ['Nachts verstecke ich mich im Haus vor Zombies.','Mit der Eisenspitzhacke kann ich endlich Diamanten abbauen.','Bruder und ich bauen ein Haus aus Stein.'],
-  9: ['Im Nether kämpfen wir heute gegen Ghasts und Schweinezombies.','Wenn es dunkel wird, stelle ich eine Fackel auf.','Mein Wolf und die Katze beschützen mich vor Creepern.'],
-  10: ['Auf der Farm ernte ich Weizen, Karotten, Kartoffeln und Rüben.','Mit Eisen, Gold und Diamanten kann man starke Rüstungen herstellen.','Im Wald baue ich ein Baumhaus und beobachte die Schafe.']
+  3: ['Creeper schleichen leise.','Zombies fürchten Sonnenlicht.','Wölfe mögen Knochen.','Schafe geben Wolle.','Kühe geben Milch.','Fackeln machen Licht.'],
+  4: ['Skelette schießen mit Pfeilen.','Wölfe schütteln sich trocken.','Diamanten liegen tief unten.','Der Nether ist heiß.','Katzen verscheuchen die Creeper.','Weizen wächst auf Feldern.'],
+  5: ['Mit Knochen zähmt man Wölfe.','Der Enderman hasst Wasser sehr.','Der Eisengolem bewacht das Dorf.','Zombies fangen im Sonnenlicht Feuer.','Mit Fisch zähmt man Katzen.'],
+  6: ['Der Creeper zischt vor der Explosion.','Die Wolle der Schafe wächst nach.','Dorfbewohner handeln mit dir gegen Smaragde.','Ein Skelett sucht im Sonnenlicht Schatten.','Aus Weizen backt man leckeres Brot.'],
+  7: ['Mit Redstone-Staub baut man Lampen und Kolben.','Zombies stecken Dorfbewohner an und verwandeln sie.','Mit Weizen lockt man Schafe und Kühe.','Kühe liefern Milch, Leder und rohes Rindfleisch.'],
+  8: ['Eine Fackel hält Monster von dunklen Stellen fern.','Der Enderman wird wütend, wenn man ihn anstarrt.','Der Eisengolem schenkt manchmal einem Dorfbewohner eine Mohnblume.'],
+  9: ['Im Nether gibt es keinen Tag und keine Nacht.','Ein zahmer Wolf trägt ein Halsband und folgt dir.','Dorfbewohner arbeiten am Tag und schlafen nachts im Bett.'],
+  10: ['Aus Diamanten macht man starke Rüstungen und sehr scharfe Schwerter.','Das Skelett sinkt im Wasser nach unten, statt zu schwimmen.','Wenn Zombies kommen, laufen die Dorfbewohner weg und verstecken sich.']
 };
 const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
@@ -1144,6 +1150,15 @@ function openInventory(){
     return n ? `<div class="citem">${itemSVG(it)}<div>${it.name}</div><div class="n">× ${n}</div></div>` : '<div class="cempty"></div>';
   }).join('');
   openMenuModal('Inventar', `<div class="g5 inv">${cells}</div>`, true);
+}
+
+function openInfo(){
+  openMenuModal('Info', `<div class="infotext">
+    <p>Typecraft ist ein nicht kommerzielles Lernspiel zum 10-Finger-Schreiben. Alle Grafiken sind selbst gezeichnet.</p>
+    <p>Die Sätze in den Satz-Werkbänken beruhen auf Informationen aus dem <a href="https://de.minecraft.wiki/" target="_blank" rel="noopener">Minecraft Wiki</a> (de.minecraft.wiki). Sie wurden in eigenen Worten umformuliert und gekürzt.</p>
+    <p>Die Inhalte des Wikis stehen unter der Lizenz <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.de" target="_blank" rel="noopener">CC BY-NC-SA 3.0</a> (Namensnennung, nicht kommerziell, Weitergabe unter gleichen Bedingungen). Die hier verwendeten Sätze stehen daher unter derselben Lizenz.</p>
+    <p>Minecraft ist eine Marke von Mojang Synergies AB. Typecraft ist kein offizielles Minecraft-Produkt und steht in keiner Verbindung zu Mojang oder Microsoft.</p>
+  </div>`, true);
 }
 
 function openShop(){
@@ -2227,6 +2242,7 @@ document.getElementById('invIcon').innerHTML = chestSVG('closed');
 // Smaragd-Anzeige öffnet den Shop, Truhen-Anzeige das Inventar (nur im Menü)
 const inMenu = () => !document.getElementById('menu').classList.contains('hidden');
 document.getElementById('btnShop').onclick = () => { if (inMenu()) openShop(); };
+document.getElementById('btnInfo').onclick = () => { if (inMenu()) openInfo(); };
 document.getElementById('btnInv').onclick = () => { if (inMenu()) openInventory(); };
 document.getElementById('btnUser').onclick = () => { if (inMenu()) openUsers(); };
 // Geräteprüfung: Mindestgröße des Fensters und reine Touch-Geräte ohne Tastatur
