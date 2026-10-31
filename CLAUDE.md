@@ -5,6 +5,7 @@ Browser-Spiel im Minecraft-Look, mit dem Kinder das 10-Finger-Schreiben lernen. 
 ## Stand
 - Lauffähiger Prototyp: `index.html` (Stand v10, eine einzige Datei mit HTML, CSS und JS, keine Abhängigkeiten, keine Build-Schritte). Einfach im Browser öffnen.
 - 18 Level (Level 0 Hände auflegen, Level 1 Grundhaltung, Level 2–17): Grundreihe, obere Reihe, untere Reihe, mit Spitzhacken-Belohnungen Holz, Stein, Eisen, Diamant.
+- Menü: ein Pfad mit den 19 Buchstaben-Leveln, Zweige für Rezepte (Werkbänke, unten) und Vorlagen (Bauplätze, oben), darunter das Bücherregal mit 8 Plätzen. Die Tür zu den Text-Leveln ist ein Platzhalter („Bald geöffnet“). Siehe `docs/level-und-fortschritt.md`.
 - Noch nicht umgesetzt: Skins, weitere Haustiere und Biome, Zahlenreihe, Umschalttaste, Ä. Die Roadmap wird nicht im Repo gepflegt, sondern im Projekt.
 - Lokal getestet nur mit Chromium/Playwright (siehe `docs/tests.md`). Ein Test auf echten Geräten und Fenstergrößen steht aus.
 - Geräteprüfung: Bei reinen Touch-Geräten (ohne erkannte Taste) oder Fenstern kleiner als 1000×600 deckt ein Hinweis das Spiel ab (`geraetPruefen()`, `MIN_W`/`MIN_H` in `index.html`). Der Spielstand bleibt unberührt.

@@ -65,20 +65,30 @@ Pro Nutzer ein Eintrag: `localStorage['typecraft-user-<name klein>']` (Namenslis
 
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
 
-## Werkbänke (Wörter-Level, früher „Truhen“)
-Menü-Bereiche: „Minen“ (die Level), „Craften“ (14 Werkbänke mit Wörtern und Sätzen), „Inventar“ (gecraftete Gegenstände), „Shop“. Am Ende einer Werkbank wird ein Truhen-Fenster mit 3 × 3 Slots gezeigt: 9 Wörter = 9 Gegenstände, je einer pro Slot (`run.list`), keine Auflistung darunter. Im Menü steht unter der Werkbank nur ein freier Platz für die Herzen, keine Buchstaben. Sie stehen als Einträge mit `chest:true` am Ende von `LEVELS` (Index 20–25, Sterne wie bei Leveln in `st.stars[i]`) und erscheinen nicht in der Level-Liste. Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Gesperrte Truhen sind kleiner, grau und haben ein Vorhängeschloss.
+## Pfad, Werkbänke, Bauplätze und Bücher
+**Menü:** ein Pfad (`renderPfad()`) in zwei Zeilen zu je 11 Spalten, darunter das Bücherregal (`shelfHTML()`). In der Mitte stehen die 19 Buchstaben-Level. Wer ein Level mit mindestens 1 Herz schafft, findet ein **Rezept** (Wörter) oder eine **Vorlage** (Sätze). Dann geht ein Zweig ab und das Zusatzlevel erscheint: Werkbänke nach unten, Bauplätze nach oben. Das Level, das etwas enthält, trägt oben rechts ein kleines Rezept- bzw. Vorlagen-Symbol. Ungefundenes ist nicht zu sehen, nur der nächste Bauplatz in der Kette steht als gestrichelter Umriss da. Die Zusatzlevel sind freiwillig, der Buchstabenpfad geht immer weiter.
 
-| Werkbank | Tasten | Freigeschaltet durch | Stand |
-|-------|--------|----------------------|-------|
-| 1 | A S D F + Umschalt | Level 2 | spielbar |
-| 2 | A S D F J K L Ö + linke Umschalt | Level 3 | spielbar (9 Wörter einmal) |
-| 3 | + G H | Level 4 | spielbar (9 Wörter einmal) |
-| 4 | Grundreihe (`CHEST4_WORDS`) | Level 6 | spielbar |
-| 5 | + obere Reihe (`CHEST5_WORDS`) | Level 12 | spielbar |
-| 6 | alle Reihen (`CHEST6_WORDS`) | Level 18 | spielbar |
-| 7–14 | Sätze mit 3 bis 10 Wörtern (`SENT_WORDS`), ganze Tastatur mit Ä, ß und Leertaste | Level 19 | spielbar |
+Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–32, Herzen wie bei Leveln in `st.stars[i]`). Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Das Abschluss-Fenster zeigt „Rezept gefunden!“ bzw. „Vorlage gefunden!“.
 
-Satz-Werkbänke (`sentences:true`): Der Satz steht als Text in der Werkbank-Leiste (getippte Zeichen werden grün). Es entstehen keine Gegenstände mehr, sondern ein **Bauwerk auf dem Bauplatz** unter der Leiste (`#bau`, `bauPlan()`): Jeder getippte Buchstabe setzt Blöcke von unten nach oben, am Level-Ende steht das fertige Bauwerk (auch im Abschluss-Fenster). Die acht Werkbänke bauen der Reihe nach `BAU_LEVEL`: Holzhaus, Steinhaus, Steinturm, Steinburg, Kupferhaus, Eisenturm, Goldburg, Diamantburg (Formen in `BAU_ART`, W = Wand, R = Dach, G = Glas, D = Tür). Ton: pro Buchstabe nur ein leiser Klick (`klick()`), das helle Bling (`xpPing()`) gibt es einmal am Satzende; die Pause zwischen zwei Buchstaben ist nur 50 ms, damit schnelles Tippen nicht verschluckt wird. Die Leertaste kommt als breiter Block (`.block.big.space`) über der Leertaste, beide Daumen leuchten. Satzzeichen nur Komma, Punkt und Bindestrich; weitere Zeichen und Enter stehen als Tickets in Notion.
+| Zusatzlevel | Tasten | `need` (Level mit dem Fund) |
+|-------|--------|------------------------------|
+| Werkbank 1 | A S D F + Umschalt | Level 2 (Index 1) |
+| Werkbank 2 | A S D F J K L Ö + linke Umschalt | Level 3 (2) |
+| Werkbank 3 | + G H | Level 4 (3) |
+| Werkbank 4 | Grundreihe | Level 5 (4) |
+| Werkbank 5 | + obere Reihe | Level 11 (10) |
+| Werkbank 6 | alle Reihen | Level 17 (16) |
+| Bauplatz 1 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Level 15 (14) |
+| Bauplatz 2 (4 Wörter) | + Y - (ohne Ä, ß) | Level 16 (15) |
+| Bauplatz 3 (5 Wörter) | wie Bauplatz 2 | Level 17 (16) |
+| Bauplatz 4 (6 Wörter) | ganze Tastatur mit Ä, ß | Level 18 (17) |
+| Bauplatz 5–8 (7 bis 10 Wörter) | ganze Tastatur | der vorige Bauplatz (Kette) |
+
+Früher als Level 15 gibt es keine Sätze: Mit der Grundreihe und der oberen Reihe fehlen N, M, C, B, damit lassen sich keine Minecraft-Sätze schreiben. Die Sätze für Bauplatz 1–3 haben deshalb keine Ä und ß (Skript-Prüfung: alle Zeichen müssen in `keys` stehen).
+
+**Bücherregal:** Jeder Bauplatz mit mindestens 1 Herz gibt einmal ein Buch (`st.books[k]`, k = Nummer des Bauplatzes 0–7; alte Spielstände bekommen die Bücher beim Laden nachträglich). Die Bücher haben die Farben der Bauwerke (`BOOK_COLORS`). Im Menü zeigt das Regal 8 Plätze, leer sind sie grau mit Buch-Umriss. Im Abschluss-Fenster erscheint ein Mini-Regal, das neue Buch fällt in seinen Platz (CSS `bookin`, Bling-Ton `xpPing()`). Bei 8 Büchern geht die Tür auf. Was dahinter liegt (Text-Level mit Fluss und Tempo), ist noch nicht gebaut: die Tür zeigt „Bald geöffnet“.
+
+Bauplätze (`sentences:true`, früher Satz-Werkbänke): Der Satz steht als Text in der Werkbank-Leiste (getippte Zeichen werden grün). Es entstehen keine Gegenstände mehr, sondern ein **Bauwerk auf dem Bauplatz** unter der Leiste (`#bau`, `bauPlan()`): Jeder getippte Buchstabe setzt Blöcke von unten nach oben, am Level-Ende steht das fertige Bauwerk (auch im Abschluss-Fenster). Die acht Werkbänke bauen der Reihe nach `BAU_LEVEL`: Holzhaus, Steinhaus, Steinturm, Steinburg, Kupferhaus, Eisenturm, Goldburg, Diamantburg (Formen in `BAU_ART`, W = Wand, R = Dach, G = Glas, D = Tür). Ton: pro Buchstabe nur ein leiser Klick (`klick()`), das helle Bling (`xpPing()`) gibt es einmal am Satzende; die Pause zwischen zwei Buchstaben ist nur 50 ms, damit schnelles Tippen nicht verschluckt wird. Die Leertaste kommt als breiter Block (`.block.big.space`) über der Leertaste, beide Daumen leuchten. Satzzeichen nur Komma, Punkt und Bindestrich; weitere Zeichen und Enter stehen als Tickets in Notion.
 
 Truhe 1: Beginn mit Einführung der Umschalt-Taste (Block „⇧“, Fenster „Neue Taste freigeschaltet“). Danach 9 Wörter (`CHEST1_WORDS`, je einmal, zufällig), Herzen und Smaragde wie bei Leveln. Alle Anfangsbuchstaben sind groß: Kohleblock = Großbuchstabe (Umschalt gedrückt halten), Steinblock = Kleinbuchstabe. Oben steht das Wort, der aktuelle Buchstabe ist gelb. Umschalt steht rechts neben dem rechten Arm (Zeile der Leertaste) und wird vom rechten kleinen Finger bedient.
 
