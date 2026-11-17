@@ -323,6 +323,8 @@
   .spieleraktion{min-height:62px;margin-top:10px;}
   .spieleraktion .btn[hidden]{display:none;}
   #btnUser{cursor:pointer;font-size:20px;}
+  #btnLayout{cursor:pointer;font-size:20px;}
+  #btnLayout:hover{background:#3a3a3a;}
   #userLabel{display:flex;align-items:center;gap:8px;}
   .hud{display:flex;align-items:center;gap:14px;}
   .counter{display:flex;align-items:center;gap:8px;font-size:26px;font-weight:bold;color:#fff;text-shadow:2px 2px 0 #3f3f3f;
@@ -465,6 +467,7 @@
     <div class="logo-wrap"><div class="badge" id="logo" title="Zur Levelübersicht">Typecraft</div><span id="lvName"></span></div>
     <div class="hud">
       <div class="counter" id="btnUser" title="Spieler wechseln"><span id="userLabel"></span></div>
+      <div class="counter" id="btnLayout" title="Tastatur-Layout wechseln (Deutsch QWERTZ / Englisch QWERTY)"></div>
       <div class="counter" id="btnShop" title="Shop"><span id="emIcon"></span><span id="emeralds">0</span></div>
       <div class="counter" id="btnInv" title="Inventar"><span id="invIcon"></span><span id="invCount">0</span></div>
       <div class="hotbar" id="hotbar"></div>
@@ -600,7 +603,22 @@ KEYROWS.forEach((row, r) => row.forEach((k, i) => { KEYPOS[k] = {r, c: ROWSTART[
 const NUMROW = ['1','2','3','4','5','6','7','8','9','0','ß'];
 NUMROW.forEach((k, i) => { KEYPOS[k] = {r: -1, c: 1 + i * 4}; });
 // Beschriftung: ß hat keinen Großbuchstaben (toUpperCase würde SS daraus machen)
-const KLBL = k => k === 'ß' ? 'ß' : k.toUpperCase();
+// Englische Tastatur (QWERTY): die Positionen bleiben dieselben, nur Beschriftung und Eingabe ändern sich.
+// Intern heißt jede Taste wie auf der deutschen Tastatur (z. B. 'ö' = rechts neben L, 'z' = sechste Taste oben).
+const isEN = () => !!st && st.layout === 'en';
+const EN_LBL = {y:'z', z:'y', 'ö':';', 'ä':"'", 'ü':'[', 'ß':'-', '-':'/'};
+const lblOf = k => isEN() ? (EN_LBL[k] || k) : k;
+const KLBL = k => { const l = lblOf(k); return l === 'ß' ? 'ß' : l.toUpperCase(); };
+// Gedrückte Taste (event.key, klein) -> interne Position. Auf der englischen Tastatur gibt es Ö Ä Ü ß nicht: diese Tasten zählen nicht.
+const EN_IN = {y:'z', z:'y', ';':'ö', "'":'ä', '[':'ü', '-':'ß', '/':'-'};
+const keyPos = c => !isEN() ? c : ('öäüß'.includes(c) ? '\u0000' : (EN_IN[c] || c));
+// Zeichen im Text -> Position (Y und Z sind vertauscht, der Bindestrich liegt oben rechts)
+const charPos = c => !isEN() ? c : ({y:'z', z:'y', '-':'ß'}[c] || c);
+// Englische Tastatur: Umlaute werden ausgeschrieben, ein paar Wörter ersetzt, die Tasten nutzen würden, die im Level noch fehlen
+const EN_SWAP = {'Öl':'Falk', 'Zeit':'Tier', 'Zombies fürchten Sonnenlicht.':'Hühner legen Eier.'};
+const enWord = w => (EN_SWAP[w] || w).replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/Ä/g,'Ae').replace(/Ö/g,'Oe').replace(/Ü/g,'Ue');
+const wordsOf = L => isEN() ? L.words.map(enWord) : L.words;
+const targetOf = L => L.words ? wordsLen(wordsOf(L), L.rounds) : L.target;
 // Mitte der Taste als Anteil der Tastaturbreite (für fallende Blöcke und neue Tasten)
 const cxOf = k => (KEYPOS[k].c + 1) / NCOL;
 const HOME10 = ['a','s','d','f','g','h','j','k','l','ö'];
@@ -730,6 +748,16 @@ const LEVELS = [
   {chest:true, sentences:true, name:'Bauplatz 8', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:31, ready:true,
    words:SENT_WORDS[10], rounds:1, target:wordsLen(SENT_WORDS[10], 1)},
 ];
+// Texte der Level, die auf der englischen Tastatur anders heißen (Index im Array LEVELS)
+const LEVEL_EN = {
+  2: {name:'Level 3: J K L ;', hint:'Neu: J, K, L und ; (Semikolon). Nur rechte Hand, die linke ruht. Die Kohleblöcke zeigen dir die neuen Tasten.'},
+  7: {name:'Level 8: + T Y', hint:'Neu: T und Y (Lapislazuli). Die Zeigefinger strecken sich nach oben und zur Seite. Danach zurück auf F bzw. J.'},
+  9: {name:'Level 10: + Q P [', hint:'Neu: Q (Kupfererz, linker kleiner Finger), P und [ (rechter kleiner Finger).'},
+  15: {name:'Level 16: + Z /', hint:'Neu: Z (Golderz, linker kleiner Finger) und Schrägstrich / (rechter kleiner Finger).'},
+  17: {name:"Level 18: + ' -", hint:"Neu: ' (Apostroph, rechts neben ;) und - (Minus, ganz rechts in der obersten Reihe). Beide tippt der rechte kleine Finger."}
+};
+const lvName = L => (isEN() && LEVEL_EN[LEVELS.indexOf(L)] || L).name;
+const lvHint = L => (isEN() && LEVEL_EN[LEVELS.indexOf(L)] || L).hint;
 const SHOP = [
   {id:'wolf',  label:'🐺 Wolf',        cost:5,  type:'pet'},
   {id:'katze', label:'🐱 Katze',       cost:10, type:'pet'},
@@ -778,7 +806,7 @@ function load(){
   } catch(e){}
   return fresh();
 }
-function fresh(){ return {v:4, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}, books:{}}; }
+function fresh(){ return {v:4, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}, books:{}, layout: lsGet('typecraft-layout') === 'en' ? 'en' : 'de'}; }
 function save(){ if (user) lsSet(keyOf(user), JSON.stringify(st)); }
 
 // Nutzer anlegen oder wählen. Der alte Spielstand (typecraft-v1) geht an den ersten Namen, der angelegt wird.
@@ -1020,6 +1048,7 @@ function renderHotbar(){
 function topBar(){
   document.getElementById('userLabel').innerHTML = user ? `${headSVG(user, 30)}<span>${user.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</span>` : '';
   document.getElementById('emeralds').textContent = st.emeralds;
+  layoutLabel();
   document.getElementById('invCount').textContent = Object.values(st.items).reduce((a, n) => a + n, 0);
   renderHotbar();
 }
@@ -1665,11 +1694,11 @@ function beginPlay(L){
   const field = document.getElementById('field');
   field.innerHTML = '';
   addPets(field);
-  run = {correct:0, wrong:0, target:L.target, cur:null, busy:false, last:null};
+  run = {correct:0, wrong:0, target:targetOf(L), cur:null, busy:false, last:null};
   shownKey = null;
   phase = 'play';
   buildBoard(field, L);
-  setHint(L.hint);
+  setHint(lvHint(L));
   updateGoal();
   if (L.chest) { chestStart(L); return; }
   showBlock();
@@ -1680,7 +1709,7 @@ function beginPlay(L){
 // Neu freigeschaltete, bessere Gegenstände sind häufiger (Gewicht 1 + 2 * Stufe), damit der Fortschritt spürbar ist.
 function chestSeq(L){
   const words = [];
-  const pool = Array.from({length: L.rounds}, () => L.words).flat();
+  const pool = Array.from({length: L.rounds}, () => wordsOf(L)).flat();
   while (pool.length) {
     const ok = pool.filter(w => w !== words[words.length - 1]);
     const w = (ok.length ? ok : pool)[Math.floor(Math.random() * (ok.length || pool.length))];
@@ -1847,7 +1876,7 @@ function chestNext(){
   const lanes = document.getElementById('lanes');
   if (!lanes || !run) return;
   const {w, item} = run.seq[run.wi], ch = w[run.ci];
-  const key = ch.toLowerCase(), cap = ch !== key;
+  const lc = ch.toLowerCase(), cap = ch !== lc, key = charPos(lc);
   const kind = item.ore;
   const space = ch === ' ';
   if (run.ci === 0) craftBuild(w);
@@ -1880,7 +1909,7 @@ function csMorph(){
   cs.upper = shiftHeld;
   b.kind = shiftHeld ? 'coal' : 'stone';
   b.el.className = 'nk ' + b.kind;
-  b.el.textContent = shiftHeld ? b.key.toUpperCase() : b.key;
+  b.el.textContent = shiftHeld ? KLBL(b.key) : lblOf(b.key);
   void b.el.offsetWidth; b.el.classList.add('pop');
 }
 // Nur mit gehaltener Umschalt zählt der Anschlag; sonst wackeln Block und Umschalt, ohne Fehler (Einführung)
@@ -1966,7 +1995,7 @@ function start(i){
   field.innerHTML = '';
   addPets(field);
   const L = LEVELS[i];
-  run = {correct:0, wrong:0, target:L.target, cur:null, busy:false, last:null};
+  run = {correct:0, wrong:0, target:targetOf(L), cur:null, busy:false, last:null};
   shownKey = null;
 
   hz = null;
@@ -2000,7 +2029,7 @@ function start(i){
   } else {
     phase = 'play';
     buildBoard(field, L);
-    setHint(L.hint);
+    setHint(lvHint(L));
     showBlock();
   }
   updateGoal();
@@ -2151,7 +2180,7 @@ function onKey(e){
   }
   if (!active || cur < 0) return;
   if (e.ctrlKey || e.metaKey || e.altKey) return;
-  const k = e.key.toLowerCase();
+  const k = keyPos(e.key.toLowerCase());
   if (k === ' ') e.preventDefault();   // die Leertaste soll weder scrollen noch einen Button auslösen
   if (e.repeat && k !== 'shift') return;   // Taste gehalten: Wiederholungen zählen nicht als Fehler
   const L = LEVELS[cur];
@@ -2313,7 +2342,7 @@ function finish(){
   const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '') + bookCard + `<div class="rcards">${benchCard}${nextCard}</div>`;
   const slots = Array.from({length: 9}, (_, i) => `<div class="lootslot">${run.list && run.list[i] ? itemSVG(run.list[i]).replace('<svg ', `<svg style="animation-delay:${.12 * i}s" `) : ''}</div>`).join('');
   const chestImg = L.sentences && run.bau ? `<div class="hausbild">${bauHTML(run.bau, run.bau.plan.length)}</div>` : L.chest ? `<div class="lootgrid">${slots}</div>` : '';
-  box.innerHTML = `<div class="mtitle">${L.name}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
+  box.innerHTML = `<div class="mtitle">${lvName(L)}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
   const retry = document.createElement('button'); retry.className = 'btn quiet'; retry.textContent = 'Nochmal';
   retry.onclick = () => { hideOverlay(); start(cur); };
@@ -2349,6 +2378,11 @@ document.getElementById('invIcon').innerHTML = chestSVG('closed');
 // Smaragd-Anzeige öffnet den Shop, Truhen-Anzeige das Inventar (nur im Menü)
 const inMenu = () => !document.getElementById('menu').classList.contains('hidden');
 document.getElementById('btnShop').onclick = () => { if (inMenu()) openShop(); };
+function layoutLabel(){ document.getElementById('btnLayout').textContent = '⌨ ' + (isEN() ? 'EN' : 'DE'); }
+document.getElementById('btnLayout').onclick = () => {
+  if (!inMenu() || !user) return;
+  st.layout = isEN() ? 'de' : 'en'; lsSet('typecraft-layout', st.layout); save(); layoutLabel(); renderMenu();
+};
 document.getElementById('btnInfo').onclick = () => { if (inMenu()) openInfo(); };
 document.getElementById('btnInv').onclick = () => { if (inMenu()) openInventory(); };
 document.getElementById('btnUser').onclick = () => { if (inMenu()) openUsers(); };
