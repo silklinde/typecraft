@@ -20,4 +20,4 @@
 
 ## Pfad-Menü: Farben und Hintergrund
 - Level braun, Werkbank grün, Bauplatz blau; gesperrte Level sind graue Boxen mit gestrichelter Umrandung.
-- Hintergrund des Pfads: Ebene in der Dämmerung, selbst gezeichnet (`pfadBgInit()`: Zellen zu je 4 Pixeln, auf Canvas gezeichnet): Himmelsverlauf, zwei Hügelreihen, Bäume, Gras mit Blumen. Die Ebenen bewegen sich beim Scrollen verschieden schnell (Parallaxe), das Gras mit dem Pfad.
+- Hintergrund (`pfadBands()`): Himmelsverlauf, Pixel-Bäume (auf Canvas gezeichnet, Zellen zu je 4 Pixeln), Grasstreifen mit Zacken, Erde (`--dirt`), danach Steinschichten (`--stone` mit immer dunklerer Überlagerung: 0, .2, .38, .54, .68, .8), Erze (`--coal`, `--iron`, … als kleine Blöcke) passend zu den Leveln der Schicht.

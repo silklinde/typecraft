@@ -60,12 +60,10 @@
 
   /* Pfad: ein geschwungener Weg, waagerecht scrollbar. Von den Werkbank-Levels (3, 6, 9, 12, 15, 18) gehen kleine Wege mit Werkbank und Bauplätzen ab */
   .pfadwrap{position:relative;border:3px solid #000;overflow:hidden;}
-  .pbg{position:absolute;inset:0;image-rendering:pixelated;pointer-events:none;}
-  .pbg .psky{position:absolute;left:0;right:0;top:0;height:118px;background:linear-gradient(#1c2744,#3d4c7a 55%,#b9856c);}
-  .pbg .player{position:absolute;left:0;right:0;top:18px;height:92px;background-repeat:repeat-x;background-position:0 100%;background-size:auto 100%;}
-  .pbg .pgrass{position:absolute;left:0;right:0;top:110px;bottom:0;background-repeat:repeat;border-top:4px solid #1c3320;}
-  .pfad{position:relative;overflow-x:auto;overflow-y:hidden;scrollbar-color:#8a6230 #1a1a1a;scroll-behavior:smooth;}
-  .pcanvas{position:relative;height:780px;}
+  .pfad{position:relative;overflow-y:auto;overflow-x:hidden;height:calc(100vh - 175px);min-height:460px;scrollbar-color:#8a6230 #1a1a1a;}
+  .pcanvas{position:relative;}
+  .pcanvas .pband{position:absolute;left:0;right:0;image-rendering:pixelated;pointer-events:none;}
+  .pcanvas .pore{position:absolute;width:38px;height:38px;background-size:100% 100%;image-rendering:pixelated;border:2px solid rgba(0,0,0,.45);box-sizing:border-box;pointer-events:none;}
   .pcanvas svg.pbahn{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;}
   .pnode{position:absolute;width:118px;transform:translate(-50%,-50%);z-index:1;}
   .pnode .chest{width:100%;min-width:0;padding:8px 2px 6px;}
@@ -490,7 +488,6 @@
     <div class="panel" id="pPfad">
       <h2>Pfad</h2>
       <div class="pfadwrap">
-        <div class="pbg"><div class="psky"></div><div class="player" id="pbgFar"></div><div class="player" id="pbgNear"></div><div class="player" id="pbgTrees"></div><div class="pgrass" id="pbgGrass"></div></div>
         <div class="pfad" id="pfad"></div>
       </div>
     </div>
@@ -1244,53 +1241,65 @@ function openTuer(){
   openMenuModal('Das Portal', `${shelfHTML()}<div class="sign">${msg}</div><div class="signpost"></div>`, true);
 }
 
-// Hintergrund des Pfads: Ebene in der Dämmerung, selbst gezeichnet (Zellen zu je 4 Pixeln), Ebenen bewegen sich beim Scrollen verschieden schnell
-function pfadBgInit(){
-  const C = 4, rnd = (s => () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296)(7);
-  const make = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w * C; c.height = h * C; const x = c.getContext('2d'); draw((col, px, py, cw = 1, ch = 1) => { x.fillStyle = col; x.fillRect(px * C, py * C, cw * C, ch * C); }); return `url(${c.toDataURL()})`; };
-  const hills = (col, hi, a1, a2, ph) => make(240, 23, f => { for (let x = 0; x < 240; x++) { const h = Math.round(hi + a1 * Math.sin(2 * Math.PI * x / 240 + ph) + a2 * Math.sin(2 * Math.PI * 3 * x / 240 + ph * 2)); f(col, x, 23 - h, 1, h); } });
-  document.getElementById('pbgFar').style.backgroundImage = hills('#34456b', 13, 5, 2.5, 0);
-  document.getElementById('pbgNear').style.backgroundImage = hills('#27423f', 8, 3.5, 2, 2);
-  document.getElementById('pbgTrees').style.backgroundImage = make(200, 23, f => {
-    [[14, 9], [42, 12], [66, 8], [101, 11], [130, 9], [158, 13], [184, 8]].forEach(([x, h]) => {
-      f('#3b2a17', x, 23 - h, 2, h);                                   // Stamm
-      f('#1d3a24', x - 3, 23 - h - 4, 8, 3); f('#245030', x - 2, 23 - h - 7, 6, 3); f('#2c5c36', x - 1, 23 - h - 9, 4, 2);   // Krone
-    });
+// Der Pfad als Querschnitt durch die Welt: oben Wiese mit Bäumen, darunter Erde, dann Steinschichten, die von Werkbank zu Werkbank dunkler werden.
+// Die Level liegen stufenartig im Zickzack: Ecke an Ecke, je drei Level und eine Werkbank, dann geht es in die Gegenrichtung weiter.
+const PF = {col:124, row:140, sky:70, loopx:245, loopy:215};
+function pfadBands(canvas, W, H, ores){
+  const C = 4, rnd = (s => () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296)(11);
+  const grassY = PF.sky + PF.row;
+  const add = (cls, css, html) => { const d = document.createElement('div'); d.className = cls; d.style.cssText = css; if (html) d.innerHTML = html; canvas.appendChild(d); return d; };
+  // Himmel
+  add('pband', `top:0;height:${grassY}px;background:linear-gradient(#1c2744,#3d4c7a 60%,#b9856c);`);
+  // Bäume links und rechts von Level 1 (Pixelgrafik, Zellen zu je 4 Pixeln)
+  const cv = document.createElement('canvas'); cv.width = 200 * C; cv.height = 36 * C; const x = cv.getContext('2d');
+  const f = (col, px, py, w = 1, h = 1) => { x.fillStyle = col; x.fillRect(px * C, py * C, w * C, h * C); };
+  [[14, 12], [48, 15], [80, 11], [118, 14], [152, 12], [182, 16]].forEach(([tx, h]) => {
+    f('#3b2a17', tx, 36 - h, 2, h);
+    f('#1d3a24', tx - 4, 36 - h - 5, 10, 4); f('#245030', tx - 3, 36 - h - 9, 8, 4); f('#2c5c36', tx - 2, 36 - h - 12, 6, 3); f('#336a40', tx - 1, 36 - h - 14, 4, 2);
   });
-  document.getElementById('pbgGrass').style.backgroundImage = make(97, 97, f => {
-    f('#2f4d2b', 0, 0, 97, 97);
-    for (let n = 0; n < 700; n++) f(['#385a32', '#294527', '#3d6437'][n % 3], Math.floor(rnd() * 97), Math.floor(rnd() * 97), 1 + (n % 4 === 0), 1);
-    for (let n = 0; n < 9; n++) { const x = 2 + Math.floor(rnd() * 93), y = 2 + Math.floor(rnd() * 93); f(['#c94c4c', '#e8d44d', '#e6e6e6'][n % 3], x, y); f('#3d6437', x, y + 1); }
+  add('pband', `top:${grassY - 144}px;height:144px;background:url(${cv.toDataURL()}) repeat-x 0 100%;`);
+  // Gras oben (wie ein Grasblock), darunter Erde
+  add('pband', `top:${grassY}px;height:${3 * PF.row}px;background:var(--dirt);background-size:56px 56px;`);
+  add('pband', `top:${grassY + 26}px;height:12px;background:repeating-linear-gradient(90deg,#4f8f2b 0 14px,transparent 14px 34px);`);
+  add('pband', `top:${grassY}px;height:26px;background:linear-gradient(#6cc03c 0 55%,#4f8f2b 55%);border-top:2px solid #2d5a1a;box-sizing:border-box;`);
+  // Steinschichten von Werkbank zu Werkbank, jede dunkler; ganz unten die tiefste
+  const alphas = [0, .2, .38, .54, .68, .8];
+  alphas.forEach((a, s) => {
+    const top = PF.sky + 4 * (s + 1) * PF.row, bot = s === 5 ? H : PF.sky + 4 * (s + 2) * PF.row;
+    add('pband', `top:${top}px;height:${bot - top}px;background:linear-gradient(rgba(8,8,24,${a}),rgba(8,8,24,${a})),var(--stone);background-size:auto,56px 56px;border-top:4px solid rgba(0,0,0,.5);box-sizing:border-box;`);
   });
-  const pf = document.getElementById('pfad');
-  const par = () => {
-    const s = pf.scrollLeft;
-    document.getElementById('pbgFar').style.backgroundPositionX = (-s * .12) + 'px';
-    document.getElementById('pbgNear').style.backgroundPositionX = (-s * .25) + 'px';
-    document.getElementById('pbgTrees').style.backgroundPositionX = (-s * .5) + 'px';
-    document.getElementById('pbgGrass').style.backgroundPositionX = (-s) + 'px';
-  };
-  pf.addEventListener('scroll', par); par();
+  // Erze als Dekoration, passend zu den Leveln der jeweiligen Schicht
+  ores.forEach(({top, bot, kinds}) => {
+    for (let n = 0; n < 16; n++) {
+      const k = kinds[n % kinds.length];
+      add('pore', `left:${Math.round(rnd() * (W - 40))}px;top:${Math.round(top + 10 + rnd() * (bot - top - 58))}px;background-image:var(--${k});`);
+    }
+  });
 }
-pfadBgInit();
-
-// Der Pfad: alle Level liegen von Anfang an auf einem geschwungenen Weg (gesperrte als Box mit gestrichelter Umrandung).
-// Von Level 3, 6, 9, 12, 15 und 18 geht ein kleiner Weg zur Werkbank ab (abwechselnd nach unten und oben), an ihr hängen Bauplätze.
-// Jeder Zweig ist eine Kette: das erste Zusatzlevel hängt am Buchstaben-Level (`need`), die nächsten am vorigen Zusatzlevel.
-// h = Höhe des Pfads; der Hauptweg sinkt bei Level 6 und 12 (Index 5 und 11) tiefer, dort gehen die Wege nach oben ab
-const PF = {gap:190, x0:110, y0:405, amp:36, off:215, freq:.85, h:780, dips:[5, 11], dip:150, dipw:1.1, loopx:245, loopy:215, doorShift:280};
-function renderPfad(){
-  const pf = document.getElementById('pfad'); pf.innerHTML = '';
+function renderPfad(keepScroll){
+  const pf = document.getElementById('pfad'), oldTop = pf.scrollTop; pf.innerHTML = '';
   const letters = [], chests = [];
   LEVELS.forEach((L, i) => { if (L.chest) chests.push(i); else letters.push(i); });
-  const pos = {};   // Index -> {x, y}
-  letters.forEach((i, n) => { pos[i] = {x: PF.x0 + n * PF.gap, y: PF.y0 + PF.amp * Math.sin(n * PF.freq) + PF.dip * PF.dips.reduce((s, q) => s + Math.exp(-(((n - q) / PF.dipw) ** 2)), 0)}; });
-  const chains = chests.filter(k => !LEVELS[LEVELS[k].need].chest).map(h => {
-    const ch = [h];
-    for (let nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
-    return ch;
-  });
-  // Glatte Kurve durch Punkte (Catmull-Rom)
+  const doorIdx = letters[letters.length - 1];
+  const W = Math.max(pf.clientWidth, 940), cx = col => (W - 4 * PF.col) / 2 + (col + .5) * PF.col, cy = row => PF.sky + (row + .5) * PF.row;
+  const at = (col, row) => ({x: cx(col), y: cy(row)});
+  const pos = {};
+  // Stufen: Segment 0 nach rechts (Level 1–3, Werkbank 1 schräg unten rechts), danach abwechselnd links und rechts, die Werkbank unter dem letzten Level
+  const wbCol = [];
+  for (let s = 0; s < 6; s++) {
+    const dir = s % 2 === 0 ? 1 : -1, start = s === 0 ? 0 : dir > 0 ? 1 : 2;
+    for (let k = 0; k < 3; k++) pos[3 * s + k] = at(start + dir * k, 4 * s + k);
+    const lastCol = start + dir * 2;
+    wbCol[s] = s === 0 ? 3 : lastCol;
+  }
+  const wbIdx = s => chests.find(k => LEVELS[k].need === 3 * s + 2);   // Werkbank nach dem Segment s
+  for (let s = 0; s < 6; s++) pos[wbIdx(s)] = at(wbCol[s], 4 * s + 3);
+  const segs = [];
+  // Hauptweg durch Level 1–18, Zweige zu den Werkbänken
+  const main = Array.from({length: 18}, (_, i) => pos[i]);
+  segs.push('M' + main.map(q => `${q.x},${q.y}`).join(' L'));
+  for (let s = 0; s < 6; s++) segs.push(`M${pos[3 * s + 2].x},${pos[3 * s + 2].y} L${pos[wbIdx(s)].x},${pos[wbIdx(s)].y}`);
+  // Bauplatz-Ketten: von der Werkbank zur Mitte hin; die letzte (Werkbank 6, Bauplatz 4–8) windet sich im Bogen um das Portal und endet dort
   const smooth = P => {
     let d = `M${P[0].x},${P[0].y}`;
     for (let n = 0; n < P.length - 1; n++) {
@@ -1299,32 +1308,37 @@ function renderPfad(){
     }
     return d;
   };
-  const doorIdx = letters[letters.length - 1], D = pos[doorIdx];
-  D.x += PF.doorShift;   // das Portal und die Bauplätze darum liegen weiter rechts
-  const segs = [];   // Wegstücke der kleinen Wege
-  chains.forEach((ch, c) => {
-    const p = LEVELS[ch[0]].need, a = pos[p], dir = c % 2 === 0 ? 1 : -1;
-    const y = a.y + dir * PF.off;
-    pos[ch[0]] = {x: a.x, y};
-    segs.push(`M${a.x},${a.y} C${a.x + 30},${a.y + dir * 70} ${a.x - 30},${y - dir * 70} ${a.x},${y}`);
-    if (p === doorIdx - 1) {
-      // Die letzte Kette (Werkbank 6, Bauplatz 4–8) windet sich im Bogen um die Tür (Level 19) und endet dort
+  const D = {x: (cx(1) + cx(2)) / 2, y: PF.sky + 27.5 * PF.row};
+  pos[doorIdx] = D;
+  for (let s = 0; s < 6; s++) {
+    const w = wbIdx(s); let ch = [w];
+    for (let nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
+    if (ch.length === 1) continue;
+    if (s === 5) {
       const ang = [0, 55, 110, 160, 205];
       ch.slice(1).forEach((k, m) => { const r = ang[m] * Math.PI / 180; pos[k] = {x: D.x + PF.loopx * Math.sin(r), y: D.y - PF.loopy * Math.cos(r)}; });
-      segs.push(smooth([pos[ch[0]], ...ch.slice(1).map(k => pos[k]), D]));
+      segs.push(smooth([pos[w], ...ch.slice(1).map(k => pos[k]), D]));
     } else {
-      ch.forEach((k, m) => { pos[k] = {x: a.x + m * PF.gap, y}; });
-      for (let m = 1; m < ch.length; m++) segs.push(`M${pos[ch[m - 1]].x},${y} L${pos[ch[m]].x},${y}`);
+      const dir = wbCol[s] >= 2 ? -1 : 1;
+      ch.slice(1).forEach((k, m) => { pos[k] = at(wbCol[s] + dir * (m + 1), 4 * s + 3); });
+      segs.push('M' + ch.map(k => `${pos[k].x},${pos[k].y}`).join(' L'));
     }
-  });
-  // Hauptweg: glatte Kurve durch alle Buchstaben-Level
-  segs.unshift(smooth(letters.slice(0, -1).map(i => pos[i])));   // Level 18 und das Portal sind nicht verbunden: zum Portal führt nur die Bauplatz-Kette
-  const W = Math.max(...Object.values(pos).map(q => q.x)) + PF.x0, H = PF.h;
+  }
+  const H = D.y + PF.loopy + 130;
   const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : ''; };
-  const curLevel = letters.slice(0, -1).find(i => unlocked(i) && !(st.stars[i] > 0)) ?? doorIdx;   // die Tür (Level 19) ist das Ziel
-  const canvas = document.createElement('div'); canvas.className = 'pcanvas'; canvas.style.width = W + 'px';
-  canvas.innerHTML = `<svg class="pbahn" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" stroke-linecap="round" stroke-linejoin="round">`
-    + `<path d="${segs.join(' ')}" stroke="#2a170a" stroke-width="18"/><path d="${segs.join(' ')}" stroke="#6b4a26" stroke-width="11"/><path d="${segs.join(' ')}" stroke="#8a6230" stroke-width="3" stroke-dasharray="7 11"/></svg>`;
+  const curLevel = letters.slice(0, -1).find(i => unlocked(i) && !(st.stars[i] > 0)) ?? doorIdx;   // das Portal ist das Ziel
+  const canvas = document.createElement('div'); canvas.className = 'pcanvas'; canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  const oreOf = (a, b) => [...new Set(Array.from({length: b - a + 1}, (_, k) => LEVELS[a + k].ore || 'coal'))];
+  pfadBands(canvas, W, H, [
+    {top: PF.sky + PF.row, bot: PF.sky + 4 * PF.row, kinds: oreOf(1, 2)},
+    ...[1, 2, 3, 4, 5].map(s => ({top: PF.sky + 4 * s * PF.row, bot: PF.sky + 4 * (s + 1) * PF.row, kinds: oreOf(3 * s, 3 * s + 2)})),
+    {top: PF.sky + 24 * PF.row, bot: H, kinds: ['obsidian', 'diamond', 'redstone']}
+  ]);
+  const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  sv.setAttribute('class', 'pbahn'); sv.setAttribute('width', W); sv.setAttribute('height', H); sv.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  sv.setAttribute('fill', 'none'); sv.setAttribute('stroke-linecap', 'round'); sv.setAttribute('stroke-linejoin', 'round');
+  sv.innerHTML = `<path d="${segs.join(' ')}" stroke="#1b1208" stroke-width="16"/><path d="${segs.join(' ')}" stroke="#b08a55" stroke-width="9"/><path d="${segs.join(' ')}" stroke="#e0c690" stroke-width="3" stroke-dasharray="6 10"/>`;
+  canvas.appendChild(sv);
   const node = (i, inner, cls) => {
     const d = document.createElement('div'); d.className = 'pnode' + (cls ? ' ' + cls : '');
     d.style.left = pos[i].x + 'px'; d.style.top = pos[i].y + 'px'; d.innerHTML = inner; canvas.appendChild(d); return d;
@@ -1351,11 +1365,14 @@ function renderPfad(){
   });
   canvas.querySelectorAll('button[data-i]').forEach(btn => { btn.onclick = () => start(+btn.dataset.i); });
   pf.appendChild(canvas);
-  // Der Weg zeigt immer das aktuelle Level (in der Mitte)
-  pf.style.scrollBehavior = 'auto';
-  pf.scrollLeft = Math.max(0, pos[curLevel].x - pf.clientWidth / 2);
-  pf.style.scrollBehavior = '';
+  // Der Pfad zeigt immer das aktuelle Level (in der Mitte)
+  pf.scrollTop = keepScroll ? oldTop : Math.max(0, pos[curLevel].y - pf.clientHeight / 2);
 }
+let pfadW = 0;
+window.addEventListener('resize', () => {
+  const pf = document.getElementById('pfad');
+  if (user && inMenu() && pf.clientWidth !== pfadW) { pfadW = pf.clientWidth; renderPfad(true); }
+});
 
 // Inventar und Shop öffnen als Fenster über dem Menü (gleiches Fenster wie das Abschluss-Fenster)
 function openMenuModal(title, bodyHtml, wide){
