@@ -80,11 +80,13 @@ Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19�
 | Werkbank 6 | Y Ä ß | Level 18 (17) |
 | Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis W O | Werkbank 3 |
 | Bauplatz 2 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Werkbank 5 |
-| Bauplatz 3, 4 (4 und 5 Wörter) | wie Bauplatz 2 | der vorige Bauplatz |
-| Bauplatz 5 (6 Wörter) | ganze Tastatur | Werkbank 6 |
-| Bauplatz 6–8 (7, 8, 10 Wörter) | ganze Tastatur | der vorige Bauplatz |
+| Bauplatz 3 (4 Wörter) | wie Bauplatz 2 | Bauplatz 2 |
+| Bauplatz 4 (5 Wörter) | wie Bauplatz 2 | Werkbank 6 |
+| Bauplatz 5–8 (6, 7, 8, 10 Wörter) | ganze Tastatur | der vorige Bauplatz |
 
 Die Wörter jeder Werkbank enthalten bevorzugt die Buchstaben, die seit der vorigen Werkbank neu dazugekommen sind. Ketten: erst das Level `need` abschließen, dann das nächste.
+
+**Level 19 = die Tür:** Auf dem Pfad ist Level 19 (Index 18) keine Spitzhacken-Kachel mehr, sondern eine verschlossene Tür mit Schloss. Sie geht auf, wenn alle 8 Bücher da sind (wie die Tür am Bücherregal), und zeigt vorerst „Bald geöffnet“ (`openTuer()`). Die Bauplätze 4–8 winden sich im Bogen um die Tür und enden dort. Das alte Zahlen-Level steht noch in `LEVELS` (Index 18, Zahlenreihe), ist aber über den Pfad nicht mehr erreichbar.
 
 **Abschluss-Fenster:** Nach jedem Level, jeder Werkbank und jedem Bauplatz zeigt das Fenster das Ergebnis und die Funde (Spitzhacke, Rezept, Buch) und hat nur einen grünen Knopf „Weiter“ (Enter geht auch), der zurück ins Menü führt.
 

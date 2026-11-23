@@ -80,6 +80,10 @@
   .pnode .chest .drop svg{width:100%;height:auto;display:block;image-rendering:pixelated;filter:drop-shadow(1px 1px 0 #000);}
   .pnode .chest.bench:not(.bau){background:#1d3b21;box-shadow:inset 0 0 0 3px #4caf50,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(110,220,110,.4);}
   .pnode .chest.bau{background:#1f2f45;box-shadow:inset 0 0 0 3px #3f6aa8,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(120,170,255,.3);}
+  .pnode .chest.door.locked .cimg svg.ch{filter:grayscale(.8) brightness(.6);}
+  .pnode .chest.door .cimg{position:relative;}
+  .pnode .chest.door .cimg svg.lock{position:absolute;right:12px;bottom:-4px;width:26px;height:auto;image-rendering:pixelated;}
+  .pnode .chest.door.open{box-shadow:inset 0 0 0 3px #7a5528,0 0 16px 3px rgba(255,209,102,.7);}
   .pnode.cur .chest{outline:4px solid #ffd166;outline-offset:3px;}
   .pnode .lbox{box-sizing:border-box;width:100%;min-height:104px;border:3px dashed #666;border-radius:4px;background:#262626;display:flex;align-items:center;justify-content:center;padding:6px 4px;text-align:center;font-family:"VT323",monospace;font-size:21px;line-height:1;color:#8a8a8a;white-space:nowrap;}
 
@@ -735,16 +739,16 @@ const LEVELS = [
    words:CHEST5_WORDS, rounds:1, target:wordsLen(CHEST5_WORDS, 1)},
   {chest:true, name:'Werkbank 6', label:'Y Ä ß', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
-  // Bauplätze: Sätze. `need` = Werkbank (Bauplatz 1 an Werkbank 3, 2–4 an Werkbank 5, 5–8 an Werkbank 6) bzw. der vorige Bauplatz. Index 25–32.
+  // Bauplätze: Sätze. `need` = Werkbank (Bauplatz 1 an Werkbank 3, 2–3 an Werkbank 5, 4–8 an Werkbank 6) bzw. der vorige Bauplatz. Index 25–32.
   {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:21, ready:true,
    words:SENT_EASY, rounds:1, target:wordsLen(SENT_EASY, 1)},
   {chest:true, sentences:true, name:'Bauplatz 2', label:'3 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:23, ready:true,
    words:SENT_WORDS[3], rounds:1, target:wordsLen(SENT_WORDS[3], 1)},
   {chest:true, sentences:true, name:'Bauplatz 3', label:'4 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:26, ready:true,
    words:SENT_WORDS[4], rounds:1, target:wordsLen(SENT_WORDS[4], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 4', label:'5 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:27, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 4', label:'5 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:24, ready:true,
    words:SENT_WORDS[5], rounds:1, target:wordsLen(SENT_WORDS[5], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 5', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:24, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 5', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:28, ready:true,
    words:SENT_WORDS[6], rounds:1, target:wordsLen(SENT_WORDS[6], 1)},
   {chest:true, sentences:true, name:'Bauplatz 6', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:29, ready:true,
    words:SENT_WORDS[7], rounds:1, target:wordsLen(SENT_WORDS[7], 1)},
@@ -1228,10 +1232,11 @@ function renderMenu(){
   renderPfad();
   const rg = document.getElementById('regal');
   rg.innerHTML = shelfHTML();
-  rg.querySelector('.bdoor').onclick = () => {
-    if (bookCount() < 8) return;
-    const box = openMenuModal('Die Tür', `<div class="sign"><b>Bald geöffnet</b>Hinter der Tür wartet bald etwas Neues.</div><div class="signpost"></div>`, false);
-  };
+  rg.querySelector('.bdoor').onclick = openTuer;
+}
+function openTuer(){
+  if (bookCount() < 8) return;
+  openMenuModal('Die Tür', `<div class="sign"><b>Bald geöffnet</b>Hinter der Tür wartet bald etwas Neues.</div><div class="signpost"></div>`, false);
 }
 
 // Hintergrund des Pfads: Ebene in der Dämmerung, selbst gezeichnet (Zellen zu je 4 Pixeln), Ebenen bewegen sich beim Scrollen verschieden schnell
@@ -1268,7 +1273,7 @@ pfadBgInit();
 // Von Level 3, 6, 9, 12, 15 und 18 geht ein kleiner Weg zur Werkbank ab (abwechselnd nach unten und oben), an ihr hängen Bauplätze.
 // Jeder Zweig ist eine Kette: das erste Zusatzlevel hängt am Buchstaben-Level (`need`), die nächsten am vorigen Zusatzlevel.
 // h = Höhe des Pfads; der Hauptweg sinkt bei Level 6 und 12 (Index 5 und 11) tiefer, dort gehen die Wege nach oben ab
-const PF = {gap:190, x0:110, y0:405, amp:36, off:215, freq:.85, h:780, dips:[5, 11], dip:150, dipw:1.1};
+const PF = {gap:190, x0:110, y0:405, amp:36, off:215, freq:.85, h:780, dips:[5, 11], dip:150, dipw:1.1, loopx:230, loopy:205};
 function renderPfad(){
   const pf = document.getElementById('pfad'); pf.innerHTML = '';
   const letters = [], chests = [];
@@ -1280,25 +1285,37 @@ function renderPfad(){
     for (let nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
     return ch;
   });
+  // Glatte Kurve durch Punkte (Catmull-Rom)
+  const smooth = P => {
+    let d = `M${P[0].x},${P[0].y}`;
+    for (let n = 0; n < P.length - 1; n++) {
+      const p0 = P[Math.max(0, n - 1)], p1 = P[n], p2 = P[n + 1], p3 = P[Math.min(P.length - 1, n + 2)];
+      d += ` C${p1.x + (p2.x - p0.x) / 6},${p1.y + (p2.y - p0.y) / 6} ${p2.x - (p3.x - p1.x) / 6},${p2.y - (p3.y - p1.y) / 6} ${p2.x},${p2.y}`;
+    }
+    return d;
+  };
+  const doorIdx = letters[letters.length - 1], D = pos[doorIdx];
   const segs = [];   // Wegstücke der kleinen Wege
   chains.forEach((ch, c) => {
     const p = LEVELS[ch[0]].need, a = pos[p], dir = c % 2 === 0 ? 1 : -1;
     const y = a.y + dir * PF.off;
-    ch.forEach((k, m) => { pos[k] = {x: a.x + m * PF.gap, y}; });
+    pos[ch[0]] = {x: a.x, y};
     segs.push(`M${a.x},${a.y} C${a.x + 30},${a.y + dir * 70} ${a.x - 30},${y - dir * 70} ${a.x},${y}`);
-    for (let m = 1; m < ch.length; m++) segs.push(`M${pos[ch[m - 1]].x},${y} L${pos[ch[m]].x},${y}`);
+    if (p === doorIdx - 1) {
+      // Die letzte Kette (Werkbank 6, Bauplatz 4–8) windet sich im Bogen um die Tür (Level 19) und endet dort
+      const ang = [0, 55, 110, 160, 205];
+      ch.slice(1).forEach((k, m) => { const r = ang[m] * Math.PI / 180; pos[k] = {x: D.x + PF.loopx * Math.sin(r), y: D.y - PF.loopy * Math.cos(r)}; });
+      segs.push(smooth([pos[ch[0]], ...ch.slice(1).map(k => pos[k]), D]));
+    } else {
+      ch.forEach((k, m) => { pos[k] = {x: a.x + m * PF.gap, y}; });
+      for (let m = 1; m < ch.length; m++) segs.push(`M${pos[ch[m - 1]].x},${y} L${pos[ch[m]].x},${y}`);
+    }
   });
   // Hauptweg: glatte Kurve durch alle Buchstaben-Level
-  const P = letters.map(i => pos[i]);
-  let d = `M${P[0].x},${P[0].y}`;
-  for (let n = 0; n < P.length - 1; n++) {
-    const p0 = P[Math.max(0, n - 1)], p1 = P[n], p2 = P[n + 1], p3 = P[Math.min(P.length - 1, n + 2)];
-    d += ` C${p1.x + (p2.x - p0.x) / 6},${p1.y + (p2.y - p0.y) / 6} ${p2.x - (p3.x - p1.x) / 6},${p2.y - (p3.y - p1.y) / 6} ${p2.x},${p2.y}`;
-  }
-  segs.unshift(d);
+  segs.unshift(smooth(letters.map(i => pos[i])));
   const W = Math.max(...Object.values(pos).map(q => q.x)) + PF.x0, H = PF.h;
   const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : ''; };
-  const curLevel = letters.find(i => unlocked(i) && !(st.stars[i] > 0)) ?? letters[letters.length - 1];
+  const curLevel = letters.slice(0, -1).find(i => unlocked(i) && !(st.stars[i] > 0)) ?? doorIdx;   // die Tür (Level 19) ist das Ziel
   const canvas = document.createElement('div'); canvas.className = 'pcanvas'; canvas.style.width = W + 'px';
   canvas.innerHTML = `<svg class="pbahn" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" stroke-linecap="round" stroke-linejoin="round">`
     + `<path d="${segs.join(' ')}" stroke="#2a170a" stroke-width="18"/><path d="${segs.join(' ')}" stroke="#6b4a26" stroke-width="11"/><path d="${segs.join(' ')}" stroke="#8a6230" stroke-width="3" stroke-dasharray="7 11"/></svg>`;
@@ -1308,6 +1325,12 @@ function renderPfad(){
   };
   LEVELS.forEach((L, i) => {
     const open = unlocked(i);
+    if (i === doorIdx) {   // Level 19: verschlossene Tür, geht mit allen 8 Büchern auf
+      const all = bookCount() === 8;
+      const d = node(i, `<button class="chest door ${all ? 'open' : 'locked'}" data-door="1" title="${all ? 'Die Tür ist offen' : 'Sammle alle 8 Bücher'}"><div class="cimg">${pixSVG(ITEM_ART.door, 'ch', BENCH_PAL)}${all ? '' : padlockSVG()}</div><div class="cname">Level ${i + 1}</div><div class="csub"></div></button>`, i === curLevel ? 'cur' : '');
+      d.querySelector('button').onclick = openTuer;
+      return;
+    }
     if (!open) {
       const hint = L.chest ? (L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald') : `Schließe zuerst Level ${i} ab`;
       node(i, `<div class="lbox" title="${hint}">${L.chest ? L.name : 'Level ' + (i + 1)}</div>`, 'locked');
