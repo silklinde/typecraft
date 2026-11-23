@@ -65,7 +65,7 @@
   .pbg .player{position:absolute;left:0;right:0;top:18px;height:92px;background-repeat:repeat-x;background-position:0 100%;background-size:auto 100%;}
   .pbg .pgrass{position:absolute;left:0;right:0;top:110px;bottom:0;background-repeat:repeat;border-top:4px solid #1c3320;}
   .pfad{position:relative;overflow-x:auto;overflow-y:hidden;scrollbar-color:#8a6230 #1a1a1a;scroll-behavior:smooth;}
-  .pcanvas{position:relative;height:650px;}
+  .pcanvas{position:relative;height:780px;}
   .pcanvas svg.pbahn{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;}
   .pnode{position:absolute;width:118px;transform:translate(-50%,-50%);z-index:1;}
   .pnode .chest{width:100%;min-width:0;padding:8px 2px 6px;}
@@ -1267,13 +1267,14 @@ pfadBgInit();
 // Der Pfad: alle Level liegen von Anfang an auf einem geschwungenen Weg (gesperrte als Box mit gestrichelter Umrandung).
 // Von Level 3, 6, 9, 12, 15 und 18 geht ein kleiner Weg zur Werkbank ab (abwechselnd nach unten und oben), an ihr hängen Bauplätze.
 // Jeder Zweig ist eine Kette: das erste Zusatzlevel hängt am Buchstaben-Level (`need`), die nächsten am vorigen Zusatzlevel.
-const PF = {gap:190, x0:110, y0:328, amp:36, off:215, freq:.85};
+// h = Höhe des Pfads; der Hauptweg sinkt bei Level 6 und 12 (Index 5 und 11) tiefer, dort gehen die Wege nach oben ab
+const PF = {gap:190, x0:110, y0:405, amp:36, off:215, freq:.85, h:780, dips:[5, 11], dip:150, dipw:1.1};
 function renderPfad(){
   const pf = document.getElementById('pfad'); pf.innerHTML = '';
   const letters = [], chests = [];
   LEVELS.forEach((L, i) => { if (L.chest) chests.push(i); else letters.push(i); });
   const pos = {};   // Index -> {x, y}
-  letters.forEach((i, n) => { pos[i] = {x: PF.x0 + n * PF.gap, y: PF.y0 + PF.amp * Math.sin(n * PF.freq)}; });
+  letters.forEach((i, n) => { pos[i] = {x: PF.x0 + n * PF.gap, y: PF.y0 + PF.amp * Math.sin(n * PF.freq) + PF.dip * PF.dips.reduce((s, q) => s + Math.exp(-(((n - q) / PF.dipw) ** 2)), 0)}; });
   const chains = chests.filter(k => !LEVELS[LEVELS[k].need].chest).map(h => {
     const ch = [h];
     for (let nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
@@ -1295,7 +1296,7 @@ function renderPfad(){
     d += ` C${p1.x + (p2.x - p0.x) / 6},${p1.y + (p2.y - p0.y) / 6} ${p2.x - (p3.x - p1.x) / 6},${p2.y - (p3.y - p1.y) / 6} ${p2.x},${p2.y}`;
   }
   segs.unshift(d);
-  const W = Math.max(...Object.values(pos).map(q => q.x)) + PF.x0, H = 650;
+  const W = Math.max(...Object.values(pos).map(q => q.x)) + PF.x0, H = PF.h;
   const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : ''; };
   const curLevel = letters.find(i => unlocked(i) && !(st.stars[i] > 0)) ?? letters[letters.length - 1];
   const canvas = document.createElement('div'); canvas.className = 'pcanvas'; canvas.style.width = W + 'px';
