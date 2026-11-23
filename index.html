@@ -1236,7 +1236,7 @@ function renderMenu(){
 }
 function openTuer(){
   if (bookCount() < 8) return;
-  openMenuModal('Die Tür', `<div class="sign"><b>Bald geöffnet</b>Hinter der Tür wartet bald etwas Neues.</div><div class="signpost"></div>`, false);
+  openMenuModal('Das Portal', `<div class="sign"><b>Bald geöffnet</b>Hinter dem Portal wartet bald etwas Neues.</div><div class="signpost"></div>`, false);
 }
 
 // Hintergrund des Pfads: Ebene in der Dämmerung, selbst gezeichnet (Zellen zu je 4 Pixeln), Ebenen bewegen sich beim Scrollen verschieden schnell
@@ -1312,7 +1312,7 @@ function renderPfad(){
     }
   });
   // Hauptweg: glatte Kurve durch alle Buchstaben-Level
-  segs.unshift(smooth(letters.map(i => pos[i])));
+  segs.unshift(smooth(letters.slice(0, -1).map(i => pos[i])));   // Level 18 und das Portal sind nicht verbunden: zum Portal führt nur die Bauplatz-Kette
   const W = Math.max(...Object.values(pos).map(q => q.x)) + PF.x0, H = PF.h;
   const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(16, true)).join('') : ''; };
   const curLevel = letters.slice(0, -1).find(i => unlocked(i) && !(st.stars[i] > 0)) ?? doorIdx;   // die Tür (Level 19) ist das Ziel
@@ -1325,9 +1325,9 @@ function renderPfad(){
   };
   LEVELS.forEach((L, i) => {
     const open = unlocked(i);
-    if (i === doorIdx) {   // Level 19: verschlossene Tür, geht mit allen 8 Büchern auf
+    if (i === doorIdx) {   // Level 19 heißt Portal: verschlossene Tür, geht mit allen 8 Büchern auf
       const all = bookCount() === 8;
-      const d = node(i, `<button class="chest door ${all ? 'open' : 'locked'}" data-door="1" title="${all ? 'Die Tür ist offen' : 'Sammle alle 8 Bücher'}"><div class="cimg">${pixSVG(ITEM_ART.door, 'ch', BENCH_PAL)}${all ? '' : padlockSVG()}</div><div class="cname">Level ${i + 1}</div><div class="csub"></div></button>`, i === curLevel ? 'cur' : '');
+      const d = node(i, `<button class="chest door ${all ? 'open' : 'locked'}" data-door="1" title="${all ? 'Die Tür ist offen' : 'Sammle alle 8 Bücher'}"><div class="cimg">${pixSVG(ITEM_ART.door, 'ch', BENCH_PAL)}${all ? '' : padlockSVG()}</div><div class="cname">Portal</div><div class="csub"></div></button>`, i === curLevel ? 'cur' : '');
       d.querySelector('button').onclick = openTuer;
       return;
     }

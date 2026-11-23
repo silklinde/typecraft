@@ -86,7 +86,7 @@ Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19�
 
 Die Wörter jeder Werkbank enthalten bevorzugt die Buchstaben, die seit der vorigen Werkbank neu dazugekommen sind. Ketten: erst das Level `need` abschließen, dann das nächste.
 
-**Level 19 = die Tür:** Auf dem Pfad ist Level 19 (Index 18) keine Spitzhacken-Kachel mehr, sondern eine verschlossene Tür mit Schloss. Sie geht auf, wenn alle 8 Bücher da sind (wie die Tür am Bücherregal), und zeigt vorerst „Bald geöffnet“ (`openTuer()`). Die Bauplätze 4–8 winden sich im Bogen um die Tür und enden dort. Das alte Zahlen-Level steht noch in `LEVELS` (Index 18, Zahlenreihe), ist aber über den Pfad nicht mehr erreichbar.
+**Level 19 = das Portal:** Auf dem Pfad heißt Level 19 (Index 18) „Portal“ und ist keine Spitzhacken-Kachel mehr, sondern eine verschlossene Tür mit Schloss. Es hat keine Verbindung zu Level 18, nur die Bauplatz-Kette (Bauplatz 8) führt hin. Sie geht auf, wenn alle 8 Bücher da sind (wie die Tür am Bücherregal), und zeigt vorerst „Bald geöffnet“ (`openTuer()`). Die Bauplätze 4–8 winden sich im Bogen um die Tür und enden dort. Das alte Zahlen-Level steht noch in `LEVELS` (Index 18, Zahlenreihe), ist aber über den Pfad nicht mehr erreichbar.
 
 **Abschluss-Fenster:** Nach jedem Level, jeder Werkbank und jedem Bauplatz zeigt das Fenster das Ergebnis und die Funde (Spitzhacke, Rezept, Buch) und hat nur einen grünen Knopf „Weiter“ (Enter geht auch), der zurück ins Menü führt.
 
