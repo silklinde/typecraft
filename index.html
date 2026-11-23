@@ -32,7 +32,7 @@
   .btn.green{background:#4caf50;}
   .panel{background:#2b2b2b;border:3px solid #000;border-radius:4px;padding:10px;margin:12px 0;}
   h2{margin:4px 0 8px;font-size:18px;}
-  /* Menü: oben der Pfad (Buchstaben-Level in der Mitte, Sätze oben, Wörter unten), darunter das Bücherregal */
+  /* Menü: oben der Pfad (Buchstaben-Level in der Mitte, Sätze oben, Wörter unten), */
   #menu{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;}
   #menu .panel{margin:6px 0;}
   /* Hinweis bei Touch-Geräten und zu kleinem Fenster: deckt nur ab, der Spielstand bleibt unberührt */
@@ -82,6 +82,8 @@
   .pnode .chest.bau{background:#1f2f45;box-shadow:inset 0 0 0 3px #3f6aa8,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(120,170,255,.3);}
   .pnode .chest.door.locked .cimg svg.ch{filter:grayscale(.8) brightness(.6);}
   .pnode .chest.door .cimg{position:relative;}
+  .pnode .chest .csub.pbooks{font-size:19px;gap:4px;white-space:nowrap;}
+  .pnode .chest .csub.pbooks svg{width:16px;height:auto;}
   .pnode .chest.door .cimg svg.lock{position:absolute;right:12px;bottom:-4px;width:26px;height:auto;image-rendering:pixelated;}
   .pnode .chest.door.open{box-shadow:inset 0 0 0 3px #7a5528,0 0 16px 3px rgba(255,209,102,.7);}
   .pnode.cur .chest{outline:4px solid #ffd166;outline-offset:3px;}
@@ -485,10 +487,6 @@
         <div class="pbg"><div class="psky"></div><div class="player" id="pbgFar"></div><div class="player" id="pbgNear"></div><div class="player" id="pbgTrees"></div><div class="pgrass" id="pbgGrass"></div></div>
         <div class="pfad" id="pfad"></div>
       </div>
-    </div>
-    <div class="panel" id="pRegal">
-      <h2>Bücherregal</h2>
-      <div id="regal"></div>
     </div>
     <button class="infobtn" id="btnInfo" title="Info und Lizenz" aria-label="Info und Lizenz">i</button>
   </div>
@@ -1230,13 +1228,14 @@ function renderMenu(){
   topBar(); show('menu');
 
   renderPfad();
-  const rg = document.getElementById('regal');
-  rg.innerHTML = shelfHTML();
-  rg.querySelector('.bdoor').onclick = openTuer;
 }
+// Klick auf das Portal: das Bücherregal im Fenster, darunter wie viele Bücher noch fehlen
 function openTuer(){
-  if (bookCount() < 8) return;
-  openMenuModal('Das Portal', `<div class="sign"><b>Bald geöffnet</b>Hinter dem Portal wartet bald etwas Neues.</div><div class="signpost"></div>`, false);
+  const n = 8 - bookCount();
+  const msg = n > 0
+    ? `<b>Das Portal ist verschlossen</b>${n === 1 ? 'Es fehlt noch 1 Buch.' : `Es fehlen noch ${n} Bücher.`}<br>Jeder Bauplatz, den du schaffst, bringt ein Buch.`
+    : `<b>Bald geöffnet</b>Hinter dem Portal wartet bald etwas Neues.`;
+  openMenuModal('Das Portal', `${shelfHTML()}<div class="sign">${msg}</div><div class="signpost"></div>`, true);
 }
 
 // Hintergrund des Pfads: Ebene in der Dämmerung, selbst gezeichnet (Zellen zu je 4 Pixeln), Ebenen bewegen sich beim Scrollen verschieden schnell
@@ -1327,7 +1326,7 @@ function renderPfad(){
     const open = unlocked(i);
     if (i === doorIdx) {   // Level 19 heißt Portal: verschlossene Tür, geht mit allen 8 Büchern auf
       const all = bookCount() === 8;
-      const d = node(i, `<button class="chest door ${all ? 'open' : 'locked'}" data-door="1" title="${all ? 'Die Tür ist offen' : 'Sammle alle 8 Bücher'}"><div class="cimg">${pixSVG(ITEM_ART.door, 'ch', BENCH_PAL)}${all ? '' : padlockSVG()}</div><div class="cname">Portal</div><div class="csub"></div></button>`, i === curLevel ? 'cur' : '');
+      const d = node(i, `<button class="chest door ${all ? 'open' : 'locked'}" data-door="1" title="${all ? 'Die Tür ist offen' : 'Sammle alle 8 Bücher'}"><div class="cimg">${pixSVG(ITEM_ART.door, 'ch', BENCH_PAL)}${all ? '' : padlockSVG()}</div><div class="cname">Portal</div><div class="csub pbooks">${all ? 'Offen' : `${bookSVG('#c9a24a')} ${8 - bookCount()} fehlen`}</div></button>`, i === curLevel ? 'cur' : '');
       d.querySelector('button').onclick = openTuer;
       return;
     }
