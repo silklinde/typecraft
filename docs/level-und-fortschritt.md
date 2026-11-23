@@ -68,12 +68,11 @@ Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` versc
 ## Pfad, Werkbänke, Bauplätze und Bücher
 **Menü:** ein Pfad (`renderPfad()`) in zwei Zeilen zu je 11 Spalten, darunter das Bücherregal (`shelfHTML()`). In der Mitte stehen die 19 Buchstaben-Level. Wer ein Level mit mindestens 1 Herz schafft, findet ein **Rezept** (Wörter) oder eine **Vorlage** (Sätze). Dann geht ein Zweig ab und das Zusatzlevel erscheint: Werkbänke nach unten, Bauplätze nach oben. Das Level, das etwas enthält, trägt oben rechts ein kleines Rezept- bzw. Vorlagen-Symbol. Ungefundenes ist nicht zu sehen, nur der nächste Bauplatz in der Kette steht als gestrichelter Umriss da. Die Zusatzlevel sind freiwillig, der Buchstabenpfad geht immer weiter.
 
-Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–32, Herzen wie bei Leveln in `st.stars[i]`). Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Das Abschluss-Fenster zeigt „Rezept gefunden!“ bzw. „Vorlage gefunden!“.
+Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–31, Herzen wie bei Leveln in `st.stars[i]`). Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Das Abschluss-Fenster zeigt „Rezept gefunden!“ bzw. „Vorlage gefunden!“.
 
 | Zusatzlevel | Tasten / Wörter | `need` (Fund) |
 |-------|--------|------------------------------|
-| Werkbank 1 | A S D F + Umschalt | Level 3 (Index 2) |
-| Werkbank 2 | + J K L Ö, linke Umschalt | Werkbank 1 |
+| Werkbank 1 | A S D F J K L Ö, beide Umschalt-Tasten (zwei Einführungen nacheinander: rechte, dann linke Umschalt) | Level 3 (Index 2) |
 | Werkbank 3 | G H E I R U | Level 7 (6) |
 | Werkbank 4 | E I R U | Werkbank 3 |
 | Werkbank 5 | obere Reihe (T Z W O Q P Ü) | Level 11 (10) |
@@ -114,5 +113,7 @@ Gecraftet werden nur Gegenstände der Kategorie Dekoration (https://de.minecraft
 
 Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Inventar“ gecraftete Gegenstände mit Namen und Anzahl; alles, was noch nicht gecraftet wurde, ist nur ein leerer grauer Inventar-Slot (ohne Namen). Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.
 
+
+**Stand v5 des Spielstands:** Werkbank 1 und 2 sind ein Level (Index 19), `load()` führt ihre Herzen zusammen und rückt alle Zusatzlevel danach um eins nach vorn.
 
 **Stand v4 des Spielstands:** Die frühere Grundhaltung (F J + Leertaste, Holzblöcke) entfällt; die Holzspitzhacke gibt Level 0 „Hände auflegen“. F steht jetzt in Level 1 (linke Hand), J in Level 2 (rechte Hand). Alle Indizes ab dem alten Level 2 sind um eins nach vorn gerückt (Migration in `load()`). Der Code für die Grundhaltung (`grundAsk`, `GRUND_SEQ`) ist noch da, wird aber nicht mehr benutzt.

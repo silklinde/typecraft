@@ -652,8 +652,7 @@ const HAENDE_SEQ = ['f', 'j', 'd', 's', 'a', 'k', 'l', 'ö', ' '];
 // Kurze Fingernamen für Hände auflegen (die Seite sieht man an der Hand)
 const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeigefinger',
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
-const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Fass','As','Dada','Fa'];
-const CHEST2_WORDS = ['Ja','Öl','Fall','Falls','Kalk','Lass','Salsa','Kajak','Alaska'];
+const CHEST1_WORDS = ['Da','Das','Dass','Fass','Ja','Öl','Fall','Falls','Kalk','Salsa','Kajak','Alaska'];   // A S D F J K L Ö
 const CHEST3_WORDS = ['Igel','Esel','Hase','Reh','Gras','Feuer','Hirse','Riese','Ruhe'];   // G H E I R U
 // Werkbänke 4–6: E I R U (Level 6–7), die obere Reihe (Level 8–10), die untere Reihe bis X . (Level 12–15)
 const CHEST4_WORDS = ['Ruder','Rudel','Eule','Fluss','Haare','Hilfe','Gurke','Reife','Ruhig'];
@@ -720,34 +719,33 @@ const LEVELS = [
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
-  {chest:true, name:'Werkbank 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:2, ready:true,
+  {chest:true, name:'Werkbank 1', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, need:2, ready:true,
+   shiftIntros:[{shift:'shift', name:'Umschalt ⇧', keys:['d','f','a']}, {shift:'shiftl', name:'Linke Umschalt ⇧', keys:['j','k','l']}],
    words:CHEST1_WORDS, rounds:1, target:wordsLen(CHEST1_WORDS, 1)},
-  {chest:true, name:'Werkbank 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:19, ready:true,
-   words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
   {chest:true, name:'Werkbank 3', label:'G H E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:6, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
-  {chest:true, name:'Werkbank 4', label:'E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:21, ready:true,
+  {chest:true, name:'Werkbank 4', label:'E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:20, ready:true,
    words:CHEST4_WORDS, rounds:1, target:wordsLen(CHEST4_WORDS, 1)},
   {chest:true, name:'Werkbank 5', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:10, ready:true,
    words:CHEST5_WORDS, rounds:1, target:wordsLen(CHEST5_WORDS, 1)},
   {chest:true, name:'Werkbank 6', label:'Untere Reihe', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
    words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
-  // Bauplätze: Sätze. `need` = Level mit der Vorlage (Index 10, 14, 18) bzw. der vorige Bauplatz (Kette). Index 25–32.
+  // Bauplätze: Sätze. `need` = Level mit der Vorlage (Index 10, 14, 18) bzw. der vorige Bauplatz (Kette). Index 24–31.
   {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:10, ready:true,
    words:SENT_EASY, rounds:1, target:wordsLen(SENT_EASY, 1)},
   {chest:true, sentences:true, name:'Bauplatz 2', label:'3 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
    words:SENT_WORDS[3], rounds:1, target:wordsLen(SENT_WORDS[3], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 3', label:'4 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:26, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 3', label:'4 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:25, ready:true,
    words:SENT_WORDS[4], rounds:1, target:wordsLen(SENT_WORDS[4], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 4', label:'5 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:27, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 4', label:'5 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:26, ready:true,
    words:SENT_WORDS[5], rounds:1, target:wordsLen(SENT_WORDS[5], 1)},
   {chest:true, sentences:true, name:'Bauplatz 5', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
    words:SENT_WORDS[6], rounds:1, target:wordsLen(SENT_WORDS[6], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 6', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:29, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 6', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:28, ready:true,
    words:SENT_WORDS[7], rounds:1, target:wordsLen(SENT_WORDS[7], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 7', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:30, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 7', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:29, ready:true,
    words:SENT_WORDS[8], rounds:1, target:wordsLen(SENT_WORDS[8], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 8', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:31, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 8', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:30, ready:true,
    words:SENT_WORDS[10], rounds:1, target:wordsLen(SENT_WORDS[10], 1)},
 ];
 // Texte der Level, die auf der englischen Tastatur anders heißen (Index im Array LEVELS)
@@ -799,6 +797,12 @@ function load(){
         if ((s.stars || {})[1]) n[0] = 3;
         s.stars = n; s.v = 4;
       }
+      // v5: Werkbank 1 und 2 sind ein Level (Index 19); alle Zusatzlevel danach rücken um eins nach vorn
+      if (s.v < 5) {
+        const n = {};
+        Object.keys(s.stars || {}).forEach(i => { const k = +i >= 21 ? +i - 1 : (+i === 20 ? 19 : +i); n[k] = Math.max(n[k] || 0, s.stars[i]); });
+        s.stars = n; s.v = 5;
+      }
       if (!s.items) s.items = {};
       if (!s.books) s.books = {};
       // Wer Bauplätze schon geschafft hat, bekommt die Bücher nachträglich
@@ -808,7 +812,7 @@ function load(){
   } catch(e){}
   return fresh();
 }
-function fresh(){ return {v:4, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}, books:{}, layout: lsGet('typecraft-layout') === 'en' ? 'en' : 'de'}; }
+function fresh(){ return {v:5, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}, books:{}, layout: lsGet('typecraft-layout') === 'en' ? 'en' : 'de'}; }
 function save(){ if (user) lsSet(keyOf(user), JSON.stringify(st)); }
 
 // Nutzer anlegen oder wählen. Der alte Spielstand (typecraft-v1) geht an den ersten Namen, der angelegt wird.
@@ -1437,8 +1441,9 @@ function buildBoard(field, L, mode){
     ? `<div class="newrow" id="hrow"></div>`
     : mode === 'cshift'
     ? (() => {
-        const x = ((L.newShift === 'shiftl' ? SHIFTL_CX : SHIFT_CX) * 100).toFixed(3);
-        return `<div class="newrow cs" id="hrow"><div id="big-${L.newShift}" class="nk iron" style="left:${x}%">⇧</div><div class="hname" id="csname" style="left:${x}%">Kleiner<br>Finger</div></div>`;
+        const sh = L.shiftIntros[cs.stage].shift;
+        const x = ((sh === 'shiftl' ? SHIFTL_CX : SHIFT_CX) * 100).toFixed(3);
+        return `<div class="newrow cs" id="hrow"><div id="big-${sh}" class="nk iron" style="left:${x}%">⇧</div><div class="hname" id="csname" style="left:${x}%">Kleiner<br>Finger</div></div>`;
       })()
     : mode === 'learn'
     ? `<div class="newrow">
@@ -1685,7 +1690,7 @@ function showToast(L){
   hideToast();
   const t = document.createElement('div');
   t.id = 'toast'; t.className = 'toast';
-  const [title, txt] = L.chest ? ['Neue Taste freigeschaltet', L.shiftName] : ['Neue Buchstaben freigeschaltet', L.neu.map(k => KLBL(k)).join(' ')];
+  const [title, txt] = L.chest ? ['Neue Taste freigeschaltet', L.shiftIntros[cs ? cs.stage : 0].name] : ['Neue Buchstaben freigeschaltet', L.neu.map(k => KLBL(k)).join(' ')];
   t.innerHTML = `<div class="ticon ${L.chest ? 'iron' : (L.ore || 'coal')}"></div><div class="ttxt"><b>${title}</b><span>${txt}</span></div>`;
   document.body.appendChild(t);
 }
@@ -1890,6 +1895,15 @@ function chestNext(){
   setExpected(key, cap && shiftFor(key));
   if (space) { const tl = document.querySelector('#intro .thumb.l'); if (tl) tl.classList.add('hover'); }   // beide Daumen
 }
+// Umschalt-Einführung: eine Stufe je neue Umschalt-Taste (Werkbank 1: erst rechte, dann linke Umschalt)
+function csStage(L, stage){
+  const field = document.getElementById('field');
+  phase = 'cshift';
+  cs = {stage, step:'press', idx:0, letters:L.shiftIntros[stage].keys, blk:null, busy:false, upper:null};
+  buildBoard(field, L, 'cshift');
+  showToast(L);
+  setExpected(L.shiftIntros[stage].shift);
+}
 // Umschalt-Einführung, Schritt 2: ein kleiner Block verwandelt sich in einen Großbuchstaben, solange Umschalt gehalten wird
 function csNext(){
   finishMining();
@@ -1938,7 +1952,8 @@ function csKey(e, k, L){
   if (cs.idx >= cs.letters.length) {
     phase = 'wait';
     setHint('Super!');
-    pendingTimer = setTimeout(() => beginPlay(L), 1000);
+    const nextStage = cs.stage + 1;
+    pendingTimer = setTimeout(() => nextStage < L.shiftIntros.length ? csStage(L, nextStage) : beginPlay(L), 1000);
     return;
   }
   later(csNext, 500);
@@ -2005,12 +2020,8 @@ function start(i){
   hz = null;
   if (L.chest) {
     // Truhe: erst die Umschalt-Taste einmal kennenlernen, dann die Wörter
-    if (L.newShift) {
-      phase = 'cshift';
-      cs = {step:'press', idx:0, letters:L.introKeys, blk:null, busy:false, upper:null};
-      buildBoard(field, L, 'cshift');
-      showToast(L);
-      setExpected(L.newShift);
+    if (L.shiftIntros) {
+      csStage(L, 0);
     } else {
       beginPlay(L);      // keine neue Taste: gleich die Wörter
     }
@@ -2200,7 +2211,7 @@ function onKey(e){
           cs.step = 'morph'; cs.busy = true;
           setExpected(null);
           const nm = document.getElementById('csname'); if (nm) nm.remove();
-          const big = document.getElementById('big-' + L.newShift);
+          const big = document.getElementById('big-' + L.shiftIntros[cs.stage].shift);
           if (big) mineBlock({el: big, kind: 'iron'});
           bounce();
           later(csNext, 700);
