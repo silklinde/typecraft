@@ -58,31 +58,23 @@
   #overlay .box .sign b{display:block;font-size:26px;margin-bottom:4px;}
   #overlay .box .signpost{width:14px;height:56px;margin:0 auto;background:#7a5526;border:3px solid #5a3d1a;border-top:0;}
 
-  /* Pfad: zwei Zeilen mit je 11 Spalten. Oben Sätze (Bauplätze), in der Mitte die Buchstaben-Level, unten Wörter (Werkbänke) */
-  .pfadrow{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));column-gap:6px;margin-bottom:14px;}
-  .pfadrow .cell{position:relative;display:flex;flex-direction:column;align-items:center;min-width:0;}
-  .pfadrow .cell.up{justify-content:flex-end;}
-  .pfadrow .cell.down{justify-content:flex-start;}
-  .pfadrow .cell .bt{position:relative;width:100%;display:flex;justify-content:center;}
-  .pfadrow .cell .bt::before,.pfadrow .cell .bt::after{content:'';position:absolute;top:50%;height:8px;margin-top:-4px;background:#6b4a26;border-top:2px solid #8a6230;border-bottom:2px solid #4a3216;box-sizing:border-box;z-index:0;}
-  .pfadrow .cell .bt::before{left:-6px;right:50%;}
-  .pfadrow .cell .bt::after{left:50%;right:-6px;}
-  .pfadrow .cell.nol .bt::before,.pfadrow .cell.nor .bt::after,.pfadrow .cell.down .bt::before,.pfadrow .cell.down .bt::after{display:none;}
-  .pfadrow .cell.down.hz:not(.nol) .bt::before,.pfadrow .cell.down.hz:not(.nor) .bt::after{display:block;}
-  .pfadrow .cell .stub{width:8px;height:18px;background:#6b4a26;border-left:2px solid #8a6230;border-right:2px solid #4a3216;box-sizing:border-box;}
-  .pfadrow .cell .stub.hid{visibility:hidden;}
-  .pfadrow .cell .bt .chest{position:relative;z-index:1;width:100%;min-width:0;margin:4px 0;padding:8px 2px 6px;}
-  .pfadrow .chest:disabled{width:100%;padding:8px 2px 6px;opacity:1;}
-  .pfadrow .chest .cimg,.pfadrow .chest:disabled .cimg{width:100%;}
-  .pfadrow .chest.lvl .cimg svg,.pfadrow .chest.lvl:disabled .cimg svg{width:min(56px,100%);height:auto;aspect-ratio:1;}
-  .pfadrow .chest .cimg svg.ch,.pfadrow .chest:disabled .cimg svg.ch{width:min(64px,100%);}
-  .pfadrow .chest .cname,.pfadrow .chest:disabled .cname{font-size:clamp(14px,1.45vw,21px);white-space:nowrap;}
-  .pfadrow .chest .csub{min-height:16px;}
-  .pfadrow .chest .drop{position:absolute;top:-10px;right:-6px;width:26px;z-index:2;}
-  .pfadrow .chest .drop svg{width:100%;height:auto;display:block;image-rendering:pixelated;filter:drop-shadow(1px 1px 0 #000);}
-  .pfadrow .ghost{position:relative;z-index:1;width:56%;aspect-ratio:1;margin:12px 0;border:3px dashed #555;border-radius:4px;background:#2b2b2b;}
-  .pfadrow .chest.bau{background:#1f2f45;box-shadow:inset 0 0 0 3px #3f6aa8,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(120,170,255,.3);}
-  .pfadrow .chest.bau:disabled{background:#2a2a2a;box-shadow:inset 0 0 0 3px #3a3a3a;}
+  /* Pfad: ein geschwungener Weg, waagerecht scrollbar. Von den Werkbank-Levels (3, 6, 9, 12, 15, 18) gehen kleine Wege mit Werkbank und Bauplätzen ab */
+  .pfad{overflow-x:auto;overflow-y:hidden;scrollbar-color:#8a6230 #1a1a1a;scroll-behavior:smooth;}
+  .pcanvas{position:relative;height:650px;}
+  .pcanvas svg.pbahn{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;}
+  .pnode{position:absolute;width:118px;transform:translate(-50%,-50%);z-index:1;}
+  .pnode .chest{width:100%;min-width:0;padding:8px 2px 6px;}
+  .pnode .chest:disabled{width:100%;opacity:1;}
+  .pnode .chest .cimg{width:100%;}
+  .pnode .chest.lvl .cimg svg{width:min(56px,100%);height:auto;aspect-ratio:1;}
+  .pnode .chest .cimg svg.ch{width:min(64px,100%);}
+  .pnode .chest .cname{font-size:21px;white-space:nowrap;}
+  .pnode .chest .csub{min-height:16px;}
+  .pnode .chest .drop{position:absolute;top:-10px;right:-6px;width:26px;z-index:2;}
+  .pnode .chest .drop svg{width:100%;height:auto;display:block;image-rendering:pixelated;filter:drop-shadow(1px 1px 0 #000);}
+  .pnode .chest.bau{background:#1f2f45;box-shadow:inset 0 0 0 3px #3f6aa8,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(120,170,255,.3);}
+  .pnode.cur .chest{outline:4px solid #ffd166;outline-offset:3px;}
+  .pnode .lbox{box-sizing:border-box;width:100%;min-height:104px;border:3px dashed #666;border-radius:4px;background:#262626;display:flex;align-items:center;justify-content:center;padding:6px 4px;text-align:center;font-family:"VT323",monospace;font-size:21px;line-height:1;color:#8a8a8a;white-space:nowrap;}
 
   /* Bücherregal: acht Plätze und die Tür zu den Text-Leveln */
   .shelf{--bw:58px;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;background:#4a3216;border:4px solid #2a170a;box-shadow:inset 0 0 0 3px #7a5528,inset 0 -8px 0 rgba(0,0,0,.35);overflow:visible;}
@@ -616,7 +608,7 @@ const keyPos = c => !isEN() ? c : ('öäüß'.includes(c) ? '\u0000' : (EN_IN[c]
 // Zeichen im Text -> Position (Y und Z sind vertauscht, der Bindestrich liegt oben rechts)
 const charPos = c => !isEN() ? c : ({y:'z', z:'y', '-':'ß'}[c] || c);
 // Englische Tastatur: Umlaute werden ausgeschrieben, ein paar Wörter ersetzt, die Tasten nutzen würden, die im Level noch fehlen
-const EN_SWAP = {'Öl':'Falk', 'Zeit':'Tier', 'Zombies fürchten Sonnenlicht.':'Hühner legen Eier.',
+const EN_SWAP = {'Öl':'Falk', 'Zeit':'Tier', 'Zombies fürchten Sonnenlicht.':'Hühner legen Eier.', 'Das Gold glitzert':'Das Gold liegt hier',
   'Katzen verscheuchen die Creeper.':'Skelette schießen mit Pfeilen.', 'Zombies fangen im Sonnenlicht Feuer.':'Skelette fangen im Sonnenlicht Feuer.', 'Mit Weizen füttert man Kühe.':'Mit Karotten füttert man Schweine.'};
 const enWord = w => (EN_SWAP[w] || w).replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/Ä/g,'Ae').replace(/Ö/g,'Oe').replace(/Ü/g,'Ue');
 const wordsOf = L => isEN() ? L.words.map(enWord) : L.words;
@@ -652,14 +644,15 @@ const HAENDE_SEQ = ['f', 'j', 'd', 's', 'a', 'k', 'l', 'ö', ' '];
 // Kurze Fingernamen für Hände auflegen (die Seite sieht man an der Hand)
 const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeigefinger',
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
+// Werkbänke 1–6 (nach Level 3, 6, 9, 12, 15, 18): Wörter mit den Buchstaben, die seit der letzten Werkbank neu dazugekommen sind
 const CHEST1_WORDS = ['Da','Das','Dass','Fass','Ja','Öl','Fall','Falls','Kalk','Salsa','Kajak','Alaska'];   // A S D F J K L Ö
-const CHEST3_WORDS = ['Igel','Esel','Hase','Reh','Gras','Feuer','Hirse','Riese','Ruhe'];   // G H E I R U
-// Werkbänke 3–5: E I R U (Level 6–7), die obere Reihe (Level 8–10), die untere Reihe bis X . (Level 12–15)
-const CHEST4_WORDS = ['Ruder','Rudel','Eule','Fluss','Haare','Hilfe','Gurke','Reife','Ruhig'];
-const CHEST5_WORDS = ['Wasser','Teller','Wiese','Torf','Hut','Rose','Wolke','Quark','Pute','Kuh','Tür','Zeit'];
-const CHEST6_WORDS = ['Banane','Computer','Mond','Vogel','Boxen','Gabel','Vase','Mama','Nacht','Creeper','Magma','Nebel'];
-// Bauplätze 1–8. Bauplatz 1 (ab Level 11): kurze Sätze nur mit den Buchstaben bis Ü, ohne Satzzeichen. Bauplatz 2–4 (ab Level 15) ohne Y, Bindestrich, Ä und ß.
-const SENT_EASY = ['Der Spieler hat Gold','Das Pferd galoppiert','Der Wolf wartet hier','Der Wolf folgt dir','Die Kuh liefert Leder','Der Spieler sieht das Haus'];
+const CHEST2_WORDS = ['Igel','Esel','Hase','Halle','Gasse','Heide','Hilfe','Eis','Hals','Hass','Sieg','Held'];   // G H E I
+const CHEST3_WORDS = ['Wasser','Torf','Hut','Rose','Wolke','Kuh','Zeit','Ruder','Fluss','Tor','Wolf','Rudel'];   // R U T Z W O
+const CHEST4_WORDS = ['Quark','Pute','Tür','Pfeil','Fackel','Creeper','Pferd','Tisch','Küche','Quelle','Wüste','Hürde'];   // Q P Ü C
+const CHEST5_WORDS = ['Banane','Computer','Mond','Vogel','Boxen','Gabel','Vase','Mama','Nacht','Nether','Magma','Nebel'];   // V M B N X
+const CHEST6_WORDS = ['Yacht','Käse','Fuß','Straße','Spaß','Äpfel','Bär','Bäume','Äxte','Fleiß','Strauß','Bälle'];   // Y Ä ß
+// Bauplätze 1–8. Bauplatz 1 (an Werkbank 3, ab Level 9): kurze Sätze nur mit den Buchstaben bis W O, ohne Satzzeichen. Bauplatz 2–4 (an Werkbank 5, ab Level 15) ohne Y, Bindestrich, Ä und ß.
+const SENT_EASY = ['Der Wolf folgt dir','Die Kuh liefert Leder','Der Wolf wartet hier','Der Wolf steht hier','Das Gold glitzert','Der Esel wartet'];
 const SENT_WORDS = {
   3: ['Creeper schleichen leise.','Zombies fürchten Sonnenlicht.','Wölfe mögen Knochen.','Schafe geben Wolle.','Kühe geben Milch.','Fackeln machen Licht.'],
   4: ['Wölfe schütteln sich trocken.','Diamanten liegen tief unten.','Katzen verscheuchen die Creeper.','Schweine fressen gern Karotten.','Spinnen greifen nachts an.'],
@@ -671,7 +664,7 @@ const SENT_WORDS = {
 };
 const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
-const SENT_KEYS0 = UPPER(['e','i','r','u','t','z','w','o','q','p','ü',' ']);   // bis Level 11 (Q P Ü), noch ohne Satzzeichen
+const SENT_KEYS0 = UPPER(['e','i','r','u','t','z','w','o',' ']);   // bis Level 9 (W O), noch ohne Satzzeichen
 const SENT_KEYS1 = UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.',' ']);   // bis Level 15 (X .)
 const SENT_KEYS = UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß',' ']);
 const LEVELS = [
@@ -722,30 +715,32 @@ const LEVELS = [
   {chest:true, name:'Werkbank 1', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, need:2, ready:true,
    shiftIntros:[{shift:'shift', name:'Umschalt ⇧', keys:['d','f','a']}, {shift:'shiftl', name:'Linke Umschalt ⇧', keys:['j','k','l']}],
    words:CHEST1_WORDS, rounds:1, target:wordsLen(CHEST1_WORDS, 1)},
-  {chest:true, name:'Werkbank 2', label:'G H E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:6, ready:true,
+  {chest:true, name:'Werkbank 2', label:'G H E I', keys:UPPER(['e','i']), neu:[], shift:true, shiftl:true, need:5, ready:true,
+   words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
+  {chest:true, name:'Werkbank 3', label:'R U T Z W O', keys:UPPER(['e','i','r','u','t','z','w','o']), neu:[], shift:true, shiftl:true, need:8, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
-  {chest:true, name:'Werkbank 3', label:'E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:20, ready:true,
+  {chest:true, name:'Werkbank 4', label:'Q P Ü C', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',']), neu:[], shift:true, shiftl:true, need:11, ready:true,
    words:CHEST4_WORDS, rounds:1, target:wordsLen(CHEST4_WORDS, 1)},
-  {chest:true, name:'Werkbank 4', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:10, ready:true,
+  {chest:true, name:'Werkbank 5', label:'V M B N X', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
    words:CHEST5_WORDS, rounds:1, target:wordsLen(CHEST5_WORDS, 1)},
-  {chest:true, name:'Werkbank 5', label:'Untere Reihe', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
+  {chest:true, name:'Werkbank 6', label:'Y Ä ß', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
    words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
-  // Bauplätze: Sätze. `need` = Level mit der Vorlage (Index 10, 14, 18) bzw. der vorige Bauplatz (Kette). Index 24–31.
-  {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:22, ready:true,
+  // Bauplätze: Sätze. `need` = Werkbank (Bauplatz 1 an Werkbank 3, 2–4 an Werkbank 5, 5–8 an Werkbank 6) bzw. der vorige Bauplatz. Index 25–32.
+  {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:21, ready:true,
    words:SENT_EASY, rounds:1, target:wordsLen(SENT_EASY, 1)},
   {chest:true, sentences:true, name:'Bauplatz 2', label:'3 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:23, ready:true,
    words:SENT_WORDS[3], rounds:1, target:wordsLen(SENT_WORDS[3], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 3', label:'4 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:25, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 3', label:'4 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:26, ready:true,
    words:SENT_WORDS[4], rounds:1, target:wordsLen(SENT_WORDS[4], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 4', label:'5 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:26, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 4', label:'5 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:27, ready:true,
    words:SENT_WORDS[5], rounds:1, target:wordsLen(SENT_WORDS[5], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 5', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 5', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:24, ready:true,
    words:SENT_WORDS[6], rounds:1, target:wordsLen(SENT_WORDS[6], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 6', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:28, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 6', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:29, ready:true,
    words:SENT_WORDS[7], rounds:1, target:wordsLen(SENT_WORDS[7], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 7', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:29, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 7', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:30, ready:true,
    words:SENT_WORDS[8], rounds:1, target:wordsLen(SENT_WORDS[8], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 8', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:30, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 8', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:31, ready:true,
    words:SENT_WORDS[10], rounds:1, target:wordsLen(SENT_WORDS[10], 1)},
 ];
 // Texte der Level, die auf der englischen Tastatur anders heißen (Index im Array LEVELS)
@@ -803,6 +798,12 @@ function load(){
         Object.keys(s.stars || {}).forEach(i => { const k = +i >= 21 ? +i - 1 : (+i === 20 ? 19 : +i); n[k] = Math.max(n[k] || 0, s.stars[i]); });
         s.stars = n; s.v = 5;
       }
+      // v6: Es gibt sechs Werkbänke (Index 19–24), die Bauplätze rücken um eins nach hinten (Index 25–32)
+      if (s.v < 6) {
+        const n = {};
+        Object.keys(s.stars || {}).forEach(i => { n[+i >= 24 ? +i + 1 : +i] = s.stars[i]; });
+        s.stars = n; s.v = 6;
+      }
       if (!s.items) s.items = {};
       if (!s.books) s.books = {};
       // Wer Bauplätze schon geschafft hat, bekommt die Bücher nachträglich
@@ -812,7 +813,7 @@ function load(){
   } catch(e){}
   return fresh();
 }
-function fresh(){ return {v:5, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}, books:{}, layout: lsGet('typecraft-layout') === 'en' ? 'en' : 'de'}; }
+function fresh(){ return {v:6, emeralds:0, stars:{}, owned:{wald:true}, biome:'wald', items:{}, books:{}, layout: lsGet('typecraft-layout') === 'en' ? 'en' : 'de'}; }
 function save(){ if (user) lsSet(keyOf(user), JSON.stringify(st)); }
 
 // Nutzer anlegen oder wählen. Der alte Spielstand (typecraft-v1) geht an den ersten Namen, der angelegt wird.
@@ -1223,56 +1224,66 @@ function renderMenu(){
   };
 }
 
-// Der Pfad: Buchstaben-Level in der Mitte. Wer ein Rezept (Wörter) oder eine Vorlage (Sätze) gefunden hat, sieht einen Zweig nach unten bzw. oben.
-// Jeder Zweig ist eine kleine Kette: das erste Zusatzlevel hängt am Buchstaben-Level (`need`), die nächsten am vorigen Zusatzlevel.
-// Zwischen zwei Zweigen liegen mindestens 3 Buchstaben-Level (Level 3, 7, 11, 15, 19).
+// Der Pfad: alle Level liegen von Anfang an auf einem geschwungenen Weg (gesperrte als Box mit gestrichelter Umrandung).
+// Von Level 3, 6, 9, 12, 15 und 18 geht ein kleiner Weg zur Werkbank ab (abwechselnd nach unten und oben), an ihr hängen Bauplätze.
+// Jeder Zweig ist eine Kette: das erste Zusatzlevel hängt am Buchstaben-Level (`need`), die nächsten am vorigen Zusatzlevel.
+const PF = {gap:190, x0:110, y0:328, amp:36, off:215, freq:.85};
 function renderPfad(){
   const pf = document.getElementById('pfad'); pf.innerHTML = '';
-  const benches = [], plots = [], chests = [];
-  LEVELS.forEach((L, i) => { if (L.chest) { chests.push(i); (L.sentences ? plots : benches).push(i); } });
-  // Ketten: ein Kopf (hängt an einem Buchstaben-Level), dann jeweils das Level, das den Vorgänger braucht.
-  // Ein Bauplatz, der an einer Werkbank hängt, gehört zu deren Kette (erst die Werkbank abschließen).
+  const letters = [], chests = [];
+  LEVELS.forEach((L, i) => { if (L.chest) chests.push(i); else letters.push(i); });
+  const pos = {};   // Index -> {x, y}
+  letters.forEach((i, n) => { pos[i] = {x: PF.x0 + n * PF.gap, y: PF.y0 + PF.amp * Math.sin(n * PF.freq)}; });
   const chains = chests.filter(k => !LEVELS[LEVELS[k].need].chest).map(h => {
     const ch = [h];
     for (let nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
     return ch;
   });
-  const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(heartSize(maxHearts(L), 16), true)).join('') : ''; };
-  const mk = (cls, inner, row, col) => { const d = document.createElement('div'); d.className = cls; d.style.gridRow = row; d.style.gridColumn = col; d.innerHTML = inner; return d; };
-  const branchBtn = (i, bau) => {
-    const L = LEVELS[i], open = unlocked(i);
-    if (!open) return `<div class="ghost" title="${L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald'}"></div>`;
-    return `<button class="chest bench${bau ? ' bau' : ''}" data-i="${i}"><div class="cimg">${bau ? vorlageSVG() : pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="cname">${L.name}</div><div class="csub">${heartsOf(L, i)}</div></button>`;
-  };
-  [[0, 10], [11, 18]].forEach(([a, b]) => {
-    const g = document.createElement('div'); g.className = 'pfadrow';
-    for (let i = a; i <= b; i++) {
-      const L = LEVELS[i], open = unlocked(i), pick = levelPick(i);
-      const badge = (benches.some(k => LEVELS[k].need === i && unlocked(k)) ? rezeptSVG() : '') + (plots.some(k => LEVELS[k].need === i && unlocked(k)) ? vorlageSVG() : '');
-      const cell = mk('cell mid' + (i === a ? ' nol' : '') + (i === b ? ' nor' : ''), `<div class="bt"><button class="chest lvl" data-i="${i}"${open ? '' : ' disabled'} title="${open ? '' : `Schließe zuerst Level ${i} ab`}"><div class="cimg">${pickaxeSVG(pick, 64)}</div><div class="cname">Level ${i + 1}</div><div class="csub">${heartsOf(L, i)}</div>${badge ? `<div class="drop">${badge}</div>` : ''}</button></div>`, 2, i - a + 1);
-      g.appendChild(cell);
-    }
-    // Wörter: Kette nach unten, Sätze: Kette nach oben (erst gefundene, bei Sätzen dazu der nächste als Umriss)
-    const addChain = ch => {
-      const p = LEVELS[ch[0]].need;
-      if (p < a || p > b) return;
-      const up = !!LEVELS[ch[0]].sentences;
-      const vis = ch.filter((k, m) => unlocked(k) || (LEVELS[k].sentences && m > 0 && unlocked(ch[m - 1])));
-      const c0 = p - a + 1, room = 11 - c0 + 1;      // so viele Zellen passen nach rechts
-      let wraps = 0;
-      vis.forEach((k, m) => {
-        const wrap = m >= room, first = m === 0, last = m === Math.min(vis.length, room) - 1;
-        const stub = `<div class="stub${first || wrap ? '' : ' hid'}"></div>`;
-        const btn = branchBtn(k, !!LEVELS[k].sentences);
-        if (wrap) { g.appendChild(mk('cell down', `${stub}<div class="bt">${btn}</div>`, 3 + (++wraps), c0)); return; }   // passt nicht mehr nach rechts: darunter
-        const cls = 'cell ' + (up ? 'up' : 'down hz') + (first ? ' nol' : '') + (last ? ' nor' : '');
-        g.appendChild(mk(cls, up ? `<div class="bt">${btn}</div>${stub}` : `${stub}<div class="bt">${btn}</div>`, up ? 1 : 3, c0 + m));
-      });
-    };
-    chains.forEach(addChain);
-    g.querySelectorAll('button[data-i]').forEach(btn => { btn.onclick = () => start(+btn.dataset.i); });
-    pf.appendChild(g);
+  const segs = [];   // Wegstücke der kleinen Wege
+  chains.forEach((ch, c) => {
+    const p = LEVELS[ch[0]].need, a = pos[p], dir = c % 2 === 0 ? 1 : -1;
+    const y = a.y + dir * PF.off;
+    ch.forEach((k, m) => { pos[k] = {x: a.x + m * PF.gap, y}; });
+    segs.push(`M${a.x},${a.y} C${a.x + 30},${a.y + dir * 70} ${a.x - 30},${y - dir * 70} ${a.x},${y}`);
+    for (let m = 1; m < ch.length; m++) segs.push(`M${pos[ch[m - 1]].x},${y} L${pos[ch[m]].x},${y}`);
   });
+  // Hauptweg: glatte Kurve durch alle Buchstaben-Level
+  const P = letters.map(i => pos[i]);
+  let d = `M${P[0].x},${P[0].y}`;
+  for (let n = 0; n < P.length - 1; n++) {
+    const p0 = P[Math.max(0, n - 1)], p1 = P[n], p2 = P[n + 1], p3 = P[Math.min(P.length - 1, n + 2)];
+    d += ` C${p1.x + (p2.x - p0.x) / 6},${p1.y + (p2.y - p0.y) / 6} ${p2.x - (p3.x - p1.x) / 6},${p2.y - (p3.y - p1.y) / 6} ${p2.x},${p2.y}`;
+  }
+  segs.unshift(d);
+  const W = Math.max(...Object.values(pos).map(q => q.x)) + PF.x0, H = 650;
+  const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(heartSize(maxHearts(L), 16), true)).join('') : ''; };
+  const curLevel = letters.find(i => unlocked(i) && !(st.stars[i] > 0)) ?? letters[letters.length - 1];
+  const canvas = document.createElement('div'); canvas.className = 'pcanvas'; canvas.style.width = W + 'px';
+  canvas.innerHTML = `<svg class="pbahn" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" stroke-linecap="round" stroke-linejoin="round">`
+    + `<path d="${segs.join(' ')}" stroke="#2a170a" stroke-width="18"/><path d="${segs.join(' ')}" stroke="#6b4a26" stroke-width="11"/><path d="${segs.join(' ')}" stroke="#8a6230" stroke-width="3" stroke-dasharray="7 11"/></svg>`;
+  const node = (i, inner, cls) => {
+    const d = document.createElement('div'); d.className = 'pnode' + (cls ? ' ' + cls : '');
+    d.style.left = pos[i].x + 'px'; d.style.top = pos[i].y + 'px'; d.innerHTML = inner; canvas.appendChild(d); return d;
+  };
+  LEVELS.forEach((L, i) => {
+    const open = unlocked(i);
+    if (!open) {
+      const hint = L.chest ? (L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald') : `Schließe zuerst Level ${i} ab`;
+      node(i, `<div class="lbox" title="${hint}">${L.chest ? L.name : 'Level ' + (i + 1)}</div>`, 'locked');
+    } else if (L.chest) {
+      const bau = !!L.sentences;
+      node(i, `<button class="chest bench${bau ? ' bau' : ''}" data-i="${i}"><div class="cimg">${bau ? vorlageSVG() : pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="cname">${L.name}</div><div class="csub">${heartsOf(L, i)}</div></button>`);
+    } else {
+      const badge = chests.some(k => LEVELS[k].need === i && unlocked(k)) ? (LEVELS[chests.find(k => LEVELS[k].need === i)].sentences ? vorlageSVG() : rezeptSVG()) : '';
+      node(i, `<button class="chest lvl" data-i="${i}"><div class="cimg">${pickaxeSVG(levelPick(i), 64)}</div><div class="cname">Level ${i + 1}</div><div class="csub">${heartsOf(L, i)}</div>${badge ? `<div class="drop">${badge}</div>` : ''}</button>`, i === curLevel ? 'cur' : '');
+    }
+  });
+  canvas.querySelectorAll('button[data-i]').forEach(btn => { btn.onclick = () => start(+btn.dataset.i); });
+  pf.appendChild(canvas);
+  // Der Weg zeigt immer das aktuelle Level (in der Mitte)
+  pf.style.scrollBehavior = 'auto';
+  pf.scrollLeft = Math.max(0, pos[curLevel].x - pf.clientWidth / 2);
+  pf.style.scrollBehavior = '';
 }
 
 // Inventar und Shop öffnen als Fenster über dem Menü (gleiches Fenster wie das Abschluss-Fenster)
@@ -2343,42 +2354,27 @@ function finish(){
 
   const box = document.getElementById('overlayBox');
   box.className = 'box';
-  const next = cur < LEVELS.length - 1 && stars > 0 && !L.chest && !LEVELS[cur + 1].chest;
   const fehler = n => n === 1 ? '1 Fehler' : `${n} Fehler`;
   const detail = L.intro ? '' : `${run.correct} ${L.chest ? 'Buchstaben' : 'Blöcke'}, ${run.wrong ? fehler(run.wrong) : 'kein Fehler'}`;
   const ziel = (L.intro || stars === maxH) ? ''
     : `<div style="margin-top:6px;color:#ddd;">${`Für ${stars + 1} ${stars === 0 ? 'Herz' : 'Herzen'} höchstens ${fehler(bud[stars])}`}.</div>`;
   const msg = stars > 0
     ? `Geschafft!<div class="mrow"><span class="hearts">${heartRow(maxH, stars, 40)}</span><span class="mem">+3 ${emeraldSVG(32)}</span></div>${detail}${ziel}`
-    : `Noch nicht ganz. ${detail}${ziel}<br>Gleich nochmal probieren!`;
-  const nextL = next ? LEVELS[cur + 1] : null;
-  const nextCard = nextL
-    ? `<div class="reward rcard"><div class="cimg" style="width:64px;margin:0 auto;">${nextL.chest ? pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL) : pickaxeSVG(levelPick(cur + 1), 64)}</div><div class="rw-title">${nextL.chest ? nextL.name : 'Level ' + (cur + 2)}</div><div class="nextbtn"></div></div>` : '';
+    : `Noch nicht ganz. ${detail}${ziel}<br>Probier es gleich nochmal!`;
   const nb = newBench >= 0 ? LEVELS[newBench] : null;
   const benchCard = nb
-    ? `<div class="reward rcard"><div class="cimg" style="width:64px;margin:0 auto;">${nb.sentences ? vorlageSVG() : rezeptSVG()}</div><div class="rw-title">${nb.sentences ? 'Vorlage gefunden!' : 'Rezept gefunden!'}</div><div class="rw-text">${nb.name}</div><div class="benchbtn"></div></div>` : '';
+    ? `<div class="reward rcard"><div class="cimg" style="width:64px;margin:0 auto;">${nb.sentences ? vorlageSVG() : rezeptSVG()}</div><div class="rw-title">${nb.sentences ? 'Vorlage gefunden!' : 'Rezept gefunden!'}</div><div class="rw-text">${nb.name}</div></div>` : '';
   const bookCard = newBook
     ? `<div class="reward bookcard"><div class="rw-title">Neues Buch!</div>${shelfHTML({newIdx: bookIdx, mini: true})}<div class="rw-text">${bookCount() === 8 ? 'Alle 8 Bücher sind da. Die Tür ist aufgegangen!' : `${bookCount()} von 8 Büchern`}</div></div>` : '';
-  const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '') + bookCard + `<div class="rcards">${benchCard}${nextCard}</div>`;
+  const rw = ((L.reward && stars > 0) ? rewardHtml(L.reward) : '') + bookCard + `<div class="rcards">${benchCard}</div>`;
   const slots = Array.from({length: 9}, (_, i) => `<div class="lootslot">${run.list && run.list[i] ? itemSVG(run.list[i]).replace('<svg ', `<svg style="animation-delay:${.12 * i}s" `) : ''}</div>`).join('');
   const chestImg = L.sentences && run.bau ? `<div class="hausbild">${bauHTML(run.bau, run.bau.plan.length)}</div>` : L.chest ? `<div class="lootgrid">${slots}</div>` : '';
   box.innerHTML = `<div class="mtitle">${lvName(L)}</div><div class="minner">${chestImg}${msg}${rw}<div class="btns" style="margin-top:14px;"></div></div>`;
   const btns = box.querySelector('.btns');
-  const retry = document.createElement('button'); retry.className = 'btn quiet'; retry.textContent = 'Nochmal';
-  retry.onclick = () => { hideOverlay(); start(cur); };
-  const menu = document.createElement('button'); menu.className = 'btn quiet'; menu.textContent = 'Menü';
-  menu.onclick = () => { hideOverlay(); renderMenu(); };
-  btns.appendChild(retry); btns.appendChild(menu);
-  if (newBench >= 0) {
-    const bb = document.createElement('button'); bb.className = 'btn green'; bb.textContent = nb.sentences ? 'Bauplatz öffnen' : 'Werkbank öffnen';
-    bb.onclick = () => { hideOverlay(); start(newBench); };
-    box.querySelector('.benchbtn').appendChild(bb);
-  }
-  if (next) {
-    const nb = document.createElement('button'); nb.className = 'btn green next'; nb.textContent = 'Nächstes Level';
-    nb.onclick = () => { hideOverlay(); start(cur + 1); };
-    box.querySelector('.nextbtn').appendChild(nb);
-  }
+  // Nach jedem Level, jeder Werkbank und jedem Bauplatz geht es zurück ins Menü
+  const weiter = document.createElement('button'); weiter.className = 'btn green'; weiter.textContent = 'Weiter';
+  weiter.onclick = () => { hideOverlay(); renderMenu(); };
+  btns.appendChild(weiter);
   // 1 Sekunde Pause: Der letzte Anschlag ist sichtbar gezählt, Eingaben werden jetzt nicht mehr gewertet.
   // Danach wächst das Fenster aus der Mitte (Animation am Fenster selbst).
   pendingTimer = setTimeout(() => {

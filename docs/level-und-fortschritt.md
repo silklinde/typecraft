@@ -66,26 +66,29 @@ Pro Nutzer ein Eintrag: `localStorage['typecraft-user-<name klein>']` (Namenslis
 Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` verschiebt alte Herzen (ohne `v`) um eins nach hinten.
 
 ## Pfad, Werkbänke, Bauplätze und Bücher
-**Menü:** ein Pfad (`renderPfad()`) in zwei Zeilen zu je 11 Spalten, darunter das Bücherregal (`shelfHTML()`). In der Mitte stehen die 19 Buchstaben-Level. Wer ein Level mit mindestens 1 Herz schafft, findet ein **Rezept** (Wörter) oder eine **Vorlage** (Sätze). Dann geht ein Zweig ab und das Zusatzlevel erscheint: Werkbänke nach unten, Bauplätze nach oben. Das Level, das etwas enthält, trägt oben rechts ein kleines Rezept- bzw. Vorlagen-Symbol. Ungefundenes ist nicht zu sehen, nur der nächste Bauplatz in der Kette steht als gestrichelter Umriss da. Die Zusatzlevel sind freiwillig, der Buchstabenpfad geht immer weiter.
+**Menü:** ein geschwungener Pfad (`renderPfad()`, Maße in `PF`), waagerecht scrollbar, darunter das Bücherregal (`shelfHTML()`). Alle Level liegen von Anfang an auf dem Pfad; gesperrte sind eine Box mit gestrichelter Umrandung und dem Namen, freigeschaltete sind normale Kacheln. Das aktuelle Level (erstes freies ohne Herz) hat einen gelben Rahmen, und der Pfad scrollt beim Öffnen des Menüs dorthin. Von Level 3, 6, 9, 12, 15 und 18 geht ein kleiner Weg ab (abwechselnd nach unten und oben) zur Werkbank; an der Werkbank hängt eine Kette mit Bauplätzen nach rechts. Wer ein Level mit mindestens 1 Herz schafft, schaltet die Werkbank frei (kleines Rezept-Symbol am Level). Die Zusatzlevel sind freiwillig, der Buchstabenpfad geht immer weiter.
 
-Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–31, Herzen wie bei Leveln in `st.stars[i]`). Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Das Abschluss-Fenster zeigt „Rezept gefunden!“ bzw. „Vorlage gefunden!“.
+Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–32, Herzen wie bei Leveln in `st.stars[i]`). Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz (oder das Level wurde schon gespielt).
 
-| Zusatzlevel | Tasten / Wörter | `need` (Fund) |
+| Zusatzlevel | Tasten / Wörter | `need` |
 |-------|--------|------------------------------|
 | Werkbank 1 | A S D F J K L Ö, beide Umschalt-Tasten (zwei Einführungen nacheinander: rechte, dann linke Umschalt) | Level 3 (Index 2) |
-| Werkbank 2 | G H E I R U | Level 7 (6) |
-| Werkbank 3 | E I R U | Werkbank 2 |
-| Werkbank 4 | obere Reihe (T Z W O Q P Ü) | Level 11 (10) |
-| Werkbank 5 | untere Reihe bis X . (C V M B N X) | Level 15 (14) |
-| Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis Q P Ü | Werkbank 4 |
+| Werkbank 2 | G H E I | Level 6 (5) |
+| Werkbank 3 | R U T Z W O | Level 9 (8) |
+| Werkbank 4 | Q P Ü C | Level 12 (11) |
+| Werkbank 5 | V M B N X | Level 15 (14) |
+| Werkbank 6 | Y Ä ß | Level 18 (17) |
+| Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis W O | Werkbank 3 |
 | Bauplatz 2 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Werkbank 5 |
 | Bauplatz 3, 4 (4 und 5 Wörter) | wie Bauplatz 2 | der vorige Bauplatz |
-| Bauplatz 5 (6 Wörter) | ganze Tastatur | Level 19 (18) |
+| Bauplatz 5 (6 Wörter) | ganze Tastatur | Werkbank 6 |
 | Bauplatz 6–8 (7, 8, 10 Wörter) | ganze Tastatur | der vorige Bauplatz |
 
-**Abstand:** Die Zweige hängen an Level 3, 7, 11, 15 und 19, dazwischen liegen immer mindestens 3 Buchstaben-Level. An jedem Zweig hängt eine kleine Kette (Wörter nach unten, Sätze nach oben): Hängt an einem Abzweig eine Werkbank und ein Bauplatz (Level 11, 15), geht der Pfad zum Bauplatz von der Werkbank aus, der Bauplatz kommt erst nach der Werkbank (rechts davon, bei Bauplatz 1 darunter, weil rechts kein Platz ist). Das erste Zusatzlevel kommt vom Buchstaben-Level, jedes weitere vom vorigen Zusatzlevel. Die Wörter und Sätze enthalten bevorzugt die Buchstaben, die seit dem letzten Zweig neu dazugekommen sind. Bereits gespielte Zusatzlevel bleiben offen (`unlocked()`), auch wenn sich ihr `need` später ändert.
+Die Wörter jeder Werkbank enthalten bevorzugt die Buchstaben, die seit der vorigen Werkbank neu dazugekommen sind. Ketten: erst das Level `need` abschließen, dann das nächste.
 
-**Erste einfache Sätze:** möglich ab Level 8 (+ T Z), z. B. „Das Haus ist hier“; sie gibt es ab Bauplatz 1 (Zweig an Level 11) ohne Punkt und Komma (Komma ab Level 12, Punkt ab Level 15). Bauplatz 1 hat Sätze bis Q P Ü, deshalb ohne C, M, B, N. Der 9-Wörter-Satzsatz entfiel, damit die neuen kurzen Sätze Platz haben.
+**Abschluss-Fenster:** Nach jedem Level, jeder Werkbank und jedem Bauplatz zeigt das Fenster das Ergebnis und die Funde (Spitzhacke, Rezept, Buch) und hat nur einen grünen Knopf „Weiter“ (Enter geht auch), der zurück ins Menü führt.
+
+**Erste einfache Sätze:** möglich ab Level 8 (+ T Z), z. B. „Der Wolf folgt dir“; sie gibt es ab Bauplatz 1 (an Werkbank 3, Level 9) ohne Punkt und Komma (Komma ab Level 12, Punkt ab Level 15). Der 9-Wörter-Satzsatz entfiel, damit die neuen kurzen Sätze Platz haben.
 
 **Englische Tastatur:** Z liegt dort auf der Y-Position (Level 16). Wörter und Sätze mit Z vor Level 16 brauchen einen Eintrag in `EN_SWAP`; geprüft wird das mit einem Skript, das für beide Layouts alle Zeichen gegen `keys` prüft.
 
@@ -113,6 +116,8 @@ Gecraftet werden nur Gegenstände der Kategorie Dekoration (https://de.minecraft
 
 Gecraftete Gegenstände zählt `st.items = {id: Anzahl}` im Spielstand. Im Menü zeigt der Bereich „Inventar“ gecraftete Gegenstände mit Namen und Anzahl; alles, was noch nicht gecraftet wurde, ist nur ein leerer grauer Inventar-Slot (ohne Namen). Das Abschluss-Fenster zeigt die Beute der Runde, neue Gegenstände mit „neu!“. Obsidian hat eine eigene Textur (`--obsidian`), aber es gibt noch keine Obsidian-Level mit Buchstaben, nur den Obsidian-Gegenstand in den Truhen.
 
+
+**Stand v6 des Spielstands:** Es gibt sechs Werkbänke (Index 19–24), die Bauplätze stehen bei Index 25–32; `load()` schiebt ihre Herzen um eins nach hinten.
 
 **Stand v5 des Spielstands:** Werkbank 1 und 2 sind ein Level (Index 19), `load()` führt ihre Herzen zusammen und rückt alle Zusatzlevel danach um eins nach vorn.
 

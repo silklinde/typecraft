@@ -149,7 +149,8 @@ Für jedes Level prüfen: Trefferzahl, neue Tasten, Erzart, Belohnung, Freischal
 
 ### Wort-Werkbänke (1–6)
 
-- [ ] Freischaltung: Zweige an Level 3 (Werkbank 1), Level 7 (Werkbank 2, dann 3), Level 11 (Werkbank 4, danach Bauplatz 1), Level 15 (Werkbank 5, danach Bauplatz 2–4), Level 19 (Bauplatz 5–8).
+- [ ] Freischaltung: Werkbank 1–6 nach Level 3, 6, 9, 12, 15, 18; Bauplatz 1 nach Werkbank 3, Bauplatz 2–4 nach Werkbank 5, Bauplatz 5–8 nach Werkbank 6. Gesperrte Level sind gestrichelte Boxen.
+- [ ] Pfad scrollt waagerecht und zeigt beim Öffnen das aktuelle Level; nach jedem Abschluss-Fenster („Weiter“) zurück im Menü.
 - [ ] Gesperrte Werkbänke sind kleiner, grau, mit Vorhängeschloss.
 - [ ] Werkbank 1: Einführung der Umschalt-Taste (⇧), Fenster „Neue Taste freigeschaltet“.
 - [ ] Umschalt-Einführung: kleiner Block „d“ wird beim Halten von Umschalt zu „D“ (Kohle). Loslassen macht ihn wieder klein. Ohne Umschalt zählt der Anschlag nicht.
