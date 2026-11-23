@@ -80,12 +80,18 @@
   .pnode .chest .drop svg{width:100%;height:auto;display:block;image-rendering:pixelated;filter:drop-shadow(1px 1px 0 #000);}
   .pnode .chest.bench:not(.bau){background:#1d3b21;box-shadow:inset 0 0 0 3px #4caf50,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(110,220,110,.4);}
   .pnode .chest.bau{background:#1f2f45;box-shadow:inset 0 0 0 3px #3f6aa8,inset 0 -6px 0 rgba(0,0,0,.35),0 0 14px rgba(120,170,255,.3);}
-  .pnode .chest.door.locked .cimg svg.ch{filter:grayscale(.8) brightness(.6);}
-  .pnode .chest.door .cimg{position:relative;}
-  .pnode .chest .csub.pbooks{font-size:19px;gap:4px;white-space:nowrap;}
-  .pnode .chest .csub.pbooks svg{width:16px;height:auto;}
-  .pnode .chest.door .cimg svg.lock{position:absolute;right:12px;bottom:-4px;width:26px;height:auto;image-rendering:pixelated;}
-  .pnode .chest.door.open{box-shadow:inset 0 0 0 3px #7a5528,0 0 16px 3px rgba(255,209,102,.7);}
+  .pnode.portal{width:240px;height:300px;}
+  .pnode .portalbtn{position:relative;display:block;width:100%;height:100%;padding:0;background:none;border:0;cursor:pointer;transition:transform .12s;}
+  .pnode .portalbtn:hover{transform:translateY(-4px);}
+  .pnode .portalbtn .pdoor{position:absolute;left:50%;top:50%;width:120px;transform:translate(-50%,-50%);}
+  .pnode .portalbtn .pdoor svg.ch{width:100%;height:auto;display:block;image-rendering:pixelated;filter:drop-shadow(3px 3px 0 rgba(0,0,0,.5));}
+  .pnode .portalbtn.locked .pdoor svg.ch{filter:grayscale(.7) brightness(.65) drop-shadow(3px 3px 0 rgba(0,0,0,.5));}
+  .pnode .portalbtn.open .pdoor svg.ch{filter:drop-shadow(0 0 14px rgba(255,209,102,.9));}
+  .pnode .portalbtn .pdoor svg.lock{position:absolute;left:50%;top:50%;width:46px;height:auto;transform:translate(-50%,-50%);image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.6));}
+  .pnode .pbook{position:absolute;width:34px;transform:translate(-50%,-50%);}
+  .pnode .pbook svg{width:100%;height:auto;display:block;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.5));}
+  .pnode .pbook.empty{opacity:.45;}
+  .pnode.portal.cur .portalbtn{filter:drop-shadow(0 0 10px #ffd166);}
   .pnode.cur .chest{outline:4px solid #ffd166;outline-offset:3px;}
   .pnode .lbox{box-sizing:border-box;width:100%;min-height:104px;border:3px dashed #666;border-radius:4px;background:#262626;display:flex;align-items:center;justify-content:center;padding:6px 4px;text-align:center;font-family:"VT323",monospace;font-size:21px;line-height:1;color:#8a8a8a;white-space:nowrap;}
 
@@ -1272,7 +1278,7 @@ pfadBgInit();
 // Von Level 3, 6, 9, 12, 15 und 18 geht ein kleiner Weg zur Werkbank ab (abwechselnd nach unten und oben), an ihr hängen Bauplätze.
 // Jeder Zweig ist eine Kette: das erste Zusatzlevel hängt am Buchstaben-Level (`need`), die nächsten am vorigen Zusatzlevel.
 // h = Höhe des Pfads; der Hauptweg sinkt bei Level 6 und 12 (Index 5 und 11) tiefer, dort gehen die Wege nach oben ab
-const PF = {gap:190, x0:110, y0:405, amp:36, off:215, freq:.85, h:780, dips:[5, 11], dip:150, dipw:1.1, loopx:230, loopy:205};
+const PF = {gap:190, x0:110, y0:405, amp:36, off:215, freq:.85, h:780, dips:[5, 11], dip:150, dipw:1.1, loopx:245, loopy:215, doorShift:280};
 function renderPfad(){
   const pf = document.getElementById('pfad'); pf.innerHTML = '';
   const letters = [], chests = [];
@@ -1294,6 +1300,7 @@ function renderPfad(){
     return d;
   };
   const doorIdx = letters[letters.length - 1], D = pos[doorIdx];
+  D.x += PF.doorShift;   // das Portal und die Bauplätze darum liegen weiter rechts
   const segs = [];   // Wegstücke der kleinen Wege
   chains.forEach((ch, c) => {
     const p = LEVELS[ch[0]].need, a = pos[p], dir = c % 2 === 0 ? 1 : -1;
@@ -1324,9 +1331,10 @@ function renderPfad(){
   };
   LEVELS.forEach((L, i) => {
     const open = unlocked(i);
-    if (i === doorIdx) {   // Level 19 heißt Portal: verschlossene Tür, geht mit allen 8 Büchern auf
+    if (i === doorIdx) {   // Level 19 heißt Portal: nur eine Tür mit 8 Büchern drumherum; offen, wenn alle 8 Bücher da sind
       const all = bookCount() === 8;
-      const d = node(i, `<button class="chest door ${all ? 'open' : 'locked'}" data-door="1" title="${all ? 'Die Tür ist offen' : 'Sammle alle 8 Bücher'}"><div class="cimg">${pixSVG(ITEM_ART.door, 'ch', BENCH_PAL)}${all ? '' : padlockSVG()}</div><div class="cname">Portal</div><div class="csub pbooks">${all ? 'Offen' : `${bookSVG('#c9a24a')} ${8 - bookCount()} fehlen`}</div></button>`, i === curLevel ? 'cur' : '');
+      const books = BOOK_COLORS.map((c, k) => { const r = k * Math.PI / 4; return `<div class="pbook${st.books[k] ? '' : ' empty'}" style="left:${(50 + 40 * Math.sin(r)).toFixed(1)}%;top:${(50 - 40 * Math.cos(r)).toFixed(1)}%">${bookSVG(st.books[k] ? c : '#8a8a8a')}</div>`; }).join('');
+      const d = node(i, `<button class="portalbtn ${all ? 'open' : 'locked'}" data-door="1" title="${all ? 'Das Portal ist offen' : 'Sammle alle 8 Bücher'}">${books}<div class="pdoor">${pixSVG(ITEM_ART.door, 'ch', BENCH_PAL)}${all ? '' : padlockSVG()}</div></button>`, 'portal' + (i === curLevel ? ' cur' : ''));
       d.querySelector('button').onclick = openTuer;
       return;
     }
