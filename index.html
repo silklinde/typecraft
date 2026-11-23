@@ -68,6 +68,7 @@
   .pfadrow .cell .bt::before{left:-6px;right:50%;}
   .pfadrow .cell .bt::after{left:50%;right:-6px;}
   .pfadrow .cell.nol .bt::before,.pfadrow .cell.nor .bt::after,.pfadrow .cell.down .bt::before,.pfadrow .cell.down .bt::after{display:none;}
+  .pfadrow .cell.down.hz:not(.nol) .bt::before,.pfadrow .cell.down.hz:not(.nor) .bt::after{display:block;}
   .pfadrow .cell .stub{width:8px;height:18px;background:#6b4a26;border-left:2px solid #8a6230;border-right:2px solid #4a3216;box-sizing:border-box;}
   .pfadrow .cell .stub.hid{visibility:hidden;}
   .pfadrow .cell .bt .chest{position:relative;z-index:1;width:100%;min-width:0;margin:4px 0;padding:8px 2px 6px;}
@@ -615,7 +616,8 @@ const keyPos = c => !isEN() ? c : ('öäüß'.includes(c) ? '\u0000' : (EN_IN[c]
 // Zeichen im Text -> Position (Y und Z sind vertauscht, der Bindestrich liegt oben rechts)
 const charPos = c => !isEN() ? c : ({y:'z', z:'y', '-':'ß'}[c] || c);
 // Englische Tastatur: Umlaute werden ausgeschrieben, ein paar Wörter ersetzt, die Tasten nutzen würden, die im Level noch fehlen
-const EN_SWAP = {'Öl':'Falk', 'Zeit':'Tier', 'Zombies fürchten Sonnenlicht.':'Hühner legen Eier.'};
+const EN_SWAP = {'Öl':'Falk', 'Zeit':'Tier', 'Zombies fürchten Sonnenlicht.':'Hühner legen Eier.',
+  'Katzen verscheuchen die Creeper.':'Skelette schießen mit Pfeilen.', 'Zombies fangen im Sonnenlicht Feuer.':'Skelette fangen im Sonnenlicht Feuer.', 'Mit Weizen füttert man Kühe.':'Mit Karotten füttert man Schweine.'};
 const enWord = w => (EN_SWAP[w] || w).replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/Ä/g,'Ae').replace(/Ö/g,'Oe').replace(/Ü/g,'Ue');
 const wordsOf = L => isEN() ? L.words.map(enWord) : L.words;
 const targetOf = L => L.words ? wordsLen(wordsOf(L), L.rounds) : L.target;
@@ -652,12 +654,13 @@ const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeige
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
 const CHEST1_WORDS = ['Da','Das','Aas','Ass','Dass','Fass','As','Dada','Fa'];
 const CHEST2_WORDS = ['Ja','Öl','Fall','Falls','Kalk','Lass','Salsa','Kajak','Alaska'];
-const CHEST3_WORDS = ['Glas','Hals','Hass','Saga','Jagd','Kahl','Gala','Gaga','Hall'];
-// Werkbänke 4–6: Wörter mit der ganzen Grundreihe, der oberen Reihe und allen Reihen
-const CHEST4_WORDS = ['Gas','Lag','Flak','Kaff','Haha','Saal','Aal','Gag','Kajaks'];
-const CHEST5_WORDS = ['Wasser','Teller','Haus','Eis','Hut','Rose','Wolke','Quark','Pute','Kuh','Tür','Zeit'];
-const CHEST6_WORDS = ['Banane','Computer','Zebra','Mond','Vogel','Yacht','Boxen','Gabel','Vase','Mama','Katze','Nacht'];
-// Bauplätze 1–8: Sätze mit 3 bis 10 Wörtern. Bauplatz 1–3 kommen ohne Ä und ß aus (Bauplatz 1 auch ohne Y und Bindestrich).
+const CHEST3_WORDS = ['Igel','Esel','Hase','Reh','Gras','Feuer','Hirse','Riese','Ruhe'];   // G H E I R U
+// Werkbänke 4–6: E I R U (Level 6–7), die obere Reihe (Level 8–10), die untere Reihe bis X . (Level 12–15)
+const CHEST4_WORDS = ['Ruder','Rudel','Eule','Fluss','Haare','Hilfe','Gurke','Reife','Ruhig'];
+const CHEST5_WORDS = ['Wasser','Teller','Wiese','Torf','Hut','Rose','Wolke','Quark','Pute','Kuh','Tür','Zeit'];
+const CHEST6_WORDS = ['Banane','Computer','Mond','Vogel','Boxen','Gabel','Vase','Mama','Nacht','Creeper','Magma','Nebel'];
+// Bauplätze 1–8. Bauplatz 1 (ab Level 11): kurze Sätze nur mit den Buchstaben bis Ü, ohne Satzzeichen. Bauplatz 2–4 (ab Level 15) ohne Y, Bindestrich, Ä und ß.
+const SENT_EASY = ['Der Spieler hat Gold','Das Pferd galoppiert','Der Wolf wartet hier','Der Wolf folgt dir','Die Kuh liefert Leder','Der Spieler sieht das Haus'];
 const SENT_WORDS = {
   3: ['Creeper schleichen leise.','Zombies fürchten Sonnenlicht.','Wölfe mögen Knochen.','Schafe geben Wolle.','Kühe geben Milch.','Fackeln machen Licht.'],
   4: ['Wölfe schütteln sich trocken.','Diamanten liegen tief unten.','Katzen verscheuchen die Creeper.','Schweine fressen gern Karotten.','Spinnen greifen nachts an.'],
@@ -665,13 +668,12 @@ const SENT_WORDS = {
   6: ['Der Creeper zischt vor der Explosion.','Die Wolle der Schafe wächst nach.','Dorfbewohner handeln mit dir gegen Smaragde.','Ein Skelett sucht im Sonnenlicht Schatten.','Aus Weizen backt man leckeres Brot.'],
   7: ['Mit Redstone-Staub baut man Lampen und Kolben.','Zombies stecken Dorfbewohner an und verwandeln sie.','Mit Weizen lockt man Schafe und Kühe.','Kühe liefern Milch, Leder und rohes Rindfleisch.','Wölfe greifen Skelette an und jagen Schafe.'],
   8: ['Neben einer Fackel erscheinen keine neuen Monster mehr.','Der Enderman wird wütend, wenn man ihn anstarrt.','Der Eisengolem schenkt manchmal einem Dorfkind eine Mohnblume.','Mit einem Eimer Wasser löscht man Feuer schnell.','Hühner legen Eier und lassen manchmal Federn fallen.'],
-  9: ['Im Nether gibt es keinen Tag und keine Nacht.','Ein zahmer Wolf trägt ein Halsband und folgt dir.','Dorfbewohner arbeiten am Tag und schlafen nachts im Bett.','Der Wither ist ein starker Boss mit drei Köpfen.','Ein Enderman nimmt Blöcke auf und trägt sie weg.'],
   10: ['Aus Diamanten macht man starke Rüstungen und sehr scharfe Schwerter.','Das Skelett sinkt im Wasser nach unten, statt zu schwimmen.','Wenn Zombies kommen, laufen die Dorfbewohner weg und verstecken sich.','Zombies, Skelette, Spinnen und Creeper erscheinen vor allem im Dunkeln.','Ein Wolf wird zahm, wenn man ihm genug Knochen gibt.']
 };
 const wordsLen = (w, rounds) => w.join('').length * rounds;
 const UPPER = (extra) => HOME10.concat(extra);
+const SENT_KEYS0 = UPPER(['e','i','r','u','t','z','w','o','q','p','ü',' ']);   // bis Level 11 (Q P Ü), noch ohne Satzzeichen
 const SENT_KEYS1 = UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.',' ']);   // bis Level 15 (X .)
-const SENT_KEYS2 = SENT_KEYS1.concat(['y','-']);                                                         // bis Level 16 (Y -)
 const SENT_KEYS = UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-','ä','ß',' ']);
 const LEVELS = [
   {name:'Level 1: Hände auflegen', keys:[], neu:[], intro:true, haende:true, target:9, reward:'holz'},
@@ -718,33 +720,33 @@ const LEVELS = [
 
   // Truhen: Wörter mit den bisher freigeschalteten Buchstaben. `need` = Level, das mindestens 1 Herz haben muss; `ready` = schon spielbar.
   // Jedes Wort kommt zweimal in zufälliger Reihenfolge; Anfangsbuchstaben werden mit Umschalt (rechter kleiner Finger) groß geschrieben.
-  {chest:true, name:'Werkbank 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:1, ready:true,
+  {chest:true, name:'Werkbank 1', label:'ASDF', keys:['a','s','d','f'], neu:[], shift:true, newShift:'shift', shiftName:'Umschalt ⇧', introKeys:['d','f','a'], need:2, ready:true,
    words:CHEST1_WORDS, rounds:1, target:wordsLen(CHEST1_WORDS, 1)},
-  {chest:true, name:'Werkbank 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:2, ready:true,
+  {chest:true, name:'Werkbank 2', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, newShift:'shiftl', shiftName:'Linke Umschalt ⇧', introKeys:['j','k','l'], need:19, ready:true,
    words:CHEST2_WORDS, rounds:1, target:wordsLen(CHEST2_WORDS, 1)},
-  {chest:true, name:'Werkbank 3', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:3, ready:true,
+  {chest:true, name:'Werkbank 3', label:'G H E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:6, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
-  {chest:true, name:'Werkbank 4', label:'ASDF JKLÖ GH', keys:HOME10, neu:[], shift:true, shiftl:true, need:4, ready:true,
+  {chest:true, name:'Werkbank 4', label:'E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:21, ready:true,
    words:CHEST4_WORDS, rounds:1, target:wordsLen(CHEST4_WORDS, 1)},
   {chest:true, name:'Werkbank 5', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:10, ready:true,
    words:CHEST5_WORDS, rounds:1, target:wordsLen(CHEST5_WORDS, 1)},
-  {chest:true, name:'Werkbank 6', label:'Alle Reihen', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü','c',',','v','m','b','n','x','.','y','-']), neu:[], shift:true, shiftl:true, need:16, ready:true,
+  {chest:true, name:'Werkbank 6', label:'Untere Reihe', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
    words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
-  // Bauplätze: Sätze mit 3 bis 10 Wörtern. `need` = Level mit der Vorlage (Bauplatz 1–4, Index 14–17) bzw. der vorige Bauplatz (5–8). Index 25–32.
-  {chest:true, sentences:true, name:'Bauplatz 1', label:'3 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
+  // Bauplätze: Sätze. `need` = Level mit der Vorlage (Index 10, 14, 18) bzw. der vorige Bauplatz (Kette). Index 25–32.
+  {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:10, ready:true,
+   words:SENT_EASY, rounds:1, target:wordsLen(SENT_EASY, 1)},
+  {chest:true, sentences:true, name:'Bauplatz 2', label:'3 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
    words:SENT_WORDS[3], rounds:1, target:wordsLen(SENT_WORDS[3], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 2', label:'4 Wörter', keys:SENT_KEYS2, neu:[], shift:true, shiftl:true, need:15, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 3', label:'4 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:26, ready:true,
    words:SENT_WORDS[4], rounds:1, target:wordsLen(SENT_WORDS[4], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 3', label:'5 Wörter', keys:SENT_KEYS2, neu:[], shift:true, shiftl:true, need:16, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 4', label:'5 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:27, ready:true,
    words:SENT_WORDS[5], rounds:1, target:wordsLen(SENT_WORDS[5], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 4', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:17, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 5', label:'6 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:18, ready:true,
    words:SENT_WORDS[6], rounds:1, target:wordsLen(SENT_WORDS[6], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 5', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:28, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 6', label:'7 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:29, ready:true,
    words:SENT_WORDS[7], rounds:1, target:wordsLen(SENT_WORDS[7], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 6', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:29, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 7', label:'8 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:30, ready:true,
    words:SENT_WORDS[8], rounds:1, target:wordsLen(SENT_WORDS[8], 1)},
-  {chest:true, sentences:true, name:'Bauplatz 7', label:'9 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:30, ready:true,
-   words:SENT_WORDS[9], rounds:1, target:wordsLen(SENT_WORDS[9], 1)},
   {chest:true, sentences:true, name:'Bauplatz 8', label:'10 Wörter', keys:SENT_KEYS, neu:[], shift:true, shiftl:true, need:31, ready:true,
    words:SENT_WORDS[10], rounds:1, target:wordsLen(SENT_WORDS[10], 1)},
 ];
@@ -901,7 +903,7 @@ function openNewUser(canGoBack){
 }
 function unlocked(i){
   const L = LEVELS[i];
-  if (L.chest) return !!L.ready && (st.stars[L.need] || 0) >= 1;
+  if (L.chest) return !!L.ready && ((st.stars[L.need] || 0) >= 1 || (st.stars[i] || 0) >= 1);
   return i === 0 || (st.stars[i-1] || 0) >= 1;
 }
 
@@ -1218,13 +1220,18 @@ function renderMenu(){
 }
 
 // Der Pfad: Buchstaben-Level in der Mitte. Wer ein Rezept (Wörter) oder eine Vorlage (Sätze) gefunden hat, sieht einen Zweig nach unten bzw. oben.
-// Die Bauplätze 5–8 hängen als Kette hinter Bauplatz 4.
+// Jeder Zweig ist eine kleine Kette: das erste Zusatzlevel hängt am Buchstaben-Level (`need`), die nächsten am vorigen Zusatzlevel.
+// Zwischen zwei Zweigen liegen mindestens 3 Buchstaben-Level (Level 3, 7, 11, 15, 19).
 function renderPfad(){
   const pf = document.getElementById('pfad'); pf.innerHTML = '';
-  const letters = [];
-  LEVELS.forEach((L, i) => { if (!L.chest) letters.push(i); });
   const benches = [], plots = [];
   LEVELS.forEach((L, i) => { if (L.chest) (L.sentences ? plots : benches).push(i); });
+  const chainsOf = list => list.filter(k => !LEVELS[LEVELS[k].need].chest).map(h => {
+    const ch = [h];
+    for (let nx = list.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = list.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
+    return ch;
+  });
+  const downChains = chainsOf(benches), upChains = chainsOf(plots);
   const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(heartSize(maxHearts(L), 16), true)).join('') : ''; };
   const mk = (cls, inner, row, col) => { const d = document.createElement('div'); d.className = cls; d.style.gridRow = row; d.style.gridColumn = col; d.innerHTML = inner; return d; };
   const branchBtn = (i, bau) => {
@@ -1232,31 +1239,28 @@ function renderPfad(){
     if (!open) return `<div class="ghost" title="${L.ready ? `Schließe zuerst ${LEVELS[L.need].name} ab` : 'Kommt bald'}"></div>`;
     return `<button class="chest bench${bau ? ' bau' : ''}" data-i="${i}"><div class="cimg">${bau ? vorlageSVG() : pixSVG(ITEM_ART.bench, 'ch', BENCH_PAL)}</div><div class="cname">${L.name}</div><div class="csub">${heartsOf(L, i)}</div></button>`;
   };
-  [[0, 10], [11, 18]].forEach(([a, b], rowNo) => {
+  [[0, 10], [11, 18]].forEach(([a, b]) => {
     const g = document.createElement('div'); g.className = 'pfadrow';
-    const n = b - a + 1;
     for (let i = a; i <= b; i++) {
       const L = LEVELS[i], open = unlocked(i), pick = levelPick(i);
-      const badge = (benches.some(k => LEVELS[k].need === i && unlocked(k)) ? rezeptSVG() : '') + ((i >= 14 && i <= 17 && unlocked(plots[i - 14])) ? vorlageSVG() : '');
+      const badge = (benches.some(k => LEVELS[k].need === i && unlocked(k)) ? rezeptSVG() : '') + (plots.some(k => LEVELS[k].need === i && unlocked(k)) ? vorlageSVG() : '');
       const cell = mk('cell mid' + (i === a ? ' nol' : '') + (i === b ? ' nor' : ''), `<div class="bt"><button class="chest lvl" data-i="${i}"${open ? '' : ' disabled'} title="${open ? '' : `Schließe zuerst Level ${i} ab`}"><div class="cimg">${pickaxeSVG(pick, 64)}</div><div class="cname">Level ${i + 1}</div><div class="csub">${heartsOf(L, i)}</div>${badge ? `<div class="drop">${badge}</div>` : ''}</button></div>`, 2, i - a + 1);
       g.appendChild(cell);
     }
-    // Wörter: Zweig nach unten unter dem Level mit dem Rezept
-    benches.forEach(k => {
-      const p = LEVELS[k].need;
+    // Wörter: Kette nach unten, Sätze: Kette nach oben (erst gefundene, bei Sätzen dazu der nächste als Umriss)
+    const addChain = (ch, up) => {
+      const p = LEVELS[ch[0]].need;
       if (p < a || p > b) return;
-      if (!unlocked(k)) return;
-      g.appendChild(mk('cell down', `<div class="stub"></div><div class="bt">${branchBtn(k, false)}</div>`, 3, p - a + 1));
-    });
-    // Sätze: Zweig nach oben unter Level 15–18, danach als Kette nach rechts
-    if (rowNo === 1) {
-      const vis = plots.filter((k, m) => unlocked(k) || (m > 0 && unlocked(plots[m - 1])));   // gefunden, dazu der nächste als Umriss
+      const vis = ch.filter((k, m) => unlocked(k) || (up && m > 0 && unlocked(ch[m - 1])));
       vis.forEach((k, m) => {
-        const col = 14 - a + 1 + m;   // Spalte von Level 15 (Index 14) plus m
-        const cls = 'cell up' + (m === 0 ? ' nol' : '') + (m === vis.length - 1 ? ' nor' : '');
-        g.appendChild(mk(cls, `<div class="bt">${branchBtn(k, true)}</div><div class="stub${m < 4 ? '' : ' hid'}"></div>`, 1, col));
+        const col = p - a + 1 + m, first = m === 0, last = m === vis.length - 1;
+        const cls = 'cell ' + (up ? 'up' : 'down hz') + (first ? ' nol' : '') + (last ? ' nor' : '');
+        const stub = `<div class="stub${first ? '' : ' hid'}"></div>`;
+        g.appendChild(mk(cls, up ? `<div class="bt">${branchBtn(k, true)}</div>${stub}` : `${stub}<div class="bt">${branchBtn(k, false)}</div>`, up ? 1 : 3, col));
       });
-    }
+    };
+    downChains.forEach(ch => addChain(ch, false));
+    upChains.forEach(ch => addChain(ch, true));
     g.querySelectorAll('button[data-i]').forEach(btn => { btn.onclick = () => start(+btn.dataset.i); });
     pf.appendChild(g);
   });

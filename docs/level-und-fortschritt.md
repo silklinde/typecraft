@@ -70,21 +70,25 @@ Spielstand `v:2`: Level 0 „Hände auflegen“ kam später dazu, `load()` versc
 
 Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19–32, Herzen wie bei Leveln in `st.stars[i]`). Freigeschaltet (`unlocked(i)`): `ready:true` und das Level `need` hat mindestens 1 Herz. Das Abschluss-Fenster zeigt „Rezept gefunden!“ bzw. „Vorlage gefunden!“.
 
-| Zusatzlevel | Tasten | `need` (Level mit dem Fund) |
+| Zusatzlevel | Tasten / Wörter | `need` (Fund) |
 |-------|--------|------------------------------|
-| Werkbank 1 | A S D F + Umschalt | Level 2 (Index 1) |
-| Werkbank 2 | A S D F J K L Ö + linke Umschalt | Level 3 (2) |
-| Werkbank 3 | + G H | Level 4 (3) |
-| Werkbank 4 | Grundreihe | Level 5 (4) |
-| Werkbank 5 | + obere Reihe | Level 11 (10) |
-| Werkbank 6 | alle Reihen | Level 17 (16) |
-| Bauplatz 1 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Level 15 (14) |
-| Bauplatz 2 (4 Wörter) | + Y - (ohne Ä, ß) | Level 16 (15) |
-| Bauplatz 3 (5 Wörter) | wie Bauplatz 2 | Level 17 (16) |
-| Bauplatz 4 (6 Wörter) | ganze Tastatur mit Ä, ß | Level 18 (17) |
-| Bauplatz 5–8 (7 bis 10 Wörter) | ganze Tastatur | der vorige Bauplatz (Kette) |
+| Werkbank 1 | A S D F + Umschalt | Level 3 (Index 2) |
+| Werkbank 2 | + J K L Ö, linke Umschalt | Werkbank 1 |
+| Werkbank 3 | G H E I R U | Level 7 (6) |
+| Werkbank 4 | E I R U | Werkbank 3 |
+| Werkbank 5 | obere Reihe (T Z W O Q P Ü) | Level 11 (10) |
+| Werkbank 6 | untere Reihe bis X . (C V M B N X) | Level 15 (14) |
+| Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis Q P Ü | Level 11 (10) |
+| Bauplatz 2 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Level 15 (14) |
+| Bauplatz 3, 4 (4 und 5 Wörter) | wie Bauplatz 2 | der vorige Bauplatz |
+| Bauplatz 5 (6 Wörter) | ganze Tastatur | Level 19 (18) |
+| Bauplatz 6–8 (7, 8, 10 Wörter) | ganze Tastatur | der vorige Bauplatz |
 
-Früher als Level 15 gibt es keine Sätze: Mit der Grundreihe und der oberen Reihe fehlen N, M, C, B, damit lassen sich keine Minecraft-Sätze schreiben. Die Sätze für Bauplatz 1–3 haben deshalb keine Ä und ß (Skript-Prüfung: alle Zeichen müssen in `keys` stehen).
+**Abstand:** Die Zweige hängen an Level 3, 7, 11, 15 und 19, dazwischen liegen immer mindestens 3 Buchstaben-Level. An jedem Zweig hängt eine kleine Kette (Wörter nach unten, Sätze nach oben): das erste Zusatzlevel kommt vom Buchstaben-Level, jedes weitere vom vorigen Zusatzlevel. Die Wörter und Sätze enthalten bevorzugt die Buchstaben, die seit dem letzten Zweig neu dazugekommen sind. Bereits gespielte Zusatzlevel bleiben offen (`unlocked()`), auch wenn sich ihr `need` später ändert.
+
+**Erste einfache Sätze:** möglich ab Level 8 (+ T Z), z. B. „Das Haus ist hier“; sie gibt es ab Bauplatz 1 (Zweig an Level 11) ohne Punkt und Komma (Komma ab Level 12, Punkt ab Level 15). Bauplatz 1 hat Sätze bis Q P Ü, deshalb ohne C, M, B, N. Der 9-Wörter-Satzsatz entfiel, damit die neuen kurzen Sätze Platz haben.
+
+**Englische Tastatur:** Z liegt dort auf der Y-Position (Level 16). Wörter und Sätze mit Z vor Level 16 brauchen einen Eintrag in `EN_SWAP`; geprüft wird das mit einem Skript, das für beide Layouts alle Zeichen gegen `keys` prüft.
 
 **Bücherregal:** Jeder Bauplatz mit mindestens 1 Herz gibt einmal ein Buch (`st.books[k]`, k = Nummer des Bauplatzes 0–7; alte Spielstände bekommen die Bücher beim Laden nachträglich). Die Bücher haben die Farben der Bauwerke (`BOOK_COLORS`). Im Menü zeigt das Regal 8 Plätze, leer sind sie grau mit Buch-Umriss. Im Abschluss-Fenster erscheint ein Mini-Regal, das neue Buch fällt in seinen Platz (CSS `bookin`, Bling-Ton `xpPing()`). Bei 8 Büchern geht die Tür auf. Was dahinter liegt (Text-Level mit Fluss und Tempo), ist noch nicht gebaut: die Tür zeigt „Bald geöffnet“.
 
