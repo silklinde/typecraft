@@ -59,7 +59,12 @@
   #overlay .box .signpost{width:14px;height:56px;margin:0 auto;background:#7a5526;border:3px solid #5a3d1a;border-top:0;}
 
   /* Pfad: ein geschwungener Weg, waagerecht scrollbar. Von den Werkbank-Levels (3, 6, 9, 12, 15, 18) gehen kleine Wege mit Werkbank und Bauplätzen ab */
-  .pfad{overflow-x:auto;overflow-y:hidden;scrollbar-color:#8a6230 #1a1a1a;scroll-behavior:smooth;}
+  .pfadwrap{position:relative;border:3px solid #000;overflow:hidden;}
+  .pbg{position:absolute;inset:0;image-rendering:pixelated;pointer-events:none;}
+  .pbg .psky{position:absolute;left:0;right:0;top:0;height:118px;background:linear-gradient(#1c2744,#3d4c7a 55%,#b9856c);}
+  .pbg .player{position:absolute;left:0;right:0;top:18px;height:92px;background-repeat:repeat-x;background-position:0 100%;background-size:auto 100%;}
+  .pbg .pgrass{position:absolute;left:0;right:0;top:110px;bottom:0;background-repeat:repeat;border-top:4px solid #1c3320;}
+  .pfad{position:relative;overflow-x:auto;overflow-y:hidden;scrollbar-color:#8a6230 #1a1a1a;scroll-behavior:smooth;}
   .pcanvas{position:relative;height:650px;}
   .pcanvas svg.pbahn{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;}
   .pnode{position:absolute;width:118px;transform:translate(-50%,-50%);z-index:1;}
@@ -472,7 +477,10 @@
   <div id="menu">
     <div class="panel" id="pPfad">
       <h2>Pfad</h2>
-      <div class="pfad" id="pfad"></div>
+      <div class="pfadwrap">
+        <div class="pbg"><div class="psky"></div><div class="player" id="pbgFar"></div><div class="player" id="pbgNear"></div><div class="player" id="pbgTrees"></div><div class="pgrass" id="pbgGrass"></div></div>
+        <div class="pfad" id="pfad"></div>
+      </div>
     </div>
     <div class="panel" id="pRegal">
       <h2>Bücherregal</h2>
@@ -1225,6 +1233,36 @@ function renderMenu(){
     const box = openMenuModal('Die Tür', `<div class="sign"><b>Bald geöffnet</b>Hinter der Tür wartet bald etwas Neues.</div><div class="signpost"></div>`, false);
   };
 }
+
+// Hintergrund des Pfads: Ebene in der Dämmerung, selbst gezeichnet (Zellen zu je 4 Pixeln), Ebenen bewegen sich beim Scrollen verschieden schnell
+function pfadBgInit(){
+  const C = 4, rnd = (s => () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296)(7);
+  const make = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w * C; c.height = h * C; const x = c.getContext('2d'); draw((col, px, py, cw = 1, ch = 1) => { x.fillStyle = col; x.fillRect(px * C, py * C, cw * C, ch * C); }); return `url(${c.toDataURL()})`; };
+  const hills = (col, hi, a1, a2, ph) => make(240, 23, f => { for (let x = 0; x < 240; x++) { const h = Math.round(hi + a1 * Math.sin(2 * Math.PI * x / 240 + ph) + a2 * Math.sin(2 * Math.PI * 3 * x / 240 + ph * 2)); f(col, x, 23 - h, 1, h); } });
+  document.getElementById('pbgFar').style.backgroundImage = hills('#34456b', 13, 5, 2.5, 0);
+  document.getElementById('pbgNear').style.backgroundImage = hills('#27423f', 8, 3.5, 2, 2);
+  document.getElementById('pbgTrees').style.backgroundImage = make(200, 23, f => {
+    [[14, 9], [42, 12], [66, 8], [101, 11], [130, 9], [158, 13], [184, 8]].forEach(([x, h]) => {
+      f('#3b2a17', x, 23 - h, 2, h);                                   // Stamm
+      f('#1d3a24', x - 3, 23 - h - 4, 8, 3); f('#245030', x - 2, 23 - h - 7, 6, 3); f('#2c5c36', x - 1, 23 - h - 9, 4, 2);   // Krone
+    });
+  });
+  document.getElementById('pbgGrass').style.backgroundImage = make(97, 97, f => {
+    f('#2f4d2b', 0, 0, 97, 97);
+    for (let n = 0; n < 700; n++) f(['#385a32', '#294527', '#3d6437'][n % 3], Math.floor(rnd() * 97), Math.floor(rnd() * 97), 1 + (n % 4 === 0), 1);
+    for (let n = 0; n < 9; n++) { const x = 2 + Math.floor(rnd() * 93), y = 2 + Math.floor(rnd() * 93); f(['#c94c4c', '#e8d44d', '#e6e6e6'][n % 3], x, y); f('#3d6437', x, y + 1); }
+  });
+  const pf = document.getElementById('pfad');
+  const par = () => {
+    const s = pf.scrollLeft;
+    document.getElementById('pbgFar').style.backgroundPositionX = (-s * .12) + 'px';
+    document.getElementById('pbgNear').style.backgroundPositionX = (-s * .25) + 'px';
+    document.getElementById('pbgTrees').style.backgroundPositionX = (-s * .5) + 'px';
+    document.getElementById('pbgGrass').style.backgroundPositionX = (-s) + 'px';
+  };
+  pf.addEventListener('scroll', par); par();
+}
+pfadBgInit();
 
 // Der Pfad: alle Level liegen von Anfang an auf einem geschwungenen Weg (gesperrte als Box mit gestrichelter Umrandung).
 // Von Level 3, 6, 9, 12, 15 und 18 geht ein kleiner Weg zur Werkbank ab (abwechselnd nach unten und oben), an ihr hängen Bauplätze.
