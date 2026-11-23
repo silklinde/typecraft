@@ -654,7 +654,7 @@ const HNAME = {a:'Kleiner<br>Finger', s:'Ringfinger', d:'Mittelfinger', f:'Zeige
                j:'Zeigefinger', k:'Mittelfinger', l:'Ringfinger', 'ö':'Kleiner<br>Finger', ' ':'Daumen'};
 const CHEST1_WORDS = ['Da','Das','Dass','Fass','Ja','Öl','Fall','Falls','Kalk','Salsa','Kajak','Alaska'];   // A S D F J K L Ö
 const CHEST3_WORDS = ['Igel','Esel','Hase','Reh','Gras','Feuer','Hirse','Riese','Ruhe'];   // G H E I R U
-// Werkbänke 4–6: E I R U (Level 6–7), die obere Reihe (Level 8–10), die untere Reihe bis X . (Level 12–15)
+// Werkbänke 3–5: E I R U (Level 6–7), die obere Reihe (Level 8–10), die untere Reihe bis X . (Level 12–15)
 const CHEST4_WORDS = ['Ruder','Rudel','Eule','Fluss','Haare','Hilfe','Gurke','Reife','Ruhig'];
 const CHEST5_WORDS = ['Wasser','Teller','Wiese','Torf','Hut','Rose','Wolke','Quark','Pute','Kuh','Tür','Zeit'];
 const CHEST6_WORDS = ['Banane','Computer','Mond','Vogel','Boxen','Gabel','Vase','Mama','Nacht','Creeper','Magma','Nebel'];
@@ -722,13 +722,13 @@ const LEVELS = [
   {chest:true, name:'Werkbank 1', label:'ASDF JKLÖ', keys:['a','s','d','f','j','k','l','ö'], neu:[], shift:true, shiftl:true, need:2, ready:true,
    shiftIntros:[{shift:'shift', name:'Umschalt ⇧', keys:['d','f','a']}, {shift:'shiftl', name:'Linke Umschalt ⇧', keys:['j','k','l']}],
    words:CHEST1_WORDS, rounds:1, target:wordsLen(CHEST1_WORDS, 1)},
-  {chest:true, name:'Werkbank 3', label:'G H E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:6, ready:true,
+  {chest:true, name:'Werkbank 2', label:'G H E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:6, ready:true,
    words:CHEST3_WORDS, rounds:1, target:wordsLen(CHEST3_WORDS, 1)},
-  {chest:true, name:'Werkbank 4', label:'E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:20, ready:true,
+  {chest:true, name:'Werkbank 3', label:'E I R U', keys:UPPER(['e','i','r','u']), neu:[], shift:true, shiftl:true, need:20, ready:true,
    words:CHEST4_WORDS, rounds:1, target:wordsLen(CHEST4_WORDS, 1)},
-  {chest:true, name:'Werkbank 5', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:10, ready:true,
+  {chest:true, name:'Werkbank 4', label:'Obere Reihe', keys:UPPER(['e','i','r','u','t','z','w','o','q','p','ü']), neu:[], shift:true, shiftl:true, need:10, ready:true,
    words:CHEST5_WORDS, rounds:1, target:wordsLen(CHEST5_WORDS, 1)},
-  {chest:true, name:'Werkbank 6', label:'Untere Reihe', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
+  {chest:true, name:'Werkbank 5', label:'Untere Reihe', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
    words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
   // Bauplätze: Sätze. `need` = Level mit der Vorlage (Index 10, 14, 18) bzw. der vorige Bauplatz (Kette). Index 24–31.
   {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:22, ready:true,

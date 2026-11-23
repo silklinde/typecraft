@@ -73,12 +73,12 @@ Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19�
 | Zusatzlevel | Tasten / Wörter | `need` (Fund) |
 |-------|--------|------------------------------|
 | Werkbank 1 | A S D F J K L Ö, beide Umschalt-Tasten (zwei Einführungen nacheinander: rechte, dann linke Umschalt) | Level 3 (Index 2) |
-| Werkbank 3 | G H E I R U | Level 7 (6) |
-| Werkbank 4 | E I R U | Werkbank 3 |
-| Werkbank 5 | obere Reihe (T Z W O Q P Ü) | Level 11 (10) |
-| Werkbank 6 | untere Reihe bis X . (C V M B N X) | Level 15 (14) |
-| Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis Q P Ü | Werkbank 5 |
-| Bauplatz 2 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Werkbank 6 |
+| Werkbank 2 | G H E I R U | Level 7 (6) |
+| Werkbank 3 | E I R U | Werkbank 2 |
+| Werkbank 4 | obere Reihe (T Z W O Q P Ü) | Level 11 (10) |
+| Werkbank 5 | untere Reihe bis X . (C V M B N X) | Level 15 (14) |
+| Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis Q P Ü | Werkbank 4 |
+| Bauplatz 2 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Werkbank 5 |
 | Bauplatz 3, 4 (4 und 5 Wörter) | wie Bauplatz 2 | der vorige Bauplatz |
 | Bauplatz 5 (6 Wörter) | ganze Tastatur | Level 19 (18) |
 | Bauplatz 6–8 (7, 8, 10 Wörter) | ganze Tastatur | der vorige Bauplatz |
