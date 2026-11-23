@@ -77,13 +77,13 @@ Alle Zusatzlevel sind Einträge mit `chest:true` am Ende von `LEVELS` (Index 19�
 | Werkbank 4 | E I R U | Werkbank 3 |
 | Werkbank 5 | obere Reihe (T Z W O Q P Ü) | Level 11 (10) |
 | Werkbank 6 | untere Reihe bis X . (C V M B N X) | Level 15 (14) |
-| Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis Q P Ü | Level 11 (10) |
-| Bauplatz 2 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Level 15 (14) |
+| Bauplatz 1 (kurze Sätze, ohne Satzzeichen) | bis Q P Ü | Werkbank 5 |
+| Bauplatz 2 (3 Wörter) | bis X . (ohne Y, Bindestrich, Ä, ß) | Werkbank 6 |
 | Bauplatz 3, 4 (4 und 5 Wörter) | wie Bauplatz 2 | der vorige Bauplatz |
 | Bauplatz 5 (6 Wörter) | ganze Tastatur | Level 19 (18) |
 | Bauplatz 6–8 (7, 8, 10 Wörter) | ganze Tastatur | der vorige Bauplatz |
 
-**Abstand:** Die Zweige hängen an Level 3, 7, 11, 15 und 19, dazwischen liegen immer mindestens 3 Buchstaben-Level. An jedem Zweig hängt eine kleine Kette (Wörter nach unten, Sätze nach oben): das erste Zusatzlevel kommt vom Buchstaben-Level, jedes weitere vom vorigen Zusatzlevel. Die Wörter und Sätze enthalten bevorzugt die Buchstaben, die seit dem letzten Zweig neu dazugekommen sind. Bereits gespielte Zusatzlevel bleiben offen (`unlocked()`), auch wenn sich ihr `need` später ändert.
+**Abstand:** Die Zweige hängen an Level 3, 7, 11, 15 und 19, dazwischen liegen immer mindestens 3 Buchstaben-Level. An jedem Zweig hängt eine kleine Kette (Wörter nach unten, Sätze nach oben): Hängt an einem Abzweig eine Werkbank und ein Bauplatz (Level 11, 15), geht der Pfad zum Bauplatz von der Werkbank aus, der Bauplatz kommt erst nach der Werkbank (rechts davon, bei Bauplatz 1 darunter, weil rechts kein Platz ist). Das erste Zusatzlevel kommt vom Buchstaben-Level, jedes weitere vom vorigen Zusatzlevel. Die Wörter und Sätze enthalten bevorzugt die Buchstaben, die seit dem letzten Zweig neu dazugekommen sind. Bereits gespielte Zusatzlevel bleiben offen (`unlocked()`), auch wenn sich ihr `need` später ändert.
 
 **Erste einfache Sätze:** möglich ab Level 8 (+ T Z), z. B. „Das Haus ist hier“; sie gibt es ab Bauplatz 1 (Zweig an Level 11) ohne Punkt und Komma (Komma ab Level 12, Punkt ab Level 15). Bauplatz 1 hat Sätze bis Q P Ü, deshalb ohne C, M, B, N. Der 9-Wörter-Satzsatz entfiel, damit die neuen kurzen Sätze Platz haben.
 

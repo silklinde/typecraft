@@ -731,9 +731,9 @@ const LEVELS = [
   {chest:true, name:'Werkbank 6', label:'Untere Reihe', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
    words:CHEST6_WORDS, rounds:1, target:wordsLen(CHEST6_WORDS, 1)},
   // Bauplätze: Sätze. `need` = Level mit der Vorlage (Index 10, 14, 18) bzw. der vorige Bauplatz (Kette). Index 24–31.
-  {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:10, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 1', label:'Kurze Sätze', keys:SENT_KEYS0, neu:[], shift:true, shiftl:true, need:22, ready:true,
    words:SENT_EASY, rounds:1, target:wordsLen(SENT_EASY, 1)},
-  {chest:true, sentences:true, name:'Bauplatz 2', label:'3 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:14, ready:true,
+  {chest:true, sentences:true, name:'Bauplatz 2', label:'3 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:23, ready:true,
    words:SENT_WORDS[3], rounds:1, target:wordsLen(SENT_WORDS[3], 1)},
   {chest:true, sentences:true, name:'Bauplatz 3', label:'4 Wörter', keys:SENT_KEYS1, neu:[], shift:true, shiftl:true, need:25, ready:true,
    words:SENT_WORDS[4], rounds:1, target:wordsLen(SENT_WORDS[4], 1)},
@@ -1228,14 +1228,15 @@ function renderMenu(){
 // Zwischen zwei Zweigen liegen mindestens 3 Buchstaben-Level (Level 3, 7, 11, 15, 19).
 function renderPfad(){
   const pf = document.getElementById('pfad'); pf.innerHTML = '';
-  const benches = [], plots = [];
-  LEVELS.forEach((L, i) => { if (L.chest) (L.sentences ? plots : benches).push(i); });
-  const chainsOf = list => list.filter(k => !LEVELS[LEVELS[k].need].chest).map(h => {
+  const benches = [], plots = [], chests = [];
+  LEVELS.forEach((L, i) => { if (L.chest) { chests.push(i); (L.sentences ? plots : benches).push(i); } });
+  // Ketten: ein Kopf (hängt an einem Buchstaben-Level), dann jeweils das Level, das den Vorgänger braucht.
+  // Ein Bauplatz, der an einer Werkbank hängt, gehört zu deren Kette (erst die Werkbank abschließen).
+  const chains = chests.filter(k => !LEVELS[LEVELS[k].need].chest).map(h => {
     const ch = [h];
-    for (let nx = list.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = list.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
+    for (let nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1]); nx !== undefined; nx = chests.find(k => LEVELS[k].need === ch[ch.length - 1])) ch.push(nx);
     return ch;
   });
-  const downChains = chainsOf(benches), upChains = chainsOf(plots);
   const heartsOf = (L, i) => { const s = st.stars[i] || 0; return s ? Array.from({length: s}, () => heartSVG(heartSize(maxHearts(L), 16), true)).join('') : ''; };
   const mk = (cls, inner, row, col) => { const d = document.createElement('div'); d.className = cls; d.style.gridRow = row; d.style.gridColumn = col; d.innerHTML = inner; return d; };
   const branchBtn = (i, bau) => {
@@ -1252,19 +1253,23 @@ function renderPfad(){
       g.appendChild(cell);
     }
     // Wörter: Kette nach unten, Sätze: Kette nach oben (erst gefundene, bei Sätzen dazu der nächste als Umriss)
-    const addChain = (ch, up) => {
+    const addChain = ch => {
       const p = LEVELS[ch[0]].need;
       if (p < a || p > b) return;
-      const vis = ch.filter((k, m) => unlocked(k) || (up && m > 0 && unlocked(ch[m - 1])));
+      const up = !!LEVELS[ch[0]].sentences;
+      const vis = ch.filter((k, m) => unlocked(k) || (LEVELS[k].sentences && m > 0 && unlocked(ch[m - 1])));
+      const c0 = p - a + 1, room = 11 - c0 + 1;      // so viele Zellen passen nach rechts
+      let wraps = 0;
       vis.forEach((k, m) => {
-        const col = p - a + 1 + m, first = m === 0, last = m === vis.length - 1;
+        const wrap = m >= room, first = m === 0, last = m === Math.min(vis.length, room) - 1;
+        const stub = `<div class="stub${first || wrap ? '' : ' hid'}"></div>`;
+        const btn = branchBtn(k, !!LEVELS[k].sentences);
+        if (wrap) { g.appendChild(mk('cell down', `${stub}<div class="bt">${btn}</div>`, 3 + (++wraps), c0)); return; }   // passt nicht mehr nach rechts: darunter
         const cls = 'cell ' + (up ? 'up' : 'down hz') + (first ? ' nol' : '') + (last ? ' nor' : '');
-        const stub = `<div class="stub${first ? '' : ' hid'}"></div>`;
-        g.appendChild(mk(cls, up ? `<div class="bt">${branchBtn(k, true)}</div>${stub}` : `${stub}<div class="bt">${branchBtn(k, false)}</div>`, up ? 1 : 3, col));
+        g.appendChild(mk(cls, up ? `<div class="bt">${btn}</div>${stub}` : `${stub}<div class="bt">${btn}</div>`, up ? 1 : 3, c0 + m));
       });
     };
-    downChains.forEach(ch => addChain(ch, false));
-    upChains.forEach(ch => addChain(ch, true));
+    chains.forEach(addChain);
     g.querySelectorAll('button[data-i]').forEach(btn => { btn.onclick = () => start(+btn.dataset.i); });
     pf.appendChild(g);
   });
